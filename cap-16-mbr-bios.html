@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 16 — Particionado MBR para BIOS/Legacy</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --bg-card: #171a21;
+    --bg-code: #0b0d11;
+    --border: #2a2e38;
+    --text: #dfe3ea;
+    --text-dim: #9aa3b2;
+    --accent: #7dd3fc;
+    --accent2: #a78bfa;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --danger: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 1rem 3rem;
+  }
+  .wrap { max-width: 800px; margin: 0 auto; }
+  header {
+    padding: 2.2rem 0 1.2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  h1 {
+    font-size: 1.6rem;
+    margin: 0 0 .3rem;
+    color: #fff;
+  }
+  .subtitle { color: var(--text-dim); font-size: .95rem; }
+  h2 {
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin-top: 2.2rem;
+    border-left: 3px solid var(--accent);
+    padding-left: .6rem;
+  }
+  h3 {
+    font-size: 1rem;
+    color: var(--accent2);
+    margin-top: 1.4rem;
+  }
+  p { color: var(--text); }
+  .lead {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    color: var(--text-dim);
+    font-size: .95rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: .9rem;
+    background: var(--bg-card);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: .55rem .7rem;
+    text-align: left;
+  }
+  th { background: #1d212b; color: var(--accent); font-weight: 600; }
+  code {
+    background: var(--bg-code);
+    color: #f0c674;
+    padding: .1rem .35rem;
+    border-radius: 4px;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: .85em;
+  }
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .9rem 1rem;
+    overflow-x: auto;
+    font-size: .85rem;
+    margin: .5rem 0 0;
+  }
+  pre code { background: none; padding: 0; color: #d4d4d4; }
+  .cmd-block {
+    margin: .8rem 0 1.4rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cmd-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1a1e27;
+    padding: .5rem .9rem;
+    font-size: .8rem;
+  }
+  .para-que {
+    color: var(--text-dim);
+    padding: .55rem .9rem 0;
+    font-size: .85rem;
+    font-style: italic;
+  }
+  .risk {
+    display: inline-block;
+    font-size: .7rem;
+    font-weight: 700;
+    padding: .15rem .5rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+  }
+  .risk-low { background: rgba(74,222,128,.15); color: var(--ok); }
+  .risk-med { background: rgba(251,191,36,.15); color: var(--warn); }
+  .risk-high { background: rgba(248,113,113,.15); color: var(--danger); }
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .7rem 1rem;
+    margin: 1rem 0;
+  }
+  summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: .95rem;
+  }
+  summary::marker { color: var(--accent2); }
+  details p, details ul { color: var(--text-dim); font-size: .9rem; }
+  .note {
+    border-left: 3px solid var(--accent2);
+    background: rgba(167,139,250,.08);
+    padding: .7rem 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    font-size: .9rem;
+  }
+  .warning {
+    border-left: 3px solid var(--danger);
+    background: rgba(248,113,113,.08);
+    padding: .7rem 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    font-size: .9rem;
+  }
+  ul { padding-left: 1.3rem; }
+  li { margin-bottom: .3rem; }
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: .8rem;
+    text-align: center;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">IV. Preparando el disco</span>
+</div>
+<span class="jagg-badge">Cap. 16 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header>
+<h1>Capítulo 16 — Particionando el disco con MBR para BIOS / Legacy Boot</h1>
+<div class="subtitle">Gentoo Handbook AMD64 · Resumen simplificado</div>
+</header>
+<div class="lead">
+  Es la versión "clásica" del particionado, para equipos que arrancan en modo <strong>BIOS/legacy</strong> en vez de UEFI. Usa la tabla de particiones <strong>MBR/DOS</strong> en lugar de GPT. La lógica es la misma que en GPT (Cap. 15): una partición de arranque, una de swap y una raíz — solo cambia la herramienta interna que usa <code>fdisk</code> y que no existe una ESP.
+</div>
+<h2>¿Cuándo se usa MBR en vez de GPT?</h2>
+<p>Solo si tu placa madre es de antes de 2010 o no soporta UEFI, o si estás en un entorno de nube que aún depende de BIOS legacy (por ejemplo, algunas instancias de AWS). Fuera de esos casos, GPT es lo recomendado.</p>
+<div class="warning">
+<strong>Limitaciones de MBR:</strong>
+<ul>
+<li>No puede direccionar discos de más de 2 TiB.</li>
+<li>Máximo 4 particiones primarias (a menos que uses una extendida).</li>
+<li>No tiene copia de respaldo de la tabla de particiones: si se daña, se pierde todo.</li>
+</ul>
+</div>
+<h2>Esquema de particiones</h2>
+<table>
+<tr><th>Partición</th><th>Punto de montaje</th><th>Sistema de archivos</th><th>Función</th></tr>
+<tr><td><code>/dev/sda1</code></td><td><code>/boot</code></td><td>xfs</td><td>Arranque (reemplaza a la ESP de GPT)</td></tr>
+<tr><td><code>/dev/sda2</code></td><td>— </td><td>swap</td><td>Memoria de intercambio</td></tr>
+<tr><td><code>/dev/sda3</code></td><td><code>/</code></td><td>xfs</td><td>Raíz del sistema</td></tr>
+</table>
+<div class="note">
+<strong>Diferencia clave con GPT:</strong> aquí no existe la ESP (FAT32). En su lugar, <code>/boot</code> cumple ese papel y puede formatearse con cualquier sistema de archivos que tu bootloader soporte (por ejemplo XFS).
+</div>
+<h2>Pasos con <code>fdisk</code></h2>
+<div class="cmd-block">
+<div class="cmd-head"><span>1. Abrir la herramienta sobre el disco</span><span class="risk risk-low">bajo riesgo</span></div>
+<div class="para-que">Para qué sirve: entra al modo interactivo de fdisk; todavía no modifica nada.</div>
+<pre><code>fdisk /dev/sda</code></pre>
+</div>
+<div class="cmd-block">
+<div class="cmd-head"><span>2. Ver la tabla actual</span><span class="risk risk-low">bajo riesgo</span></div>
+<div class="para-que">Para qué sirve: muestra qué particiones existen antes de tocar nada.</div>
+<pre><code>Command (m for help): p</code></pre>
+</div>
+<div class="cmd-block">
+<div class="cmd-head"><span>3. Crear tabla MBR nueva (borra todo)</span><span class="risk risk-high">alto riesgo</span></div>
+<div class="para-que">Para qué sirve: elimina cualquier partición previa y crea una etiqueta MBR limpia. Si prefieres conservar particiones existentes, usa <code>d</code> para borrarlas una por una en vez de esto.</div>
+<pre><code>Command (m for help): o</code></pre>
+</div>
+<div class="cmd-block">
+<div class="cmd-head"><span>4. Crear partición /boot (1 GB)</span><span class="risk risk-med">riesgo medio</span></div>
+<div class="para-que">Para qué sirve: reserva el espacio donde vivirá el kernel y el bootloader.</div>
+<pre><code>Command (m for help): n
+Partition type: p  (primaria)
+Partition number: 1
+First sector: 2048  (Enter, valor por defecto)
+Last sector: +1G</code></pre>
+</div>
+<div class="cmd-block">
+<div class="cmd-head"><span>5. Crear partición swap (4 GB)</span><span class="risk risk-med">riesgo medio</span></div>
+<div class="para-que">Para qué sirve: crea el espacio de intercambio y luego le asigna el tipo correcto (código 19 = Linux swap).</div>
+<pre><code>Command (m for help): n
+Partition number: 2
+First sector: (Enter)
+Last sector: +4G
+
+Command (m for help): t
+Partition number: 2
+Partition type: 19</code></pre>
+</div>
+<div class="cmd-block">
+<div class="cmd-head"><span>6. Crear partición raíz (resto del disco)</span><span class="risk risk-med">riesgo medio</span></div>
+<div class="para-que">Para qué sirve: usa todo el espacio restante para el sistema principal.</div>
+<pre><code>Command (m for help): n
+Partition number: 3
+First sector: (Enter)
+Last sector: (Enter, usa el resto del disco)</code></pre>
+</div>
+<div class="cmd-block">
+<div class="cmd-head"><span>7. Guardar cambios y salir</span><span class="risk risk-high">alto riesgo</span></div>
+<div class="para-que">Para qué sirve: escribe la tabla de particiones al disco de forma definitiva. Antes de este paso, todo es reversible con <code>q</code>.</div>
+<pre><code>Command (m for help): w</code></pre>
+</div>
+<h2>Formatear las particiones</h2>
+<p>Un adelanto de lo que viene en el siguiente tramo del capítulo (creación de sistemas de archivos):</p>
+<div class="cmd-block">
+<div class="cmd-head"><span>Formatear /boot y la raíz con XFS</span><span class="risk risk-med">riesgo medio</span></div>
+<div class="para-que">Para qué sirve: prepara las particiones para poder guardar archivos. Borra cualquier dato existente en ellas.</div>
+<pre><code>mkfs.xfs -c options=/usr/share/xfsprogs/mkfs/lts_6.18.conf /dev/sda1
+mkfs.xfs -c options=/usr/share/xfsprogs/mkfs/lts_6.18.conf /dev/sda3</code></pre>
+</div>
+<div class="cmd-block">
+<div class="cmd-head"><span>Activar el swap</span><span class="risk risk-low">bajo riesgo</span></div>
+<div class="para-que">Para qué sirve: inicializa la partición 2 como memoria de intercambio (se detalla en el capítulo siguiente).</div>
+<pre><code>mkswap /dev/sda2
+swapon /dev/sda2</code></pre>
+</div>
+<details>
+<summary>💡 Comparación rápida: MBR vs GPT</summary>
+<table>
+<tr><th></th><th>MBR</th><th>GPT</th></tr>
+<tr><td>Límite de tamaño de disco</td><td>2 TiB</td><td>Prácticamente ilimitado</td></tr>
+<tr><td>Máx. particiones primarias</td><td>4 (o más con extendida)</td><td>128 por defecto</td></tr>
+<tr><td>Backup de la tabla</td><td>No</td><td>Sí (copia al final del disco)</td></tr>
+<tr><td>Partición de arranque</td><td><code>/boot</code> normal</td><td>ESP en FAT32</td></tr>
+<tr><td>Modo de firmware</td><td>BIOS / Legacy</td><td>UEFI</td></tr>
+</table>
+</details>
+<details>
+<summary>💡 ¿Por qué no lo necesitas en tu instalación?</summary>
+<p>Tu configuración usa GPT + UEFI (Capítulo 15), no MBR. Este capítulo existe como referencia por si en el futuro instalas Gentoo en hardware antiguo o en una VM que solo soporta BIOS legacy.</p>
+</details>
+<footer>Compendio Gentoo · Capítulo 16 · Generado para estudio personal</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-15-particionado-gpt-uefi.html">← Cap. 15: Capítulo 15 · Particionar el disco con GPT para UEFI</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-17-sistemas-archivos.html">Cap. 17: Capítulo 17 · Creación de sistemas de archivos →</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 35 — System Information | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#0f1115; --bg-panel:#161a21; --bg-code:#0b0d11;
+    --border:#262b35; --text:#dfe3ea; --text-dim:#8b93a3;
+    --accent:#7aa2ff; --accent-2:#5ee6b0; --warn:#ffb454; --danger:#ff6b6b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6; padding:0 1rem 4rem;
+  }
+  .wrap{max-width:840px; margin:0 auto;}
+  header{padding:2.5rem 0 1.5rem; border-bottom:1px solid var(--border); margin-bottom:2rem;}
+  .kicker{color:var(--accent); font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; font-weight:600;}
+  h1{font-size:1.7rem; margin:.3rem 0 .5rem;}
+  .subtitle{color:var(--text-dim); font-size:.95rem;}
+  h2{font-size:1.25rem; margin-top:2.5rem; padding-top:.5rem; border-top:1px solid var(--border);
+     display:flex; align-items:center; gap:.5rem;}
+  h2 .num{color:var(--accent); font-weight:800;}
+  h3{font-size:1.05rem; color:var(--accent-2); margin-top:1.5rem;}
+  p{margin:.6rem 0;}
+  code{
+    background:var(--bg-code); color:#e8c07d; padding:.15rem .4rem; border-radius:4px;
+    font-family:"SF Mono",Consolas,Menlo,monospace; font-size:.88rem;
+  }
+  pre{
+    background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+    padding:.9rem 1rem; overflow-x:auto; margin:.7rem 0;
+  }
+  pre code{background:none; padding:0; color:#c9d1e0; font-size:.85rem;}
+  .comment{color:#6b7280;}
+  .callout{
+    border-radius:8px; padding:.8rem 1rem; margin:.8rem 0; font-size:.92rem;
+    border:1px solid var(--border); background:var(--bg-panel);
+  }
+  .callout.uso{border-left:3px solid var(--accent);}
+  .callout.uso .label{color:var(--accent); font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em;}
+  .callout.warn{border-left:3px solid var(--warn);}
+  .callout.warn .label{color:var(--warn); font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em;}
+  .callout.tip{border-left:3px solid var(--accent-2);}
+  .callout.tip .label{color:var(--accent-2); font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em;}
+  .callout p:first-of-type{margin-top:.3rem;}
+  .badge{
+    display:inline-block; font-size:.68rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.04em; padding:.15rem .5rem; border-radius:20px; margin-left:.4rem;
+    vertical-align:middle;
+  }
+  .badge.low{background:rgba(94,230,176,.12); color:var(--accent-2); border:1px solid rgba(94,230,176,.35);}
+  .badge.med{background:rgba(255,180,84,.12); color:var(--warn); border:1px solid rgba(255,180,84,.35);}
+  .path{
+    font-family:"SF Mono",Consolas,Menlo,monospace; font-size:.85rem; color:var(--accent);
+    background:rgba(122,162,255,.08); padding:.1rem .4rem; border-radius:4px;
+  }
+  table{width:100%; border-collapse:collapse; margin:.8rem 0; font-size:.88rem;}
+  th,td{text-align:left; padding:.5rem .6rem; border-bottom:1px solid var(--border);}
+  th{color:var(--text-dim); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.03em;}
+  details{
+    background:var(--bg-panel); border:1px solid var(--border); border-radius:8px;
+    padding:.6rem .9rem; margin:.7rem 0;
+  }
+  summary{cursor:pointer; font-weight:600; color:var(--accent);}
+  summary::marker{color:var(--accent);}
+  details[open] summary{margin-bottom:.5rem;}
+  ul,ol{padding-left:1.3rem;}
+  li{margin:.3rem 0;}
+  .card-grid{display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1rem 0;}
+  @media (max-width:640px){.card-grid{grid-template-columns:1fr;}}
+  .card{background:var(--bg-panel); border:1px solid var(--border); border-radius:10px; padding:1rem;}
+  .card h4{margin:0 0 .5rem; font-size:.95rem; color:var(--text);}
+  .card .tag{font-size:.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em;}
+  footer{margin-top:3rem; padding-top:1.2rem; border-top:1px solid var(--border); color:var(--text-dim); font-size:.82rem;}
+  a{color:var(--accent);}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">X. Configuración inicial del sistema y servicios</span>
+</div>
+<span class="jagg-badge">Cap. 35 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header>
+<div class="kicker">Compendio Gentoo — Instalación</div>
+<h1>Capítulo 35 · System Information</h1>
+<p class="subtitle">Contraseña de root y configuración inicial de arranque (init), antes del primer reinicio.</p>
+</header>
+<div class="callout uso">
+<div class="label">¿Para qué sirve este capítulo?</div>
+<p>Prepara lo mínimo indispensable para que el sistema sea usable en cuanto reinicies: una forma de entrar (contraseña de root) y cómo se comporta el sistema al arrancar/apagar (teclado, reloj, gestor de servicios).</p>
+</div>
+<h2><span class="num">35.1</span> Contraseña de root</h2>
+<p>Se define con un solo comando, sin editar archivos:</p>
+<pre><code>passwd</code></pre>
+<div class="callout uso">
+<div class="label">Cómo se usa</div>
+<p>Al ejecutarlo te pide escribir la contraseña dos veces (confirmación). No aparece nada en pantalla mientras escribes — es normal, no está congelado.</p>
+</div>
+<div class="callout warn">
+<div class="label">Importante</div>
+<p>Sin esto no podrás iniciar sesión al reiniciar: todavía no existe ningún usuario normal, solo <code>root</code>. El usuario para el día a día se crea después, en el capítulo 50.</p>
+</div>
+<h2><span class="num">35.2</span> Init and boot configuration</h2>
+<p>"Init" es el primer proceso que arranca el sistema y administra los demás servicios. Gentoo te deja elegir cuál usar; tú usas <strong>OpenRC</strong>.</p>
+<h3>35.2.1 OpenRC <span class="badge low">Tu configuración</span></h3>
+<p>Son tres archivos de texto que se editan con <code>nano</code>. No hay comando de "instalación", solo edición directa.</p>
+<div class="card-grid">
+<div class="card">
+<div class="tag">Configuración general</div>
+<h4><span class="path">/etc/rc.conf</span></h4>
+<p>Controla el comportamiento general de OpenRC: verbosidad al arrancar, colores, arranque en paralelo, editor por defecto, etc.</p>
+</div>
+<div class="card">
+<div class="tag">Teclado</div>
+<h4><span class="path">/etc/conf.d/keymaps</span></h4>
+<p>Define el layout de teclado de la <em>consola</em> en modo texto (no aplica a un entorno gráfico).</p>
+</div>
+<div class="card">
+<div class="tag">Reloj</div>
+<h4><span class="path">/etc/conf.d/hwclock</span></h4>
+<p>Le dice al sistema si el reloj físico de la placa madre está en UTC o en hora local.</p>
+</div>
+<div class="card">
+<div class="tag">Solo stage3 "desktop"</div>
+<h4><code>dbus-uuidgen</code></h4>
+<p>Genera el ID de máquina que usa <code>dbus</code>, el "bus" de comunicación entre programas de escritorio.</p>
+</div>
+</div>
+<h4>1. /etc/rc.conf — el panel de control</h4>
+<pre><code>nano /etc/rc.conf</code></pre>
+<p>Viene lleno de comentarios (<code>#</code>) explicando cada opción, con valores por defecto razonables. Solo descomenta lo que quieras cambiar.</p>
+<details>
+<summary>Ver opciones comunes que suele tocar la gente</summary>
+<table>
+<tr><th>Opción</th><th>Qué hace</th></tr>
+<tr><td><code>rc_parallel="YES"</code></td><td>Arranca servicios en paralelo → boot más rápido (puede complicar el diagnóstico si algo falla).</td></tr>
+<tr><td><code>rc_interactive="YES"</code></td><td>Te deja elegir si saltar un servicio que está tardando o fallando durante el arranque.</td></tr>
+<tr><td><code>unicode="YES"</code></td><td>Habilita soporte Unicode en la consola (recomendado para <code>es_MX.UTF-8</code>).</td></tr>
+</table>
+</details>
+<h4>2. /etc/conf.d/keymaps — layout de teclado</h4>
+<pre><code>nano /etc/conf.d/keymaps</code></pre>
+<p>Busca la línea <code>keymap="us"</code> y cámbiala. Para español latinoamericano:</p>
+<pre><code>keymap="la-latin1"</code></pre>
+<div class="callout tip">
+<div class="label">Cómo ver las opciones disponibles</div>
+<p>Antes de editar, puedes listar los layouts instalados:</p>
+<pre><code>ls /usr/share/keymaps/i386/qwerty/</code></pre>
+<p>El nombre del archivo sin la extensión <code>.map.gz</code> es el valor que va en <code>keymap=</code>.</p>
+</div>
+<div class="callout warn">
+<div class="label">Riesgo</div>
+<p>Si el keymap es incorrecto, al escribir en consola después del reinicio saldrán símbolos raros (tildes, ñ, signos fuera de lugar). No es grave, solo hay que corregir el archivo y volver a cargar el mapa con <code>loadkeys</code>.</p>
+</div>
+<h4>3. /etc/conf.d/hwclock — reloj de hardware</h4>
+<pre><code>nano /etc/conf.d/hwclock</code></pre>
+<p>Busca la línea <code>clock=</code>:</p>
+<table>
+<tr><th>Valor</th><th>Cuándo usarlo</th></tr>
+<tr><td><code>clock="UTC"</code></td><td>Recomendado si el equipo solo tiene Linux.</td></tr>
+<tr><td><code>clock="local"</code></td><td>Si tienes dual-boot con Windows (que por defecto usa hora local en el reloj de hardware).</td></tr>
+</table>
+<div class="callout warn">
+<div class="label">Consecuencia de equivocarse</div>
+<p>El sistema puede mostrar la hora desfasada varias horas ("clock skew"), lo que puede causar problemas con certificados, sincronización o registros de log con hora incorrecta.</p>
+</div>
+<h4>Extra — solo si tu stage3 es tipo "desktop"</h4>
+<pre><code>dbus-uuidgen --ensure=/etc/machine-id</code></pre>
+<p>Genera un identificador único para la máquina, usado por <code>dbus</code>. Si tu stage3 no es desktop, se omite: se genera automáticamente cuando se instale el paquete <code>dbus</code> más adelante.</p>
+<h3>35.2.2 systemd <span class="badge med">Referencia — no es tu configuración</span></h3>
+<p>Si usaras systemd en vez de OpenRC, en lugar de editar archivos sueltos usarías comandos interactivos:</p>
+<pre><code>systemd-machine-id-setup
+systemd-firstboot --prompt</code></pre>
+<ul>
+<li><code>systemd-machine-id-setup</code> — genera el ID único de la máquina (equivalente al <code>dbus-uuidgen</code> de OpenRC).</li>
+<li><code>systemd-firstboot --prompt</code> — asistente interactivo que pregunta locale, timezone, hostname, contraseña de root y shell, todo en un solo paso.</li>
+</ul>
+<p>Después se activan los servicios recomendados por defecto:</p>
+<pre><code>systemctl preset-all --preset-mode=enable-only</code></pre>
+<div class="callout tip">
+<div class="label">Diferencia con la variante completa</div>
+<p><code>--preset-mode=enable-only</code> solo <em>activa</em> servicios, sin tocar los que ya desactivaste. La variante sin esa bandera (<code>systemctl preset-all</code>) puede sobrescribir configuraciones que ya hayas ajustado durante la instalación, así que se usa con más cuidado.</p>
+</div>
+<div class="callout warn">
+<div class="label">Nota del manual</div>
+<p>Es normal que aparezca una advertencia de fallo al correr este comando desde el LiveCD, porque el propio medio de instalación de Gentoo usa OpenRC, no systemd.</p>
+</div>
+<h3>Comparación rápida</h3>
+<table>
+<tr><th>Tarea</th><th>OpenRC</th><th>systemd</th></tr>
+<tr><td>ID de máquina</td><td><code>dbus-uuidgen</code> (solo desktop)</td><td><code>systemd-machine-id-setup</code></td></tr>
+<tr><td>Configuración inicial</td><td>Editar 3 archivos a mano</td><td><code>systemd-firstboot --prompt</code> (asistente)</td></tr>
+<tr><td>Activar servicios por defecto</td><td>Uno por uno, luego con <code>rc-update add</code></td><td><code>systemctl preset-all</code> (masivo)</td></tr>
+<tr><td>Enfoque</td><td>Imperativo, archivos de texto plano</td><td>Declarativo por unidades + asistentes</td></tr>
+</table>
+<div class="callout uso">
+<div class="label">Analogía con NixOS</div>
+<p>Estos tres archivos de OpenRC equivalen a opciones dispersas que en NixOS declararías juntas en <code>configuration.nix</code> (<code>console.keyMap</code>, <code>time.hardwareClockInLocalTime</code>, etc.). Aquí no hay un solo archivo declarativo: es imperativo y repartido en varios archivos que editas directamente.</p>
+</div>
+<footer>
+  Capítulo 35 de 53 · Gentoo AMD64 Handbook — Instalación con OpenRC, multilib, GPT+UEFI, GRUB+dracut, es_MX.UTF-8
+</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-34-networking.html">← Cap. 34: Información de red</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-36-system-logger.html">Cap. 36: Capítulo 36 — System Logger →</a>
+</div>
+</body>
+</html>

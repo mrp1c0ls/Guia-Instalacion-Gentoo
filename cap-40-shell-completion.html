@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 40 — Shell Completion (Bash)</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --bg-card:#161b22;
+    --border:#30363d;
+    --text:#c9d1d9;
+    --text-dim:#8b949e;
+    --accent:#58a6ff;
+    --green:#3fb950;
+    --yellow:#d29922;
+    --code-bg:#010409;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    line-height:1.6;
+    max-width:820px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  h1{
+    font-size:1.7rem;
+    border-bottom:2px solid var(--border);
+    padding-bottom:12px;
+    color:#fff;
+  }
+  h1 .cap-num{color:var(--accent); font-weight:600;}
+  h2{
+    font-size:1.2rem;
+    color:var(--accent);
+    margin-top:2em;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  p{color:var(--text);}
+  .lead{
+    color:var(--text-dim);
+    font-size:0.98rem;
+    border-left:3px solid var(--accent);
+    padding-left:14px;
+    margin:18px 0 28px;
+  }
+  .badge{
+    display:inline-block;
+    font-size:0.72rem;
+    font-weight:600;
+    padding:2px 9px;
+    border-radius:12px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+  }
+  .badge.opcional{background:rgba(88,166,255,0.15); color:var(--accent); border:1px solid var(--accent);}
+  .badge.riesgo-bajo{background:rgba(63,185,80,0.15); color:var(--green); border:1px solid var(--green);}
+  code{
+    background:var(--code-bg);
+    color:#79c0ff;
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:0.9em;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    margin:14px 0;
+  }
+  pre code{
+    background:none;
+    padding:0;
+    color:#c9d1d9;
+  }
+  pre .prompt{color:var(--green);}
+  pre .comment{color:var(--text-dim);}
+  .callout{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-left:4px solid var(--yellow);
+    border-radius:6px;
+    padding:12px 16px;
+    margin:16px 0;
+    font-size:0.94rem;
+  }
+  .callout strong{color:var(--yellow);}
+  .para-que-sirve{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    margin:10px 0 18px;
+  }
+  .para-que-sirve summary{
+    cursor:pointer;
+    font-weight:600;
+    color:var(--accent);
+    list-style:none;
+  }
+  .para-que-sirve summary::-webkit-details-marker{display:none;}
+  .para-que-sirve summary::before{
+    content:"▸ ";
+    display:inline-block;
+    transition:transform 0.15s;
+  }
+  .para-que-sirve[open] summary::before{
+    content:"▾ ";
+  }
+  .para-que-sirve p{margin:10px 0 0; color:var(--text-dim);}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0;
+    font-size:0.92rem;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:8px 10px;
+    text-align:left;
+  }
+  th{background:var(--bg-card); color:var(--accent);}
+  td code{font-size:0.85em;}
+  .analogy{
+    background:rgba(88,166,255,0.06);
+    border:1px dashed var(--accent);
+    border-radius:6px;
+    padding:10px 14px;
+    font-size:0.9rem;
+    color:var(--text-dim);
+    margin:14px 0;
+  }
+  .analogy strong{color:var(--accent);}
+  .nav-context{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.85rem;
+    color:var(--text-dim);
+    margin-top:40px;
+    padding-top:16px;
+    border-top:1px solid var(--border);
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">X. Configuración inicial del sistema y servicios</span>
+</div>
+<span class="jagg-badge">Cap. 40 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1><span class="cap-num">Cap. 40</span> — Shell Completion (Bash)</h1>
+<span class="badge opcional">Opcional</span>
+<span class="badge riesgo-bajo">Riesgo bajo</span>
+<p class="lead">
+Autocompletado inteligente en bash: presionas <code>Tab</code> y el shell te sugiere comandos, opciones (<code>--flags</code>), rutas y hasta paquetes de Portage. Es pura comodidad — no toca el arranque, el kernel ni nada crítico del sistema.
+</p>
+<h2>¿Qué problema resuelve?</h2>
+<p>
+Por defecto, bash en Gentoo solo completa nombres de archivos y comandos básicos. No sabe, por ejemplo, qué opciones acepta <code>emerge</code> o <code>systemctl</code>. El paquete <code>bash-completion</code> le agrega a bash "diccionarios" de reglas por comando, para que el <code>Tab</code> sea mucho más útil.
+</p>
+<details class="para-que-sirve">
+<summary>¿Para qué sirve realmente, en la práctica?</summary>
+<p>
+Evita errores de tipeo en comandos largos (nombres de paquetes, flags de <code>emerge</code>, subcomandos de <code>git</code>, etc.) y ahorra tiempo al no tener que recordar la sintaxis exacta de cada herramienta. Es más notorio cuanto más usas la terminal a diario.
+</p>
+</details>
+<h2>Instalación</h2>
+<pre><code><span class="prompt">root #</span> emerge --ask app-shells/bash-completion</code></pre>
+<div class="para-que-sirve" style="display:block; padding:14px 16px;">
+<strong style="color:var(--accent)">¿Qué instala este comando?</strong>
+<p style="margin-top:8px;">
+El paquete <code>app-shells/bash-completion</code>, que trae:
+</p>
+<ul style="color:var(--text-dim); margin:6px 0;">
+<li>Un framework central que bash carga al iniciar sesión.</li>
+<li>Scripts de completado individuales para cientos de comandos comunes (<code>tar</code>, <code>git</code>, <code>ssh</code>, <code>rsync</code>, etc.).</li>
+<li>Reglas específicas para herramientas propias de Gentoo, como <code>emerge</code> — por ejemplo, escribir <code>emerge --a</code> y presionar <code>Tab</code> sugiere <code>--ask</code>, <code>--autounmask</code>, etc.</li>
+</ul>
+</div>
+<h2>¿Dónde se configura y cómo se activa?</h2>
+<p>
+No requiere edición manual de archivos para funcionar de forma básica. El paquete se engancha automáticamente al iniciar una sesión de bash interactiva, a través de <code>/etc/bash/bashrc</code> (o <code>/etc/profile.d/</code>, según la versión). Basta con cerrar y volver a abrir la terminal (o hacer <code>source /etc/bash/bashrc</code>) después de instalarlo.
+</p>
+<div class="callout">
+<strong>Nota:</strong> si estás dentro del entorno <code>chroot</code> haciendo la instalación, el autocompletado nuevo aplicará quzando arranques el sistema instalado y abras una sesión de bash normal ahí — no dentro del live environment.
+</div>
+<h2>Gestión fina con <code>eselect</code></h2>
+<p>
+Una vez instalado el paquete, puedes activar o desactivar completions por comando individual usando el módulo <code>bashcomp</code> de <code>eselect</code> — la misma herramienta que ya usaste para <code>eselect news</code> o para elegir perfil.
+</p>
+<table>
+<thead><tr><th>Comando</th><th>Qué hace</th></tr></thead>
+<tbody>
+<tr><td><code>eselect bashcomp list</code></td><td>Muestra todos los completions disponibles y cuáles están activos/inactivos.</td></tr>
+<tr><td><code>eselect bashcomp enable &lt;nombre&gt;</code></td><td>Activa el completion de un comando específico.</td></tr>
+<tr><td><code>eselect bashcomp disable &lt;nombre&gt;</code></td><td>Desactiva uno puntual (útil si genera lentitud o conflictos).</td></tr>
+<tr><td><code>eselect bashcomp enable --global</code></td><td>Activa todos los completions disponibles de una vez.</td></tr>
+</tbody>
+</table>
+<pre><code><span class="comment"># Ejemplo: ver qué completions hay disponibles</span>
+<span class="prompt">root #</span> eselect bashcomp list
+
+<span class="comment"># Ejemplo: activar solo el de git</span>
+<span class="prompt">root #</span> eselect bashcomp enable git</code></pre>
+<div class="analogy">
+<strong>Analogía con NixOS:</strong> es parecido a poner <code>programs.bash.enableCompletion = true;</code> en tu <code>configuration.nix</code> — activa el mecanismo, pero aquí en Gentoo el paquete se emerge de forma explícita y luego puedes afinar comando por comando con <code>eselect</code>, en vez de una sola opción declarativa global.
+</div>
+<h2>Verificación rápida</h2>
+<p>Para confirmar que quedó activo, abre una terminal nueva y prueba:</p>
+<pre><code><span class="prompt">$</span> emerge --<span class="comment"><tab><tab></tab></tab></span>
+<span class="comment"># Debería listar todas las opciones largas de emerge (--ask, --deep, --update, ...)</span></code></pre>
+<h2>¿Es necesario para tu instalación?</h2>
+<p>
+No. Es completamente independiente de OpenRC, GRUB, dracut o cualquier paso crítico. Puedes instalarlo ahora o después del primer arranque sin ningún impacto en el resto del proceso.
+</p>
+<div class="nav-context">
+<span>← Cap. 39: Acceso remoto (SSH)</span>
+<span>Cap. 41: Sincronización de hora (chrony) →</span>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-39-ssh.html">← Cap. 39: Acceso remoto por shell (SSH)</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-41-sincronizacion-tiempo.html">Cap. 41: Capítulo 41 — Sincronización de tiempo →</a>
+</div>
+</body>
+</html>

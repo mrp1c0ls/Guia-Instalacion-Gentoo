@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 30 — Firmware y Microcódigo | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#12141a; --bg-card:#1a1d26; --bg-code:#0d0f14;
+    --border:#2a2e3a; --text:#e2e4ea; --text-dim:#9aa0ae;
+    --accent:#7dd3fc; --accent2:#c4b5fd; --green:#86efac;
+    --yellow:#fde68a; --red:#fca5a5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    max-width:840px; margin:0 auto; padding:2rem 1.2rem 4rem;
+    line-height:1.6;
+  }
+  h1{font-size:1.6rem; border-bottom:2px solid var(--accent); padding-bottom:.5rem;}
+  h1 .num{color:var(--accent); font-weight:800;}
+  h2{font-size:1.15rem; color:var(--accent2); margin-top:2.2rem; display:flex; align-items:center; gap:.5rem;}
+  h3{font-size:1rem; color:var(--text); margin-top:1.4rem;}
+  p{color:var(--text); margin:.6rem 0;}
+  .subtitle{color:var(--text-dim); font-size:.95rem; margin-top:-.3rem;}
+  .badge{
+    display:inline-block; font-size:.68rem; font-weight:700; padding:.15rem .55rem;
+    border-radius:999px; text-transform:uppercase; letter-spacing:.03em;
+  }
+  .badge-low{background:rgba(134,239,172,.15); color:var(--green); border:1px solid rgba(134,239,172,.4);}
+  .badge-med{background:rgba(253,230,138,.15); color:var(--yellow); border:1px solid rgba(253,230,138,.4);}
+  .card{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+    padding:1rem 1.2rem; margin:1rem 0;
+  }
+  .why{
+    background:rgba(125,211,252,.07); border-left:3px solid var(--accent);
+    padding:.6rem .9rem; margin:.7rem 0; border-radius:0 6px 6px 0; font-size:.93rem;
+  }
+  .why b{color:var(--accent);}
+  code{
+    background:var(--bg-code); color:var(--green); padding:.15rem .4rem;
+    border-radius:4px; font-size:.9em; font-family:'JetBrains Mono',Consolas,monospace;
+  }
+  pre{
+    background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+    padding:.9rem 1rem; overflow-x:auto; font-size:.88rem;
+  }
+  pre code{background:none; padding:0; color:var(--green);}
+  .path{color:var(--yellow); font-family:monospace;}
+  table{width:100%; border-collapse:collapse; margin:.8rem 0; font-size:.92rem;}
+  th,td{border:1px solid var(--border); padding:.5rem .7rem; text-align:left;}
+  th{background:var(--bg-code); color:var(--accent2);}
+  details{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:8px;
+    margin:.7rem 0; padding:.2rem .9rem;
+  }
+  summary{cursor:pointer; font-weight:600; color:var(--accent); padding:.6rem 0;}
+  details[open] summary{border-bottom:1px solid var(--border); margin-bottom:.6rem;}
+  .config-tag{
+    display:inline-flex; align-items:center; gap:.4rem; background:rgba(196,181,253,.08);
+    border:1px solid rgba(196,181,253,.3); border-radius:6px; padding:.4rem .7rem;
+    font-size:.85rem; margin:.5rem 0;
+  }
+  .config-tag b{color:var(--accent2);}
+  .extra{border-color:rgba(196,181,253,.4);}
+  .extra summary{color:var(--accent2);}
+  hr{border:none; border-top:1px solid var(--border); margin:2rem 0;}
+  .footer{color:var(--text-dim); font-size:.8rem; text-align:center; margin-top:2.5rem;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">VII. Configuración regional y hardware</span>
+</div>
+<span class="jagg-badge">Cap. 30 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1><span class="num">30.</span> Instalando Firmware y Microcódigo</h1>
+<p class="subtitle">Capítulo corto: solo hay que instalar los paquetes correctos para que tu hardware funcione.</p>
+<div class="why">
+<b>En una frase:</b> el kernel de Linux sabe <i>hablarle</i> a tu hardware, pero muchos dispositivos (WiFi, GPU, e incluso el CPU) necesitan un archivito extra de "instrucciones de fábrica" para arrancar correctamente. Eso es el firmware/microcódigo.
+</div>
+<h2>30.1 Firmware <span class="badge badge-low">Riesgo bajo</span></h2>
+<p>El firmware vive normalmente en un chip de la fábrica del dispositivo, pero muchos fabricantes esperan que el sistema operativo lo cargue en cada arranque. En Gentoo, ese firmware no viene incluido — hay que instalarlo aparte.</p>
+<h3>30.1.1 Linux Firmware <em>(sugerido para casi todos)</em></h3>
+<div class="card">
+<p>Paquete "todo en uno" que trae firmware para la mayoría de tarjetas WiFi, GPUs y otros dispositivos comunes.</p>
+<pre><code>root # emerge --ask sys-kernel/linux-firmware</code></pre>
+<div class="why"><b>Para qué sirve:</b> sin esto, tu WiFi o tu GPU pueden simplemente no encender, aunque el driver del kernel esté cargado.</div>
+<div class="config-tag">⚠️ <b>Ojo:</b> este paquete casi siempre pide aceptar licencias no-libres. Se configura en <span class="path">/etc/portage/package.license/</span> o con <code>ACCEPT_LICENSE</code> en <span class="path">/etc/portage/make.conf</span>.</div>
+</div>
+<details>
+<summary>30.1.1.1 Carga de Firmware (detalle técnico)</summary>
+<p>El firmware se carga normalmente cuando el kernel activa el módulo del dispositivo. Si compilas ese módulo <b>integrado</b> al kernel (<code>Y</code>) en lugar de como módulo separado (<code>M</code>), el firmware debe estar disponible vía <code>CONFIG_EXTRA_FIRMWARE</code> desde el arranque mismo — si no, la carga puede fallar o complicarse.</p>
+<div class="why">Esto conecta directo con la decisión que tomarás en el Capítulo 32 al configurar el kernel: <i>built-in vs módulo</i> no es solo preferencia, tiene efectos reales.</div>
+</details>
+<h3>30.1.2 SOF Firmware <em>(solo si tu audio lo requiere)</em></h3>
+<div class="card">
+<p>Firmware de audio abierto (reemplaza al propietario SST de Intel). Lo necesitan CPUs Intel 10ma gen+ y algunas APUs AMD.</p>
+<pre><code>root # emerge --ask sys-firmware/sof-firmware</code></pre>
+</div>
+<h2>30.2 Microcódigo <span class="badge badge-med">Revisa tu CPU</span></h2>
+<p>No es firmware de un periférico — es firmware <b>del propio CPU</b>. Corrige bugs de estabilidad, seguridad o comportamiento a nivel de hardware del procesador.</p>
+<table>
+<tr><th>Fabricante</th><th>¿Dónde está?</th><th>Comando</th></tr>
+<tr><td>AMD</td><td>Ya incluido en <code>linux-firmware</code></td><td><i>nada extra que hacer</i></td></tr>
+<tr><td>Intel</td><td>Paquete separado</td><td><code>emerge --ask sys-firmware/intel-microcode</code></td></tr>
+</table>
+<div class="why"><b>Para qué sirve:</b> el microcódigo parchea el CPU en cada arranque (antes de que el kernel termine de iniciar) contra fallos de hardware — algunos son de estabilidad, otros de seguridad (piensa en vulnerabilidades tipo Spectre/Meltdown, corregidas parcialmente así).</div>
+<hr/>
+<details class="extra">
+<summary>➕ Contenido extra: cómo verificar qué CPU tienes (no está en el Handbook, pero te ahorra dudas)</summary>
+<p>Antes de decidir si necesitas <code>intel-microcode</code>, confirma tu fabricante desde la terminal chroot o el live media:</p>
+<pre><code>root # grep "model name" /proc/cpuinfo | head -1</code></pre>
+<p>Si dice <code>Intel</code>, instala <code>intel-microcode</code>. Si dice <code>AMD</code>, ya quedó cubierto por <code>linux-firmware</code>.</p>
+</details>
+<details class="extra">
+<summary>➕ Contenido extra: ¿cómo se activa el microcódigo en el arranque?</summary>
+<p>El Handbook no lo detalla aquí, pero vale saberlo: el microcódigo se carga de dos formas posibles —</p>
+<ul>
+<li><b>Early loading (recomendado):</b> el bootloader (GRUB) lo mete al <i>initramfs</i> antes de que arranque el kernel. Con <code>dracut</code> (tu caso) esto es automático una vez instalado el paquete correcto — no necesitas configurar nada extra.</li>
+<li><b>Late loading:</b> el kernel lo aplica ya arrancado, vía sysfs. Es menos ideal porque el CPU corre unos segundos sin el parche.</li>
+</ul>
+<div class="why">Como ya definiste <code>dracut</code> como generador de initramfs, el microcódigo se integra solo — es una de las ventajas de esa combinación.</div>
+</details>
+<hr/>
+<h2>📍 Resumen: ¿dónde se configura todo?</h2>
+<table>
+<tr><th>Qué</th><th>Dónde</th></tr>
+<tr><td>Instalar paquetes de firmware</td><td>Comandos <code>emerge --ask</code> (no hay archivo de config propio)</td></tr>
+<tr><td>Aceptar licencias no-libres</td><td><span class="path">/etc/portage/make.conf</span> (<code>ACCEPT_LICENSE</code>) o <span class="path">/etc/portage/package.license/</span></td></tr>
+<tr><td>Firmware built-in al kernel</td><td>Opción <code>CONFIG_EXTRA_FIRMWARE</code> en la configuración del kernel (Cap. 32)</td></tr>
+<tr><td>Carga temprana de microcódigo</td><td>Automática vía <code>dracut</code> al regenerar el initramfs — sin archivo que tocar</td></tr>
+</table>
+<div class="footer">Compendio Gentoo · Capítulo 30 · Firmware y Microcódigo</div>
+
+<div id="jagg-bottombar">
+<a href="cap-29-referencias.html">← Cap. 29: Capítulo 29 — Referencias Sin comandos</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-31-installkernel.html">Cap. 31: Capítulo 31 — sys-kernel/installkernel →</a>
+</div>
+</body>
+</html>

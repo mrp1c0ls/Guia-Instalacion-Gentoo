@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cap. 52 — ¿A dónde ir desde aquí?</title>
+<style>
+  :root{
+    --bg:#0f1115; --bg-card:#171a21; --bg-card2:#1d212a;
+    --text:#e6e6e6; --muted:#9aa3b2; --accent:#7dd3fc;
+    --accent2:#a78bfa; --green:#4ade80; --yellow:#fbbf24; --red:#f87171;
+    --border:#2a2f3a; --code-bg:#0b0d12;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6; margin:0; padding:0 0 60px;
+  }
+  header{
+    background:linear-gradient(135deg,#1a1e27,#20141f);
+    padding:36px 24px 28px; border-bottom:1px solid var(--border);
+  }
+  header h1{margin:0 0 6px; font-size:1.8rem; color:var(--accent);}
+  header p.subtitle{margin:0; color:var(--muted); font-size:0.95rem;}
+  main{max-width:880px; margin:0 auto; padding:24px;}
+  h2{color:var(--accent2); border-bottom:1px solid var(--border); padding-bottom:8px; margin-top:44px;}
+  h3{color:var(--accent); margin-top:26px;}
+  .card{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+    padding:18px 20px; margin:16px 0;
+  }
+  .callout{
+    background:var(--bg-card2); border-left:4px solid var(--accent2);
+    padding:12px 16px; border-radius:6px; margin:14px 0; font-size:0.95rem;
+  }
+  .callout strong{color:var(--accent2);}
+  code{
+    background:var(--code-bg); color:#e2e8f0; padding:2px 6px;
+    border-radius:4px; font-size:0.9em; font-family:"Cascadia Code","Fira Code",monospace;
+  }
+  pre{
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; font-family:"Cascadia Code","Fira Code",monospace;
+    font-size:0.88rem;
+  }
+  pre code{background:none; padding:0;}
+  .badge{
+    display:inline-block; font-size:0.72rem; font-weight:600; padding:2px 9px;
+    border-radius:20px; margin-left:8px; vertical-align:middle;
+  }
+  .badge.info{background:#1e3a5f; color:#7dd3fc;}
+  .badge.opcional{background:#3a331e; color:var(--yellow);}
+  .badge.comunidad{background:#1e3a2a; color:var(--green);}
+  .badge.nixos{background:#2a1e3a; color:var(--accent2);}
+  ul{padding-left:22px;}
+  li{margin-bottom:6px;}
+  details{
+    background:var(--bg-card2); border:1px solid var(--border); border-radius:8px;
+    margin:12px 0; padding:8px 14px;
+  }
+  summary{cursor:pointer; font-weight:600; color:var(--accent); padding:6px 0;}
+  summary:hover{color:var(--accent2);}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:0.92rem;}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--border);}
+  th{color:var(--accent); background:var(--bg-card2);}
+  tr:hover{background:#1a1e27;}
+  a{color:var(--accent);}
+  .footer-nav{
+    margin-top:50px; padding-top:20px; border-top:1px solid var(--border);
+    color:var(--muted); font-size:0.85rem; text-align:center;
+  }
+  .step-list{counter-reset:step;}
+  .step-list li{list-style:none; position:relative; padding-left:34px; margin-bottom:10px;}
+  .step-list li::before{
+    counter-increment:step; content:counter(step);
+    position:absolute; left:0; top:0; background:var(--accent2); color:#141018;
+    width:22px; height:22px; border-radius:50%; font-size:0.78rem;
+    font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">XII. Finalizando la instalación</span>
+</div>
+<span class="jagg-badge">Cap. 52 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<h1>Capítulo 52 — ¿A dónde ir desde aquí?</h1>
+<p class="subtitle">Handbook de Gentoo AMD64 · Cierre de la instalación y puntos de continuidad</p>
+</header>
+<main>
+<div class="callout">
+<strong>Para qué sirve este capítulo:</strong> no instala ni configura nada. Es el mapa de salida: qué leer después, dónde preguntar cuando algo falle, y cómo participar en la comunidad. No hay comandos obligatorios aquí — el sistema ya está instalado y funcionando.
+</div>
+<h2>52.1 — Documentación adicional</h2>
+<div class="card">
+<p>El Handbook cubre solo lo mínimo para tener un sistema arrancando: partición, chroot, kernel, bootloader, red básica. Deliberadamente <strong>no</strong> cubre:</p>
+<ul>
+<li>Entornos de escritorio (DE) ni gestores de ventanas (WM)</li>
+<li>Hardening (endurecimiento de seguridad)</li>
+<li>Administración avanzada del sistema día a día</li>
+</ul>
+<p>Todo eso vive en la <strong>Gentoo Wiki</strong>, fuera del Handbook.</p>
+</div>
+<h3>Siguiente lectura recomendada</h3>
+<div class="card">
+<p><strong>Working with Gentoo</strong> (Trabajando con Gentoo) — es la continuación natural del Handbook, y cubre lo que necesitarás en el día a día:</p>
+<ul>
+<li>Mantener el sistema actualizado (<code>emerge --sync</code>, <code>emerge -avuDN @world</code>)</li>
+<li>Instalar y desinstalar paquetes adicionales</li>
+<li>USE flags a fondo (ya viste lo básico en capítulos previos)</li>
+<li>OpenRC en profundidad: servicios, runlevels, dependencias</li>
+</ul>
+</div>
+<details>
+<summary>Otros recursos útiles en la wiki (no forman parte del Handbook)</summary>
+<ul>
+<li><strong>Índice de temas de documentación</strong> — la wiki organiza artículos por categoría (redes, contenedores, seguridad, hardware, etc.)</li>
+<li><strong>Guía de localización</strong> — útil para dejar el sistema completamente en español (fechas, mensajes, teclado). Relevante para tu configuración con locale <code>es_MX.UTF-8</code>.</li>
+<li><strong>Artículos "meta" de DE/WM</strong> — resúmenes de alto nivel de entornos de escritorio (KDE Plasma, GNOME, XFCE) y gestores de ventanas (i3, Sway, Hyprland). Cada uno tiene pasos de instalación propios y distintos entre sí.</li>
+<li><strong>Category:Meta</strong> — artículos panorámicos sobre software disponible en el ecosistema Gentoo.</li>
+</ul>
+</details>
+<h2>52.2 — Gentoo en línea</h2>
+<div class="callout">
+<strong>Código de conducta:</strong> todos los canales oficiales (foro, IRC, listas, Bugzilla) se rigen por el <em>Code of Conduct</em> de Gentoo. Participar es un privilegio, no un derecho — se espera buen trato incluso al reportar errores.
+</div>
+<h3>52.2.1 — Foro e IRC <span class="badge comunidad">Comunidad</span></h3>
+<div class="card">
+<p><strong>Para qué sirve:</strong> son los canales de soporte entre usuarios, en tiempo real (IRC) o asíncrono (foro). Antes de preguntar, siempre conviene buscar — es muy probable que otro usuario nuevo ya haya tenido tu mismo problema.</p>
+<ul>
+<li><strong>Foro:</strong> <a href="https://forums.gentoo.org">forums.gentoo.org</a></li>
+<li><strong>IRC:</strong> canal <code>#gentoo</code> en la red <strong>Libera.Chat</strong></li>
+</ul>
+<h4 style="color:var(--accent); margin-top:18px;">Cómo entrar al canal IRC (opciones)</h4>
+<ol class="step-list">
+<li><strong>Vía navegador (sin instalar nada):</strong> entra a <a href="https://web.libera.chat/#gentoo">web.libera.chat/#gentoo</a>, elige un apodo (nickname) y te conecta directo al canal.</li>
+<li><strong>Vía cliente IRC dedicado</strong> (ej. <code>irssi</code>, <code>weechat</code>, <code>HexChat</code>): se instala con <code>emerge --ask net-irc/irssi</code> (o el cliente que prefieras), luego se conecta al servidor <code>irc.libera.chat</code> y se une al canal con <code>/join #gentoo</code>.</li>
+<li><strong>Registro de nick (opcional pero recomendado):</strong> en Libera.Chat se registra el nickname con NickServ para evitar que otros lo usen y para tener acceso a ciertos canales con restricciones.</li>
+</ol>
+</div>
+<h3>52.2.2 — Listas de correo <span class="badge comunidad">Comunidad</span></h3>
+<div class="card">
+<p><strong>Para qué sirve:</strong> alternativa para quienes prefieren soporte por correo electrónico en vez de crear cuenta en foro o usar IRC. Cada lista cubre un tema específico (usuarios, desarrollo, anuncios, etc.) y requiere suscripción previa siguiendo las instrucciones de cada lista en el sitio oficial.</p>
+</div>
+<h3>52.2.3 — Bugs <span class="badge info">Diagnóstico</span></h3>
+<div class="card">
+<p><strong>Cuándo usarlo:</strong> es el último recurso, después de buscar en la wiki, el foro y preguntar en IRC/listas sin encontrar solución. En ese punto, es señal de que puede ser un error real del software o de la documentación.</p>
+<h4 style="color:var(--accent); margin-top:14px;">Proceso para reportar un bug</h4>
+<ol class="step-list">
+<li>Entra a <a href="https://bugs.gentoo.org">bugs.gentoo.org</a> (Bugzilla de Gentoo).</li>
+<li>Busca si el problema ya fue reportado (evita duplicados).</li>
+<li>Si no existe, crea una cuenta y abre un nuevo reporte, indicando: paquete/versión afectada, pasos para reproducir, logs relevantes (ej. salida de <code>emerge --info</code>).</li>
+<li>Un desarrollador asignado dará seguimiento — el Handbook aclara explícitamente que no hay que temerles, generalmente son accesibles.</li>
+</ol>
+</div>
+<h3>52.2.4 — Guía de desarrollo <span class="badge opcional">Opcional / avanzado</span></h3>
+<div class="card">
+<p><strong>Para qué sirve:</strong> es para quien quiera ir más allá de usuario y contribuir a Gentoo mismo — no es necesaria para uso normal del sistema.</p>
+<ul>
+<li>Sitio: <a href="https://devmanual.gentoo.org">devmanual.gentoo.org</a></li>
+<li>Enseña a escribir <strong>ebuilds</strong> (las "recetas" que Portage usa para compilar paquetes)</li>
+<li>Explica <strong>eclasses</strong> (funciones reutilizables entre ebuilds)</li>
+<li>Define conceptos generales del desarrollo en Gentoo</li>
+</ul>
+</div>
+<details>
+<summary>¿Y systemd? — nota contextual (tu instalación usa OpenRC)</summary>
+<p>El capítulo 52 no menciona systemd directamente porque es puramente informativo sobre comunidad y documentación, no sobre configuración de sistema. Sin embargo, vale aclarar: los recursos de esta sección (foro, IRC, Bugzilla, listas de correo) son <strong>idénticos</strong> para instalaciones con OpenRC o con systemd — no hay diferencia de canal según el init system. La única diferencia sería, en la sección "Working with Gentoo" que sigue, algunos artículos estarán separados por init system (por ejemplo, gestión de servicios: <code>rc-update</code> en OpenRC vs <code>systemctl</code> en systemd). Como tu instalación usa <strong>OpenRC</strong>, esa será la rama de documentación relevante para ti.</p>
+</details>
+<h2>Dónde se configura / dónde se usa cada cosa</h2>
+<table>
+<tr><th>Elemento</th><th>Dónde vive</th><th>Acción típica</th></tr>
+<tr><td>Foro</td><td>forums.gentoo.org</td><td>Buscar antes de postear; crear cuenta solo si vas a participar</td></tr>
+<tr><td>IRC</td><td>irc.libera.chat, canal <code>#gentoo</code></td><td>Conectar vía web o cliente (<code>irssi</code>), <code>/join #gentoo</code></td></tr>
+<tr><td>Listas de correo</td><td>gentoo.org/get-involved/mailing-lists</td><td>Suscribirse a la lista temática deseada</td></tr>
+<tr><td>Bugzilla</td><td>bugs.gentoo.org</td><td>Buscar bug existente → si no hay, crear reporte nuevo</td></tr>
+<tr><td>Devmanual</td><td>devmanual.gentoo.org</td><td>Consulta al escribir ebuilds/eclasses propios</td></tr>
+<tr><td>Siguiente parte del Handbook</td><td>Handbook:AMD64/Working/Portage</td><td>Leer para gestión post-instalación (updates, USE, OpenRC)</td></tr>
+</table>
+<div class="footer-nav">
+  Compendio personal — Instalación Gentoo AMD64 · OpenRC · GRUB · dracut · es_MX.UTF-8
+</div>
+</main>
+
+<div id="jagg-bottombar">
+<a href="cap-51-limpieza-disco.html">← Cap. 51: Limpieza de disco</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-53-closing-thoughts.html">Cap. 53: Capítulo 53 — Reflexiones finales Informativo →</a>
+</div>
+</body>
+</html>

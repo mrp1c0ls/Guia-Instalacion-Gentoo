@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 31 — sys-kernel/installkernel</title>
+<style>
+  :root{
+    --bg:#0f1117;
+    --bg-card:#171a23;
+    --bg-code:#0a0c11;
+    --border:#2a2e3a;
+    --text:#e4e6eb;
+    --text-dim:#9aa0ac;
+    --accent:#7aa2f7;
+    --accent-soft:#2b3550;
+    --risk-low:#4caf7d;
+    --risk-med:#e0a83c;
+    --risk-high:#e05c5c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    margin:0;
+    padding:0 0 60px 0;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px;}
+  h1{
+    font-size:1.7rem;
+    border-bottom:2px solid var(--accent);
+    padding-bottom:10px;
+    margin-bottom:4px;
+  }
+  .subtitle{color:var(--text-dim);font-size:0.95rem;margin-bottom:30px;}
+  h2{
+    font-size:1.25rem;
+    color:var(--accent);
+    margin-top:38px;
+    border-left:4px solid var(--accent);
+    padding-left:10px;
+  }
+  h3{font-size:1.05rem;color:#c7cadb;margin-top:22px;}
+  p{margin:10px 0;}
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 18px;
+    margin:16px 0;
+  }
+  .para-que-sirve{
+    background:var(--accent-soft);
+    border-left:4px solid var(--accent);
+    border-radius:6px;
+    padding:10px 14px;
+    margin:12px 0;
+    font-size:0.92rem;
+  }
+  .para-que-sirve b{color:var(--accent);}
+  code{
+    background:var(--bg-code);
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:"Cascadia Code","Fira Code",Consolas,monospace;
+    font-size:0.88em;
+    color:#9ecbff;
+  }
+  pre{
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    margin:10px 0;
+  }
+  pre code{background:none;padding:0;color:#c9d1d9;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0;
+    font-size:0.92rem;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:8px 10px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:#1c2030;color:var(--accent);}
+  tr:nth-child(even){background:#151822;}
+  .risk{
+    display:inline-block;
+    font-size:0.72rem;
+    font-weight:600;
+    padding:2px 9px;
+    border-radius:20px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .risk-low{background:rgba(76,175,125,.15);color:var(--risk-low);border:1px solid var(--risk-low);}
+  .risk-med{background:rgba(224,168,60,.15);color:var(--risk-med);border:1px solid var(--risk-med);}
+  .risk-info{background:rgba(122,162,247,.15);color:var(--accent);border:1px solid var(--accent);}
+  .ruta{
+    font-family:monospace;
+    background:#1c2030;
+    color:#f0c674;
+    padding:1px 6px;
+    border-radius:4px;
+  }
+  details{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:10px 0;
+    padding:0;
+    overflow:hidden;
+  }
+  summary{
+    cursor:pointer;
+    padding:12px 16px;
+    font-weight:600;
+    color:var(--accent);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::after{content:"+";font-size:1.2rem;color:var(--text-dim);}
+  details[open] summary::after{content:"–";}
+  details .content{padding:0 16px 16px 16px;}
+  .faq{margin-top:14px;}
+  .faq details{background:#141722;}
+  .faq summary{font-weight:500;color:var(--text);}
+  .faq summary::before{content:"❓ ";}
+  .resumen-final{
+    background:linear-gradient(135deg,#1c2436,#171a23);
+    border:1px solid var(--accent);
+    border-radius:10px;
+    padding:18px;
+    margin-top:34px;
+  }
+  .toc{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 20px;
+    font-size:0.9rem;
+  }
+  .toc a{color:var(--accent-soft);}
+  .toc a{color:#9ecbff;text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  footer{text-align:center;color:var(--text-dim);font-size:0.8rem;margin-top:50px;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">VII. Configuración regional y hardware</span>
+</div>
+<span class="jagg-badge">Cap. 31 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<h1>Capítulo 31 — <code>sys-kernel/installkernel</code></h1>
+<div class="subtitle">Handbook de Gentoo AMD64 · Preparando el "repartidor" del kernel antes de instalarlo</div>
+<div class="toc">
+<b>Contenido</b><br/>
+<a href="#intro">¿Qué es installkernel?</a> ·
+    <a href="#donde">¿Dónde se configura?</a> ·
+    <a href="#bootloader">31.1 Elegir el bootloader</a> ·
+    <a href="#initramfs">31.2 Initramfs</a> ·
+    <a href="#uki">31.3 Unified Kernel Image</a> ·
+    <a href="#resumen">Configuración recomendada</a> ·
+    <a href="#faq">Preguntas frecuentes</a>
+</div>
+<h2 id="intro">¿Qué es <code>installkernel</code>?</h2>
+<p>Es el paquete que actúa como <b>repartidor automático</b> del kernel. Cuando más adelante emerjas el kernel de verdad (capítulo 32), alguien tiene que:</p>
+<ul>
+<li>Copiar la imagen del kernel a <span class="ruta">/boot</span> o <span class="ruta">/efi</span> (según el bootloader)</li>
+<li>Generar el initramfs si hace falta</li>
+<li>Avisarle al gestor de arranque que hay un kernel nuevo</li>
+</ul>
+<p>Ese trabajo lo hace <code>installkernel</code>, y su comportamiento se define <b>antes</b> de instalar el kernel, mediante USE flags.</p>
+<div class="para-que-sirve">
+<b>Para qué sirve este capítulo:</b> no instala el kernel — solo prepara el mecanismo que lo va a "enganchar" correctamente con tu bootloader e initramfs cuando lo instales en el siguiente capítulo.
+  </div>
+<h2 id="donde">¿Dónde se configura?</h2>
+<p>Todo pasa por archivos dentro de <span class="ruta">/etc/portage/package.use/</span>, que es un <b>directorio</b>, no un archivo único. Portage lee todos los archivos que haya adentro y los combina.</p>
+<table>
+<tr><th>Archivo (nombre libre, por convención)</th><th>Contenido</th></tr>
+<tr><td><span class="ruta">/etc/portage/package.use/installkernel</span></td><td><code>sys-kernel/installkernel grub dracut</code></td></tr>
+<tr><td><span class="ruta">/etc/portage/package.use/uki</span></td><td>Flags relacionadas a Unified Kernel Image (opcional)</td></tr>
+</table>
+<p>Si el archivo aparece vacío al abrirlo con <code>nano</code>, es normal: lo estás <b>creando</b> tú mismo, no viene pre-poblado como <code>make.conf</code>.</p>
+<h2 id="bootloader">31.1 Bootloader — elegir el mecanismo de arranque <span class="risk risk-info">DECISIÓN</span></h2>
+<p>Esta es la decisión más importante del capítulo: define <b>quién</b> arranca tu kernel al encender la máquina. No instala nada del bootloader todavía (eso es el capítulo 44) — solo le dice a <code>installkernel</code> para cuál de ellos debe preparar los archivos.</p>
+<table>
+<tr><th>Opción</th><th>Qué es</th><th>USE flags</th><th>Copia el kernel a</th></tr>
+<tr>
+<td><b>GRUB</b></td>
+<td>El más flexible y documentado. Funciona en BIOS y UEFI. Recomendado si no estás seguro.</td>
+<td><code>grub</code></td>
+<td><span class="ruta">/boot</span></td>
+</tr>
+<tr>
+<td><b>systemd-boot</b></td>
+<td>Más simple, solo UEFI. Funciona con OpenRC o systemd. Buen soporte de Secure Boot.</td>
+<td><code>systemd systemd-boot</code></td>
+<td><span class="ruta">/efi</span></td>
+</tr>
+<tr>
+<td><b>EFI stub</b></td>
+<td>El kernel arranca directo desde el firmware UEFI, sin intermediario. Minimalista pero rígido.</td>
+<td><code>efistub</code> (testing)</td>
+<td><span class="ruta">/efi</span></td>
+</tr>
+<tr>
+<td><b>Tradicional (lilo, syslinux)</b></td>
+<td>Layout clásico de <span class="ruta">/boot</span>, para bootloaders antiguos o no-UEFI.</td>
+<td>ninguno de los anteriores</td>
+<td><span class="ruta">/boot</span></td>
+</tr>
+</table>
+<details>
+<summary>¿Por qué "solo una selección es necesaria"?</summary>
+<div class="content">
+<p>Porque cada opción configura <code>installkernel</code> para hablar con un bootloader distinto. Elegir GRUB y systemd-boot al mismo tiempo no tiene sentido — son mecanismos que compiten entre sí, no que se complementan. Puedes cambiar de opinión después reinstalando <code>installkernel</code> con otras flags.</p>
+</div>
+</details>
+<div class="para-que-sirve">
+<b>Para qué sirve la flag <code>grub</code> específicamente:</b> hace que cada vez que se instale un kernel nuevo, se ejecute automáticamente <code>grub-mkconfig</code> por ti — sin ese flag tendrías que regenerar la configuración de GRUB a mano cada vez.
+  </div>
+<h2 id="initramfs">31.2 Initramfs <span class="risk risk-med">CASI SIEMPRE NECESARIO</span></h2>
+<p>Es un mini sistema de archivos temporal en RAM que carga los módulos necesarios (por ejemplo, el driver de tu disco) <b>antes</b> de que el kernel pueda montar tu partición raíz real.</p>
+<div class="para-que-sirve">
+<b>Para qué sirve:</b> sin él, si tu driver de almacenamiento es un módulo (lo normal en un kernel de distribución), el kernel arranca pero no encuentra cómo montar <code>/</code>, y el sistema no bootea.
+  </div>
+<pre><code># /etc/portage/package.use/installkernel
+sys-kernel/installkernel dracut</code></pre>
+<pre><code>emerge --ask sys-kernel/installkernel</code></pre>
+<h2 id="uki">31.3 Unified Kernel Image (opcional) <span class="risk risk-low">OPCIONAL</span></h2>
+<p>Empaqueta kernel + initramfs + parámetros de arranque en <b>un solo archivo</b>. Útil sobre todo para Secure Boot, porque firmas un solo archivo en vez de varios.</p>
+<details>
+<summary>¿Debería usarlo en mi primera instalación?</summary>
+<div class="content">
+<p>No es necesario. Añade complejidad extra y está pensado para casos con Secure Boot activo. Se puede agregar después, una vez que el sistema arranque de forma confiable con la configuración básica.</p>
+</div>
+</details>
+<div class="resumen-final" id="resumen">
+<h3 style="margin-top:0;">✅ Configuración recomendada (GRUB + OpenRC + dracut)</h3>
+<pre><code># /etc/portage/package.use/installkernel
+sys-kernel/installkernel grub dracut</code></pre>
+<pre><code>emerge --ask sys-kernel/installkernel</code></pre>
+<p style="margin-bottom:0;color:var(--text-dim);font-size:0.9rem;">Este comando no instala el kernel — instala la herramienta que sabrá qué hacer cuando lo emerjas en el capítulo 32.</p>
+</div>
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+<details>
+<summary>¿Y si no configuro nada, funciona igual?</summary>
+<div class="content">
+<p><code>installkernel</code> se instala de todas formas como dependencia del kernel, pero sin las USE flags correctas puede quedar sin generar initramfs ni avisar al bootloader. El sistema podría quedar instalado sin poder arrancar. No es obligatorio en <i>todos</i> los casos, pero en tu configuración (kernel de distribución + GRUB) prácticamente sí lo es.</p>
+</div>
+</details>
+<details>
+<summary>¿Por qué el archivo <code>package.use/installkernel</code> aparece vacío al abrirlo?</summary>
+<div class="content">
+<p>Porque lo estás creando tú. A diferencia de <code>make.conf</code> (que ya viene con contenido del stage3), los archivos dentro de <code>package.use/</code> normalmente no existen hasta que tú decides que un paquete necesita una excepción.</p>
+</div>
+</details>
+<details>
+<summary>¿El nombre del archivo dentro de <code>package.use/</code> importa?</summary>
+<div class="content">
+<p>No. Portage lee <b>todos</b> los archivos de esa carpeta y los combina como si fueran uno. El nombre <code>installkernel</code> es solo convención para que tú sepas qué contiene cada archivo.</p>
+</div>
+</details>
+<details>
+<summary>¿Puedo elegir GRUB y systemd-boot a la vez "por si acaso"?</summary>
+<div class="content">
+<p>No tiene sentido — son mecanismos de arranque distintos y competirían entre sí. Elige uno; siempre puedes cambiar después reconfigurando <code>installkernel</code>.</p>
+</div>
+</details>
+<details>
+<summary>¿Este capítulo ya instala GRUB?</summary>
+<div class="content">
+<p>No. Solo prepara <code>installkernel</code> para que sepa que, cuando GRUB esté instalado (capítulo 44), debe generar su configuración automáticamente. La instalación real de GRUB en el disco es un paso posterior y de mayor riesgo.</p>
+</div>
+</details>
+</div>
+<footer>Compendio Gentoo — Capítulo 31 · sys-kernel/installkernel</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-30-firmware-microcodigo.html">← Cap. 30: 30. Instalando Firmware y Microcódigo</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-32-seleccion-kernel.html">Cap. 32: Capítulo 32 — Selección del Kernel →</a>
+</div>
+</body>
+</html>

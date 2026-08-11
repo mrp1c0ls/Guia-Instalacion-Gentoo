@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Cap. 51 — Limpieza de disco | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#161b22; --bg3:#1c2128;
+    --text:#c9d1d9; --text-dim:#8b949e; --accent:#58a6ff;
+    --green:#3fb950; --yellow:#d29922; --red:#f85149; --purple:#bc8cff;
+    --border:#30363d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); margin:0; padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:840px; margin:0 auto; padding:32px 20px 80px;}
+  header{border-bottom:1px solid var(--border); padding-bottom:20px; margin-bottom:28px;}
+  .chapno{color:var(--accent); font-size:14px; letter-spacing:1px; text-transform:uppercase; font-weight:600;}
+  h1{font-size:26px; margin:6px 0 4px; color:#fff;}
+  .subtitle{color:var(--text-dim); font-size:15px;}
+  h2{font-size:19px; color:#fff; border-left:4px solid var(--accent); padding-left:10px; margin-top:38px;}
+  h3{font-size:16px; color:var(--accent); margin-top:24px;}
+  p{margin:10px 0;}
+  code{
+    background:#0d1117; border:1px solid var(--border); border-radius:4px;
+    padding:1px 6px; font-family:"SF Mono",Consolas,monospace; font-size:13px; color:#e6edf3;
+  }
+  pre{
+    background:#0a0d12; border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; font-size:13px; margin:14px 0;
+  }
+  pre code{background:none; border:none; padding:0; color:#79c0ff;}
+  .comment{color:#6e7681;}
+  .callout{
+    background:var(--bg3); border-left:4px solid var(--purple); border-radius:6px;
+    padding:12px 16px; margin:16px 0;
+  }
+  .callout .label{color:var(--purple); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:.5px;}
+  .badge{
+    display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.5px; padding:3px 9px; border-radius:12px; margin-left:8px; vertical-align:middle;
+  }
+  .badge.low{background:rgba(63,185,80,.15); color:var(--green); border:1px solid rgba(63,185,80,.4);}
+  .badge.info{background:rgba(88,166,255,.15); color:var(--accent); border:1px solid rgba(88,166,255,.4);}
+  details{
+    background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+    padding:10px 16px; margin:14px 0;
+  }
+  summary{cursor:pointer; font-weight:600; color:#fff; padding:4px 0;}
+  summary:hover{color:var(--accent);}
+  ul, ol{padding-left:22px;}
+  li{margin:6px 0;}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14px;}
+  th, td{border:1px solid var(--border); padding:8px 12px; text-align:left; vertical-align:top;}
+  th{background:var(--bg3); color:#fff;}
+  tr:nth-child(even){background:#12161c;}
+  .step-list{counter-reset:step;}
+  .step{
+    position:relative; padding:10px 0 10px 42px; margin:8px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .step:last-child{border-bottom:none;}
+  .step::before{
+    counter-increment:step; content:counter(step);
+    position:absolute; left:0; top:8px;
+    background:var(--accent); color:#0d1117; font-weight:700;
+    width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:13px;
+  }
+  .step strong{color:#fff;}
+  footer{margin-top:50px; padding-top:16px; border-top:1px solid var(--border); color:var(--text-dim); font-size:13px;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">XII. Finalizando la instalación</span>
+</div>
+<span class="jagg-badge">Cap. 51 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header>
+<div class="chapno">Handbook Gentoo AMD64 · Capítulo 51</div>
+<h1>Limpieza de disco</h1>
+<div class="subtitle">Eliminación de artefactos de instalación tras un reboot exitoso</div>
+</header>
+<div class="callout">
+<div class="label">¿Para qué sirve este capítulo?</div>
+<p style="margin:6px 0 0;">Una vez que tu sistema Gentoo ya arrancó correctamente fuera del chroot, los archivos que usaste para <em>construir</em> el sistema (el stage3 y sus acompañantes de verificación) ya cumplieron su propósito. Este capítulo es simplemente recoger la basura que dejó el proceso de instalación en el directorio raíz.</p>
+</div>
+<h2>1. ¿Qué son estos "artefactos de instalación"?</h2>
+<p>Cuando descargaste e instalaste el stage3 (capítulo de instalación del stage), dejaste varios archivos en <code>/</code>:</p>
+<ul>
+<li><code>stage3-amd64-*.tar.xz</code> — el tarball con el sistema base que extrajiste.</li>
+<li><code>*.DIGESTS</code> / <code>*.CONTENTS</code> — archivos con los checksums (SHA256/BLAKE2B) que usaste para verificar que el tarball no estuviera corrupto o alterado.</li>
+<li><code>*.asc</code> — la firma PGP del tarball, usada para confirmar que el archivo lo publicó realmente el equipo de Gentoo.</li>
+</ul>
+<p>Ninguno de estos archivos es necesario para que el sistema funcione — son evidencia del proceso de instalación, no parte del sistema instalado.</p>
+<div class="callout">
+<div class="label">Analogía rápida</div>
+<p style="margin:6px 0 0;">Es como cuando instalas un programa desde un <code>.exe</code> o <code>.deb</code> descargado: una vez instalado, el instalador ya no hace falta. Puedes borrarlo sin que el programa deje de funcionar.</p>
+</div>
+<h2>2. Requisito previo <span class="badge info">Importante</span></h2>
+<p>Este paso se hace <strong>después</strong> de reiniciar y confirmar que el sistema Gentoo bootea correctamente (capítulo 48, "Rebooting the system"). No lo hagas dentro del entorno live ni antes de comprobar que el arranque fue exitoso — si algo salió mal con GRUB o el kernel, es útil conservar el stage3 por si necesitas volver a chroot y reparar algo.</p>
+<h2>3. Verificar qué hay antes de borrar <span class="badge low">Riesgo bajo</span></h2>
+<p>Es buena práctica ver primero qué archivos existen, en vez de borrar a ciegas:</p>
+<pre><code><span class="comment"># Lista archivos en la raíz que empiecen con "stage3"</span>
+root # ls -lh /stage3-*</code></pre>
+<div class="step-list">
+<div class="step"><strong>Ejecutas <code>ls -lh /stage3-*</code>.</strong> El shell expande el patrón (<em>glob</em>) y te muestra cada archivo que coincide, junto con su tamaño en formato legible (<code>-h</code>).</div>
+<div class="step"><strong>Confirmas visualmente</strong> que ahí está el <code>.tar.xz</code> y sus archivos de verificación asociados (<code>.DIGESTS</code>, <code>.asc</code>, etc.).</div>
+</div>
+<h2>4. Eliminar los artefactos</h2>
+<pre><code>root # rm /stage3-*.tar.*</code></pre>
+<div class="step-list">
+<div class="step"><strong>El shell expande <code>/stage3-*.tar.*</code></strong> a todos los archivos en <code>/</code> que empiecen con <code>stage3-</code> y contengan <code>.tar.</code> en el nombre (esto cubre el <code>.tar.xz</code> mismo y variantes como <code>.tar.xz.asc</code> o <code>.tar.xz.sha256</code>).</div>
+<div class="step"><strong><code>rm</code> borra cada archivo</strong> de la lista resultante, uno por uno, sin pedir confirmación (comportamiento por defecto de <code>rm</code> sin la flag <code>-i</code>).</div>
+<div class="step"><strong>El espacio en disco se libera</strong> inmediatamente — el stage3 suele pesar varios cientos de MB, así que es una limpieza notoria.</div>
+</div>
+<details>
+<summary>Opciones útiles de <code>rm</code> si quieres más control</summary>
+<table>
+<tr><th>Opción</th><th>Qué hace</th></tr>
+<tr><td><code>-i</code></td><td>Pregunta confirmación antes de borrar cada archivo.</td></tr>
+<tr><td><code>-v</code></td><td>Modo verboso: imprime cada archivo que borra.</td></tr>
+<tr><td><code>-f</code></td><td>Fuerza el borrado sin preguntar, ignora archivos inexistentes.</td></tr>
+</table>
+<p>Ejemplo más seguro para primera vez: <code>rm -iv /stage3-*.tar.*</code></p>
+</details>
+<h2>5. Confirmar que se liberó espacio (opcional)</h2>
+<pre><code>root # df -h /</code></pre>
+<p><code>df -h</code> (<em>disk free</em>, formato legible) muestra el espacio usado y disponible en cada sistema de archivos montado. Correrlo antes y después del <code>rm</code> te deja ver la diferencia real.</p>
+<h2>6. Enriquecimiento: no lo confundas con la limpieza de Portage</h2>
+<p>Este capítulo borra <strong>archivos sueltos de instalación</strong>, algo que se hace una sola vez. Es distinto de la limpieza continua que hace Portage sobre paquetes ya emergidos (vista en el capítulo 49, "Portage maintenance"):</p>
+<table>
+<tr><th>Comando</th><th>Qué limpia</th><th>Frecuencia</th></tr>
+<tr><td><code>rm /stage3-*.tar.*</code></td><td>El tarball de instalación inicial y sus firmas/checksums.</td><td>Una sola vez, tras el primer reboot exitoso.</td></tr>
+<tr><td><code>emerge --depclean</code></td><td>Paquetes huérfanos que ya no dependen de nada instalado.</td><td>Periódica, tras actualizaciones.</td></tr>
+<tr><td><code>eclean-dist</code></td><td>Tarballs de código fuente viejos en <code>/var/cache/distfiles</code> (requiere <code>app-portage/gentoolkit</code>).</td><td>Periódica.</td></tr>
+<tr><td><code>eclean-pkg</code></td><td>Paquetes binarios viejos en <code>/var/cache/binhost/gentoo</code>.</td><td>Periódica.</td></tr>
+</table>
+<div class="callout">
+<div class="label">systemd vs OpenRC</div>
+<p style="margin:6px 0 0;">Este capítulo no tiene diferencias entre init systems — <code>rm</code> y <code>df</code> son comandos de shell estándar, no dependen de OpenRC ni systemd. Como usas OpenRC, no aplica ninguna variante aquí.</p>
+</div>
+<h2>Resumen: dónde se configura / dónde se ejecuta cada cosa</h2>
+<table>
+<tr><th>Acción</th><th>Ubicación / comando</th><th>Cuándo</th></tr>
+<tr><td>Ver artefactos pendientes</td><td><code>ls -lh /stage3-*</code></td><td>Antes de borrar, para confirmar qué hay.</td></tr>
+<tr><td>Borrar artefactos</td><td><code>rm /stage3-*.tar.*</code> en <code>/</code></td><td>Después del primer reboot exitoso al nuevo sistema.</td></tr>
+<tr><td>Verificar espacio liberado</td><td><code>df -h /</code></td><td>Opcional, antes/después del <code>rm</code>.</td></tr>
+<tr><td>Limpieza continua de paquetes</td><td><code>emerge --depclean</code>, <code>eclean-dist</code>, <code>eclean-pkg</code></td><td>Mantenimiento periódico (no es parte de este capítulo, ver Cap. 49).</td></tr>
+</table>
+<footer>Compendio personal del Gentoo AMD64 Handbook — Capítulo 51: Disk cleanup.</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-50-administracion-usuarios.html">← Cap. 50: Capítulo 50 — Administración de usuarios</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-52-donde-ir-desde-aqui.html">Cap. 52: Capítulo 52 — ¿A dónde ir desde aquí? →</a>
+</div>
+</body>
+</html>

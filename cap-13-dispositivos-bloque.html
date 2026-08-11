@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cap. 13 — Dispositivos de bloque | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#12141a; --bg-card:#1a1d26; --bg-card2:#20242f;
+    --text:#e4e6eb; --text-dim:#9aa0ac; --border:#2a2f3a;
+    --accent:#7dd3fc; --accent2:#a78bfa; --green:#4ade80;
+    --yellow:#facc15; --red:#f87171;
+    --mono:'SF Mono', 'Fira Code', Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height:1.6; margin:0; padding:0 1rem 4rem;
+  }
+  .wrap{max-width:820px; margin:0 auto;}
+  header{padding:2.5rem 0 1.5rem; border-bottom:1px solid var(--border);}
+  header .tag{
+    display:inline-block; font-size:.75rem; letter-spacing:.08em;
+    color:var(--accent); text-transform:uppercase; margin-bottom:.5rem;
+  }
+  h1{font-size:1.7rem; margin:.2rem 0;}
+  header p{color:var(--text-dim); margin:.3rem 0 0; font-size:.95rem;}
+
+  h2{
+    font-size:1.15rem; margin-top:2.2rem; color:var(--accent);
+    border-left:3px solid var(--accent); padding-left:.6rem;
+  }
+  h3{font-size:1rem; color:var(--text); margin-top:1.4rem;}
+
+  p{color:var(--text); font-size:.95rem;}
+  .lead{color:var(--text-dim); font-size:.95rem;}
+
+  table{width:100%; border-collapse:collapse; margin:1rem 0; font-size:.88rem;}
+  th, td{padding:.55rem .7rem; border:1px solid var(--border); text-align:left; vertical-align:top;}
+  th{background:var(--bg-card2); color:var(--accent); font-weight:600;}
+  tr:nth-child(even){background:var(--bg-card);}
+  code{
+    font-family:var(--mono); background:var(--bg-card2);
+    padding:.1rem .35rem; border-radius:4px; font-size:.85em; color:var(--accent);
+  }
+  pre{
+    background:#0d0f14; border:1px solid var(--border); border-radius:8px;
+    padding:1rem; overflow-x:auto; font-size:.82rem; font-family:var(--mono);
+    line-height:1.5;
+  }
+  pre code{background:none; padding:0; color:#c9d1d9;}
+  .comment{color:#6b7280;}
+  .prompt{color:var(--green);}
+
+  .callout{
+    display:flex; gap:.6rem; background:var(--bg-card);
+    border:1px solid var(--border); border-left:4px solid var(--accent2);
+    border-radius:8px; padding:.8rem 1rem; margin:1rem 0; font-size:.88rem;
+  }
+  .callout .icon{font-size:1.1rem; flex-shrink:0;}
+  .callout.warn{border-left-color:var(--yellow);}
+  .callout.danger{border-left-color:var(--red);}
+  .callout b{color:var(--accent2); display:block; margin-bottom:.15rem;}
+  .callout.warn b{color:var(--yellow);}
+  .callout.danger b{color:var(--red);}
+
+  .risk{
+    display:inline-block; font-size:.7rem; font-weight:600; letter-spacing:.03em;
+    padding:.15rem .5rem; border-radius:20px; text-transform:uppercase; margin-left:.4rem;
+  }
+  .risk.low{background:#14311f; color:var(--green);}
+  .risk.mid{background:#332a10; color:var(--yellow);}
+  .risk.high{background:#3a1616; color:var(--red);}
+
+  details{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:8px;
+    margin:.7rem 0; padding:.1rem 1rem;
+  }
+  summary{
+    cursor:pointer; padding:.7rem 0; font-weight:600; color:var(--text);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary:after{content:"+"; color:var(--accent); font-size:1.1rem; margin-left:.5rem;}
+  details[open] summary:after{content:"–";}
+  details .inner{padding-bottom:1rem;}
+
+  .keycap{
+    display:inline-block; font-family:var(--mono); background:#2a2f3a;
+    border:1px solid #3a4150; border-bottom-width:2px; border-radius:5px;
+    padding:.05rem .45rem; font-size:.85em; color:var(--accent); margin:0 .1rem;
+  }
+
+  footer{margin-top:3rem; padding-top:1.2rem; border-top:1px solid var(--border);
+    color:var(--text-dim); font-size:.82rem;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">IV. Preparando el disco</span>
+</div>
+<span class="jagg-badge">Cap. 13 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header>
+<span class="tag">Compendio Gentoo · Sección I</span>
+<h1>Capítulo 13 — Introducción a los dispositivos de bloque</h1>
+<p>El paso previo a particionar: cómo Linux nombra los discos y qué formatos de tabla de particiones existen.</p>
+</header>
+<h2>13.1 · Dispositivos de bloque</h2>
+<p>Un <b>dispositivo de bloque</b> es la forma en que Linux representa un disco: una capa que permite leer y escribir en "bloques" de 4096 bytes sin importar la tecnología física (SATA, NVMe, USB, etc.). Cada tipo de conexión recibe un nombre distinto en <code>/dev/</code>.</p>
+<table>
+<tr><th>Tipo de disco</th><th>Nombre en /dev/</th><th>Notas</th></tr>
+<tr><td>SATA, SAS, SCSI, USB</td><td><code>/dev/sda</code></td><td>El más común. 1ª partición: <code>/dev/sda1</code></td></tr>
+<tr><td>NVMe (SSD por PCIe)</td><td><code>/dev/nvme0n1</code></td><td>Más rápido. 1ª partición: <code>/dev/nvme0n1p1</code></td></tr>
+<tr><td>MMC / eMMC / SD</td><td><code>/dev/mmcblk0</code></td><td>No recomendado para el sistema base</td></tr>
+<tr><td>VirtIO (VM / QEMU)</td><td><code>/dev/vda</code></td><td>Solo en máquinas virtuales</td></tr>
+</table>
+<div class="callout">
+<span class="icon">💡</span>
+<div><b>Para qué sirve saber esto</b>Te permite reconocer de inmediato, con solo ver <code>lsblk</code> o <code>fdisk -l</code>, qué disco es cuál antes de tocar algo — clave para no particionar el disco equivocado.</div>
+</div>
+<h2>13.2 · Tablas de particiones: GPT vs MBR</h2>
+<p>Un disco casi nunca se usa "en bruto"; se divide en particiones. La tabla de particiones es el índice que describe dónde empieza y termina cada una.</p>
+<table>
+<tr><th></th><th>GPT</th><th>MBR / DOS</th></tr>
+<tr><td>Año</td><td>Moderno</td><td>1983 (legacy)</td></tr>
+<tr><td>Límite de particiones</td><td>Prácticamente ninguno</td><td>4 primarias (o 3 + extendida)</td></tr>
+<tr><td>Tamaño máx. de disco</td><td>~8 ZiB</td><td>2 TiB</td></tr>
+<tr><td>Copia de respaldo de la tabla</td><td>Sí, al final del disco</td><td>No — un solo punto de falla</td></tr>
+<tr><td>Requiere para UEFI</td><td>Sí, casi obligatorio</td><td>No compatible</td></tr>
+</table>
+<div class="callout warn">
+<span class="icon">⚠️</span>
+<div><b>Ojo con el dual-boot</b>Si usas GPT en una PC configurada en modo BIOS (no UEFI), Windows se niega a arrancar desde ahí. Verifica el modo de tu firmware antes de elegir.</div>
+</div>
+<p class="lead">Recomendación del Handbook: usar <b>GPT</b> siempre que se pueda. MBR solo tiene sentido en hardware anterior a 2010 o algunos entornos de nube virtualizados.</p>
+<h2>13.3 · Almacenamiento avanzado</h2>
+<p>El medio de instalación también soporta, aunque no los cubre en detalle: <code>Btrfs</code>, <code>ZFS</code>, <code>LVM</code> y cifrado del disco raíz. Se mencionan como referencia para quien quiera ir más allá del esquema básico.</p>
+<h2>13.4 · Esquema de particionado por defecto</h2>
+<table>
+<tr><th>Partición</th><th>Sistema de archivos</th><th>Tamaño</th><th>Uso</th></tr>
+<tr><td><code>/dev/sda1</code></td><td>fat32 (UEFI) / xfs (BIOS)</td><td>1 GiB</td><td>ESP o arranque</td></tr>
+<tr><td><code>/dev/sda2</code></td><td>linux-swap</td><td>RAM × 2</td><td>Swap</td></tr>
+<tr><td><code>/dev/sda3</code></td><td>xfs</td><td>Resto del disco</td><td>Raíz <code>/</code></td></tr>
+</table>
+<h2>Herramientas: fdisk y parted</h2>
+<p>El capítulo solo las menciona; el uso real viene en el capítulo 15. <code>fdisk</code> funciona con MBR y GPT y es la que usa el Handbook. <code>parted</code> es una alternativa, más orientada a GPT desde el inicio.</p>
+<h3>Comandos internos de fdisk (modo interactivo)</h3>
+<table>
+<tr><th>Tecla</th><th>Acción</th><th>Riesgo</th></tr>
+<tr><td><span class="keycap">p</span></td><td>Imprime la tabla de particiones actual</td><td><span class="risk low">bajo</span></td></tr>
+<tr><td><span class="keycap">n</span></td><td>Crea una nueva partición</td><td><span class="risk low">bajo</span> (en memoria)</td></tr>
+<tr><td><span class="keycap">d</span></td><td>Marca una partición para borrar</td><td><span class="risk mid">medio</span></td></tr>
+<tr><td><span class="keycap">t</span></td><td>Cambia el tipo de partición</td><td><span class="risk low">bajo</span></td></tr>
+<tr><td><span class="keycap">g</span></td><td>Crea tabla GPT nueva (borra todo)</td><td><span class="risk mid">medio</span> (reversible con q)</td></tr>
+<tr><td><span class="keycap">o</span></td><td>Crea tabla MBR nueva (borra todo)</td><td><span class="risk mid">medio</span> (reversible con q)</td></tr>
+<tr><td><span class="keycap">i</span></td><td>Muestra info de una partición: UUID, Type-UUID</td><td><span class="risk low">bajo</span></td></tr>
+<tr><td><span class="keycap">w</span></td><td>Escribe los cambios al disco de verdad y sale</td><td><span class="risk high">alto</span> — irreversible</td></tr>
+<tr><td><span class="keycap">q</span></td><td>Sale sin guardar nada</td><td><span class="risk low">bajo</span> — botón de pánico</td></tr>
+</table>
+<div class="callout danger">
+<span class="icon">🛑</span>
+<div><b>Nada se guarda hasta w</b>Todo lo que haces con <span class="keycap">n</span>, <span class="keycap">d</span>, <span class="keycap">t</span>, <span class="keycap">g</span> u <span class="keycap">o</span> vive solo en memoria. Si te equivocas, sal con <span class="keycap">q</span> y el disco real queda intacto.</div>
+</div>
+<details>
+<summary>Ejemplo: crear el esquema GPT/UEFI paso a paso</summary>
+<div class="inner">
+<pre><code><span class="prompt">root #</span> fdisk /dev/sda
+
+Command (m for help): <b>g</b>          <span class="comment"># tabla GPT nueva</span>
+
+Command (m for help): <b>n</b>          <span class="comment"># partición ESP</span>
+Partition number (1-128, default 1): 1
+First sector: [Enter]
+Last sector: +1G
+
+Command (m for help): <b>t</b>          <span class="comment"># marcarla como EFI System</span>
+Partition number: 1
+Type: 1
+
+Command (m for help): <b>n</b>          <span class="comment"># swap</span>
+...
+Command (m for help): <b>n</b>          <span class="comment"># root</span>
+...
+
+Command (m for help): <b>p</b>          <span class="comment"># revisar antes de guardar</span>
+Command (m for help): <b>w</b>          <span class="comment"># ¡guardar y salir!</span>
+</code></pre>
+</div>
+</details>
+<h3>Ver UUIDs</h3>
+<p>Dentro de <code>fdisk</code>, la tecla <span class="keycap">i</span> muestra el UUID de una partición individual (solo en GPT). Pero para ver <b>todos</b> los discos de un jalón, el Handbook usa <code>blkid</code> fuera de fdisk:</p>
+<pre><code><span class="prompt">root #</span> blkid
+/dev/sda1: PARTUUID="c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
+/dev/sda2: PARTUUID="0657fd6d-a4ab-43c4-84e5-0933c84b4f4f"
+/dev/sda3: PARTUUID="1cdf763a-5b4c-4dbf-99db-a056c504e8b2"</code></pre>
+<table>
+<tr><th>Tipo de identificador</th><th>¿Qué identifica?</th><th>¿Cuándo cambia?</th></tr>
+<tr><td><code>PARTUUID</code></td><td>La partición en sí</td><td>Solo si la recreas</td></tr>
+<tr><td><code>UUID</code> (filesystem)</td><td>El contenido / sistema de archivos</td><td>Al reformatear con <code>mkfs</code></td></tr>
+</table>
+<div class="callout">
+<span class="icon">💡</span>
+<div><b>Para qué sirve esto</b>Estos identificadores son los que vas a usar más adelante en <code>/etc/fstab</code> en vez de <code>/dev/sda1</code>, porque no cambian aunque el orden de detección de discos cambie entre reinicios.</div>
+</div>
+<footer>
+  Compendio Gentoo · Capítulo 13 — Basado en el Gentoo AMD64 Handbook. Generado para uso personal de estudio.
+</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-08-preparando-discos.html">← Cap. 08: Capítulo 8 · Preparando los discos</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-14-diseno-particiones.html">Cap. 14: Capítulo 14 — Diseñando un esquema de particiones →</a>
+</div>
+</body>
+</html>

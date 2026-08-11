@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 19 — Eligiendo el Stage File | Compendio Gentoo</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-soft: #1f6feb33;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.2rem 4rem;
+  }
+  h1 {
+    font-size: 1.8rem;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.6rem;
+    margin-bottom: 0.3rem;
+  }
+  .subtitle { color: var(--text-dim); margin-bottom: 2rem; font-size: 0.95rem; }
+  h2 {
+    font-size: 1.3rem;
+    color: var(--accent);
+    margin-top: 2.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  h2::before { content: "§"; color: var(--purple); }
+  p { margin: 0.8rem 0; }
+  code {
+    background: #1f242b;
+    color: #ffa657;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+  .callout {
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent);
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  .callout strong { color: var(--accent); }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem;
+    margin: 1rem 0;
+  }
+  .card h3 { margin-top: 0; font-size: 1.05rem; }
+  .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+  .tag-recomendado { background: #2ea04326; color: var(--green); border: 1px solid #2ea04355; }
+  .tag-avanzado { background: #f8514926; color: var(--red); border: 1px solid #f8514955; }
+  .tag-info { background: #58a6ff26; color: var(--accent); border: 1px solid #58a6ff55; }
+  .tag-tuconfig { background: #bc8cff26; color: var(--purple); border: 1px solid #bc8cff55; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+  }
+  th { background: #1c2128; color: var(--accent); }
+  tr:nth-child(even) { background: #12161c; }
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 1rem 0;
+    padding: 0.2rem 1rem;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.8rem 0;
+    color: var(--accent);
+  }
+  summary:hover { color: #79c0ff; }
+  details[open] summary { border-bottom: 1px solid var(--border); margin-bottom: 0.8rem; }
+  .config-box {
+    background: linear-gradient(135deg, #1f6feb22, #bc8cff11);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1rem 1.3rem;
+    margin: 1.5rem 0;
+  }
+  .config-box h3 { margin-top: 0; color: var(--purple); }
+  .nav-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+  .nav-footer a { color: var(--accent); text-decoration: none; }
+  .nav-footer a:hover { text-decoration: underline; }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">V. Sistema base (stage3)</span>
+</div>
+<span class="jagg-badge">Cap. 19 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 19 — Eligiendo el Stage File</h1>
+<p class="subtitle">Compendio de instalación Gentoo · Sección: Base del sistema</p>
+<div class="callout">
+<strong>En una frase:</strong> aquí decides el "molde" con el que va a nacer tu sistema Gentoo — qué sistema de init usará y si soportará software de 32 bits.
+</div>
+<h2>¿Qué es un Stage File?</h2>
+<p>
+Es un archivo comprimido que contiene un sistema Gentoo casi completo, ya preparado por el equipo de Gentoo. Lo vas a descomprimir dentro de tu partición raíz y a partir de ahí construyes todo lo demás. No es más que el punto de partida — no hay comandos en este capítulo, solo una decisión.
+</p>
+<div class="card">
+<h3>¿Por qué importa elegir bien? <span class="tag tag-info">contexto</span></h3>
+<p>
+Porque cambiar de opción <em>después</em> de instalado es posible pero complicado, sobre todo pasar de "sin soporte 32 bits" a "con soporte 32 bits". Vale la pena decidir con calma ahora.
+</p>
+</div>
+<h2>Eje 1: Sistema de init</h2>
+<p>El sistema de init es el proceso que arranca todos los servicios del sistema justo después de que carga el kernel.</p>
+<table>
+<tr><th>Opción</th><th>Qué es</th><th>Ideal para</th></tr>
+<tr>
+<td><strong>OpenRC</strong></td>
+<td>Sistema de init nativo y original de Gentoo. Basado en dependencias entre servicios.</td>
+<td>Quien busca simplicidad y el enfoque tradicional de Gentoo</td>
+</tr>
+<tr>
+<td><strong>systemd</strong></td>
+<td>Init moderno usado por la mayoría de distros Linux actuales (Ubuntu, Fedora, Arch, etc.)</td>
+<td>Quien ya conoce systemd de otras distros</td>
+</tr>
+</table>
+<h2>Eje 2: Soporte de arquitectura</h2>
+<table>
+<tr><th>Opción</th><th>Qué hace</th><th>Riesgo</th></tr>
+<tr>
+<td><strong>Multilib</strong></td>
+<td>Usa librerías de 64 bits siempre que puede, y cae a 32 bits solo cuando algo lo necesita (ej. software o juegos viejos)</td>
+<td><span class="tag tag-recomendado">recomendado</span></td>
+</tr>
+<tr>
+<td><strong>No-multilib</strong></td>
+<td>Sistema 100% de 64 bits, sin ninguna librería de 32 bits</td>
+<td><span class="tag tag-avanzado">avanzado</span></td>
+</tr>
+</table>
+<div class="callout">
+<strong>⚠️ Advertencia del manual:</strong> migrar de no-multilib a multilib después requiere conocimiento profundo de Gentoo y del toolchain de bajo nivel. Si eres principiante, evita no-multilib salvo que tengas una razón concreta para necesitarlo.
+</div>
+<h2>Tip que enriquece este capítulo: el flavor "desktop"</h2>
+<p>
+Además de init y multilib, algunos stage files incluyen la palabra <code>desktop</code> en el nombre. Estos vienen con paquetes como <code>llvm</code> y <code>rust-bin</code> preinstalados y ajustes de USE flags pensados para acelerar la instalación si vas a usar entorno gráfico. Si tu plan final incluye escritorio (GNOME, KDE, etc.), es útil tenerlo en mente aunque la elección real de perfil ocurre más adelante.
+</p>
+<details>
+<summary>📖 ¿Cómo se relaciona esto con el perfil (profile) de Portage?</summary>
+<p>
+El stage file está <em>basado</em> en un perfil de Portage, pero no son lo mismo. El stage file es el punto de partida binario; el perfil (que seleccionas más adelante con <code>eselect profile</code>) define configuraciones por defecto como USE flags y versiones de paquetes permitidas. Elegir bien el stage ahora hace que el perfil correspondiente ya venga alineado, evitándote trabajo extra.
+</p>
+</details>
+<div class="config-box">
+<h3>🎯 Tu configuración</h3>
+<p>Según lo definido en el Capítulo 3, tu combinación es:</p>
+<p><span class="tag tag-tuconfig">OpenRC</span> <span class="tag tag-tuconfig">Multilib</span></p>
+<p>Esto significa que en el siguiente capítulo (20) vas a buscar un stage file <strong>sin</strong> la palabra <code>systemd</code> ni <code>nomultilib</code> en el nombre — el estándar <code>amd64</code> multilib con OpenRC.</p>
+</div>
+<div class="nav-footer">
+<span>← Cap. 18: Montar la partición raíz</span>
+<span>Cap. 20: Descargar el stage file →</span>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-18-montar-raiz.html">← Cap. 18: Montar la partición raíz</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-20-descargando-stage.html">Cap. 20: Capítulo 20 — Descargando el archivo stage →</a>
+</div>
+</body>
+</html>

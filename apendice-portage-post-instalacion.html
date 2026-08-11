@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gentoo · Capítulo — Gestión de paquetes post-instalación (Portage)</title>
+<style>
+  :root {
+    --bg: #12141a;
+    --bg-alt: #191c24;
+    --card: #1e222c;
+    --border: #2b303c;
+    --text: #dfe3ea;
+    --text-dim: #9aa1b0;
+    --accent: #7aa2f7;
+    --accent-soft: #2a3550;
+    --green: #6fcf97;
+    --green-bg: #1c2e24;
+    --yellow: #f2c94c;
+    --yellow-bg: #332b15;
+    --red: #eb5757;
+    --red-bg: #331a1a;
+    --code-bg: #0e1015;
+    --code-border: #262b36;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 0 4rem 0;
+  }
+  header {
+    background: linear-gradient(180deg, var(--bg-alt), var(--bg));
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 1.5rem 2rem;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0 0 0.4rem;
+    font-size: 1.7rem;
+    color: #fff;
+  }
+  header p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 0;
+  }
+  h2 {
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-top: 2.6rem;
+    font-size: 1.3rem;
+  }
+  h3 {
+    color: #fff;
+    font-size: 1.05rem;
+    margin-top: 1.6rem;
+  }
+  p { color: var(--text); }
+  code {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.88em;
+    color: #e3c893;
+    font-family: "SF Mono", Consolas, monospace;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    font-size: 0.86rem;
+    font-family: "SF Mono", Consolas, monospace;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #cfe0ff;
+  }
+  .comment { color: #6b7280; }
+  .callout {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.92rem;
+  }
+  .callout strong { color: var(--accent); }
+  .badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+  .badge-low { background: var(--green-bg); color: var(--green); }
+  .badge-mid { background: var(--yellow-bg); color: var(--yellow); }
+  .badge-high { background: var(--red-bg); color: var(--red); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.7rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-alt);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+  details {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 0.8rem 0;
+    padding: 0.2rem 1rem;
+  }
+  summary {
+    cursor: pointer;
+    padding: 0.7rem 0;
+    font-weight: 600;
+    color: #fff;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "▸ ";
+    color: var(--accent);
+  }
+  details[open] summary::before { content: "▾ "; }
+  details > *:not(summary) { padding-bottom: 0.8rem; }
+  .flag {
+    display: inline-block;
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 4px;
+    padding: 0.05rem 0.4rem;
+    font-family: monospace;
+    font-size: 0.85em;
+    color: #e3c893;
+  }
+  .note-systemd {
+    background: var(--yellow-bg);
+    border-left: 3px solid var(--yellow);
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  .note-systemd strong { color: var(--yellow); }
+  ul, ol { color: var(--text); }
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.4rem;
+    margin-top: 1.5rem;
+  }
+  .toc a { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+  .toc a:hover { text-decoration: underline; }
+  .toc li { margin-bottom: 0.3rem; }
+  footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    margin-top: 3rem;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">Apéndice</span>
+</div>
+<span class="jagg-badge">Cap. A · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<h1>Gestión de paquetes post-instalación</h1>
+<p>Portage · <code>emerge</code> y herramientas relacionadas — AMD64 · OpenRC</p>
+</header>
+<div class="wrap">
+<div class="toc">
+<strong>Contenido</strong>
+<ol>
+<li><a href="#emerge">¿Qué es <code>emerge</code>?</a></li>
+<li><a href="#instalar">Instalar paquetes</a></li>
+<li><a href="#actualizar">Actualizar el sistema (@world)</a></li>
+<li><a href="#sync">Sincronizar el árbol de ebuilds</a></li>
+<li><a href="#buscar">Buscar paquetes</a></li>
+<li><a href="#desinstalar">Desinstalar y limpiar</a></li>
+<li><a href="#autounmask">Conflictos y <code>--autounmask</code></a></li>
+<li><a href="#packageuse">package.use/ y package.accept_keywords/</a></li>
+<li><a href="#inspeccion">Inspección: equery, revdep-rebuild</a></li>
+<li><a href="#circular">Dependencias circulares</a></li>
+<li><a href="#systemd">Nota sobre systemd</a></li>
+<li><a href="#resumen">Tabla resumen — dónde se configura</a></li>
+</ol>
+</div>
+<h2 id="emerge">1. ¿Qué es <code>emerge</code>?</h2>
+<p><code>emerge</code> es el gestor de paquetes de Portage: resuelve dependencias, descarga fuentes (o binarios), compila e instala. Es el único comando que necesitas para el 90% del mantenimiento diario del sistema.</p>
+<div class="callout"><strong>Para qué sirve:</strong> es el punto de entrada único para instalar, actualizar, desinstalar, buscar y limpiar software. Internamente lee <code>/etc/portage/make.conf</code> en cada invocación, además de todo lo que haya bajo <code>/etc/portage/package.*/</code>.</div>
+<p><strong>Sintaxis general:</strong></p>
+<pre><code>emerge [opciones] &lt;categoría/paquete | @conjunto&gt;</code></pre>
+<p>El paquete se identifica como <code class="flag">categoría/nombre</code> (ej. <code class="flag">www-client/firefox</code>). Si el nombre no es ambiguo, puedes omitir la categoría. Un <code class="flag">@conjunto</code> (set) agrupa varios paquetes — el más importante es <code class="flag">@world</code>, la lista de todo lo instalado explícitamente.</p>
+<h2 id="instalar">2. Instalar paquetes</h2>
+<details open="">
+<summary>Ejemplo de instalación básica</summary>
+<pre><code><span class="comment"># Instalar un navegador</span>
+root # emerge --ask www-client/firefox
+
+<span class="comment"># Proceso que sigue Portage al ejecutarse:</span>
+<span class="comment"># 1. Lee make.conf y package.* para conocer USE flags, keywords, masks</span>
+<span class="comment"># 2. Calcula el árbol de dependencias del paquete pedido</span>
+<span class="comment"># 3. Muestra el plan: qué se instala, con qué flags, tamaño de descarga</span>
+<span class="comment"># 4. Espera confirmación (por --ask)</span>
+<span class="comment"># 5. Descarga fuentes/binarios, compila si aplica, e instala</span></code></pre>
+</details>
+<table>
+<tr><th>Opción</th><th>Para qué sirve</th></tr>
+<tr><td><span class="flag">-a</span> / <span class="flag">--ask</span></td><td>Muestra el plan de acción y pide confirmación antes de tocar el sistema. Úsalo siempre.</td></tr>
+<tr><td><span class="flag">-p</span> / <span class="flag">--pretend</span></td><td>Simula: calcula el plan pero no ejecuta nada, ni siquiera pide confirmar.</td></tr>
+<tr><td><span class="flag">-v</span> / <span class="flag">--verbose</span></td><td>Muestra detalle extra: qué USE flags quedan activos/inactivos por paquete.</td></tr>
+</table>
+<div class="callout"><strong>Diferencia clave:</strong> <code>--pretend</code> nunca ejecuta nada aunque no lo combines con <code>--ask</code>. <code>--ask</code> sí ejecuta, pero solo después de tu confirmación.</div>
+<h2 id="actualizar">3. Actualizar el sistema (@world) <span class="badge badge-mid">riesgo medio</span></h2>
+<p>Portage no tiene un mecanismo de "generaciones" atómicas: actualiza paquete por paquete sobre el sistema en vivo. El objetivo de actualización casi siempre es <code class="flag">@world</code>, el conjunto de paquetes instalados explícitamente (más el <code class="flag">@system</code> base).</p>
+<details open="">
+<summary>Ejemplo de actualización completa</summary>
+<pre><code>root # emerge --ask --verbose --update --deep --newuse @world
+
+<span class="comment"># Proceso:</span>
+<span class="comment"># 1. Toma @world como punto de partida</span>
+<span class="comment"># 2. --deep expande la revisión a TODO el árbol de dependencias, no solo directas</span>
+<span class="comment"># 3. Compara versiones instaladas vs disponibles en el árbol sincronizado</span>
+<span class="comment"># 4. --newuse detecta cambios de USE flags en make.conf/package.use desde la última compilación</span>
+<span class="comment"># 5. Construye el plan de recompilación/actualización y lo muestra (por -v)</span>
+<span class="comment"># 6. Tras confirmar, compila/instala en orden de dependencias</span></code></pre>
+</details>
+<table>
+<tr><th>Opción</th><th>Para qué sirve</th></tr>
+<tr><td><span class="flag">-u</span> / <span class="flag">--update</span></td><td>Considera paquetes ya instalados como candidatos a actualizar (sin esto, solo instala lo que falta).</td></tr>
+<tr><td><span class="flag">-D</span> / <span class="flag">--deep</span></td><td>Revisa dependencias de forma recursiva y completa, no solo el primer nivel.</td></tr>
+<tr><td><span class="flag">--newuse</span></td><td>Recompila si cambiaron USE flags desde la última vez que se compiló el paquete.</td></tr>
+<tr><td><span class="flag">--changed-use</span></td><td>Similar, pero solo si el cambio de USE afecta características ya compiladas (más selectivo, evita recompilaciones innecesarias).</td></tr>
+<tr><td><span class="flag">-g</span> / <span class="flag">--getbinpkg</span></td><td>Prefiere descargar binarios de un binhost configurado en vez de compilar desde fuente.</td></tr>
+</table>
+<h2 id="sync">4. Sincronizar el árbol de ebuilds</h2>
+<p>Antes de instalar o actualizar, tu copia local de "recetas" (ebuilds) debe estar actualizada.</p>
+<details>
+<summary>Ejemplo de sincronización</summary>
+<pre><code>root # emerge --sync
+
+<span class="comment"># Proceso:</span>
+<span class="comment"># 1. Lee sync-type y sync-uri en /etc/portage/repos.conf/gentoo.conf</span>
+<span class="comment"># 2. Descarga los cambios más recientes (rsync/git/webrsync según config)</span>
+<span class="comment"># 3. Verifica firmas OpenPGP del snapshot (si sync-openpgp-key-path está definido)</span>
+<span class="comment"># 4. Actualiza /var/db/repos/gentoo con el árbol nuevo</span>
+<span class="comment"># 5. Anuncia "news items" pendientes si los hay</span>
+
+<span class="comment"># Terminal lenta (framebuffer/serial):</span>
+root # emerge --sync --quiet</code></pre>
+</details>
+<details>
+<summary>Configuración: /etc/portage/repos.conf/gentoo.conf</summary>
+<pre><code>[DEFAULT]
+main-repo = gentoo
+
+[gentoo]
+location = /var/db/repos/gentoo
+sync-type = rsync
+sync-uri = rsync://rsync.gentoo.org/gentoo-portage/
+auto-sync = yes</code></pre>
+<p>Aquí se define el mecanismo de sincronización. Cambiar <code class="flag">sync-type</code> a <code class="flag">git</code> es común si prefieres seguir el repositorio oficial en GitHub en vez de rsync.</p>
+</details>
+<div class="callout"><strong>Leer noticias del repositorio:</strong> tras sincronizar, Portage puede avisar de "news items" — mensajes críticos (cambios que rompen algo, migraciones necesarias).</div>
+<pre><code>root # eselect news list    <span class="comment"># ver disponibles</span>
+root # eselect news read    <span class="comment"># leer</span>
+root # eselect news purge   <span class="comment"># marcar como leídos</span></code></pre>
+<h2 id="buscar">5. Buscar paquetes</h2>
+<pre><code>root # emerge --search firefox        <span class="comment"># por nombre</span>
+root # emerge --searchdesc "web browser"  <span class="comment"># también en descripción, más lento</span></code></pre>
+<div class="callout"><strong>Alternativa recomendada:</strong> <code>app-portage/eix</code> mantiene un índice propio y busca mucho más rápido que <code>emerge --search</code>. Vale la pena instalarlo temprano: <code>emerge --ask app-portage/eix</code>, y luego <code>eix &lt;paquete&gt;</code>.</div>
+<h2 id="desinstalar">6. Desinstalar y limpiar</h2>
+<details open="">
+<summary>Desinstalar un paquete específico <span class="badge badge-mid">riesgo medio</span></summary>
+<pre><code>root # emerge --ask --unmerge www-client/firefox</code></pre>
+<p><span class="flag">-C</span> / <span class="flag">--unmerge</span>: elimina exactamente el paquete indicado, <strong>sin</strong> tocar sus dependencias huérfanas — esas se limpian aparte.</p>
+</details>
+<details open="">
+<summary>Limpiar paquetes obsoletos/huérfanos <span class="badge badge-high">riesgo alto si no revisas antes</span></summary>
+<pre><code><span class="comment"># 1. Revisar SIEMPRE antes de ejecutar de verdad</span>
+root # emerge --ask --pretend --depclean
+
+<span class="comment"># 2. Si la lista se ve correcta, ejecutar</span>
+root # emerge --ask --depclean</code></pre>
+<p><span class="flag">--depclean</span> elimina paquetes que ya no son necesarios: dependencias que quedaron huérfanas tras actualizaciones, o versiones antiguas de paquetes con slots múltiples (como el kernel).</p>
+</details>
+<div class="callout"><strong>Proteger un paquete de depclean:</strong> si Portage marca algo como huérfano pero lo usas manualmente fuera de @world, usa <code>emerge --noreplace app-misc/foo</code> para preservarlo sin agregarlo formalmente al conjunto mundial.</div>
+<h2 id="autounmask">7. Conflictos de configuración: <code>--autounmask</code></h2>
+<p>Cuando Portage no puede instalar algo con la configuración actual (falta un USE flag, requiere rama inestable, está enmascarado), no falla en silencio: te muestra exactamente qué cambio resolvería el conflicto.</p>
+<details open="">
+<summary>Ejemplo: conflicto de USE flag</summary>
+<pre><code>root # emerge --ask media-video/mpv
+
+<span class="comment"># Salida típica de Portage:</span>
+<span class="comment"># The following USE changes are necessary to proceed:</span>
+<span class="comment">#  #required by mpv (argument)</span>
+<span class="comment"># &gt;=media-video/mpv-0.38.0 -vulkan</span></code></pre>
+</details>
+<table>
+<tr><th>Opción</th><th>Para qué sirve</th></tr>
+<tr><td><span class="flag">--autounmask</span></td><td>Calcula y <em>propone</em> el cambio necesario. Activo por defecto. No modifica archivos.</td></tr>
+<tr><td><span class="flag">--autounmask-write</span></td><td>Escribe la propuesta directamente en <code>/etc/portage/package.*/</code>. No vuelve a intentar el emerge por sí solo.</td></tr>
+<tr><td><span class="flag">--autounmask-keep-masks</span></td><td>Restringe la propuesta a USE/keywords, sin proponer desenmascarar paquetes.</td></tr>
+</table>
+<details>
+<summary>Flujo completo para aplicar el cambio</summary>
+<pre><code>root # emerge --ask --autounmask-write media-video/mpv
+root # etc-update
+root # emerge --ask media-video/mpv
+
+<span class="comment"># Proceso:</span>
+<span class="comment"># 1. autounmask-write escribe el cambio propuesto (a veces como archivo ._cfg0000_*)</span>
+<span class="comment"># 2. etc-update te muestra el diff y te deja aprobarlo o rechazarlo</span>
+<span class="comment"># 3. Una vez aprobado, el archivo definitivo queda en package.use/ o package.accept_keywords/</span>
+<span class="comment"># 4. Se reintenta el emerge, ahora sin conflicto</span></code></pre>
+</details>
+<h2 id="packageuse">8. <code>package.use/</code> y <code>package.accept_keywords/</code></h2>
+<h3>package.use/ — excepciones de USE flags por paquete</h3>
+<p>Directorio donde defines USE flags específicos de un paquete, sin tocar el <code class="flag">USE=</code> global de <code>make.conf</code>. No existen archivos por defecto — tú los creas.</p>
+<details open="">
+<summary>Ejemplo: /etc/portage/package.use/mpv</summary>
+<pre><code>media-video/mpv -vulkan libplacebo</code></pre>
+<p>Sintaxis: <code class="flag">categoría/paquete flag1 -flag2 flag3</code>. Sin signo = activar; con <code class="flag">-</code> = desactivar. Puedes acotar por versión: <code class="flag">&gt;=media-video/mpv-0.38.0</code>.</p>
+</details>
+<h3>package.accept_keywords/ — permitir ramas inestables</h3>
+<p>Gentoo marca paquetes como estables (<code class="flag">amd64</code>) o inestables/testing (<code class="flag">~amd64</code>). Por defecto solo se instalan versiones estables. Si necesitas una versión más nueva que aún está en pruebas, la autorizas aquí — paquete por paquete, no globalmente.</p>
+<details open="">
+<summary>Ejemplo: /etc/portage/package.accept_keywords/mpv <span class="badge badge-mid">riesgo medio</span></summary>
+<pre><code>media-video/mpv ~amd64</code></pre>
+<p>Esto autoriza instalar versiones <code class="flag">~amd64</code> (testing) solo de <code>mpv</code>, dejando el resto del sistema en la rama estable.</p>
+</details>
+<div class="callout"><strong>Para qué sirve separar en directorio:</strong> Portage lee <em>todos</em> los archivos dentro de <code>package.use/</code> y <code>package.accept_keywords/</code>, sin importar el nombre. La convención de un archivo por paquete (o por tema) es solo para mantener orden y facilitar revertir cambios individuales.</div>
+<h2 id="inspeccion">9. Herramientas de inspección</h2>
+<details>
+<summary>equery (paquete gentoolkit) — consultar sin instalar</summary>
+<pre><code>root # emerge --ask app-portage/gentoolkit
+
+root # equery list '*'                    <span class="comment"># todo lo instalado</span>
+root # equery depends www-client/firefox  <span class="comment"># qué depende de firefox</span>
+root # equery uses www-client/firefox     <span class="comment"># USE flags activos/inactivos</span>
+root # equery files www-client/firefox    <span class="comment"># archivos instalados por el paquete</span>
+root # equery belongs /usr/bin/firefox    <span class="comment"># a qué paquete pertenece un archivo</span></code></pre>
+</details>
+<details>
+<summary>revdep-rebuild — reparar enlaces rotos <span class="badge badge-low">riesgo bajo</span></summary>
+<pre><code>root # revdep-rebuild
+
+<span class="comment"># Para qué sirve: tras actualizar librerías compartidas, algunos binarios</span>
+<span class="comment"># pueden quedar enlazados contra versiones viejas. Este comando detecta</span>
+<span class="comment"># esos casos y recompila los paquetes afectados.</span></code></pre>
+</details>
+<h2 id="circular">10. Dependencias circulares</h2>
+<p>A veces el paquete A necesita a B para compilarse, y B necesita a A. Portage resuelve esto rompiendo el ciclo con una compilación en dos pasadas: instala una versión mínima de uno de los dos (a veces usando USE flags reducidos temporalmente), y luego reconstruye ambos ya con las dependencias completas satisfechas. Esto es automático — normalmente no necesitas intervenir, pero si ves mensajes de "circular dependencies" en un <code>--pretend</code>, es señal de que Portage ya está resolviendo esto internamente antes de compilar.</p>
+<h2 id="systemd">11. Nota sobre systemd</h2>
+<div class="note-systemd">
+<strong>No aplica a tu instalación (OpenRC).</strong> Se incluye solo como referencia si en el futuro migras o comparas sistemas.
+  </div>
+<p>En un sistema con systemd como gestor de servicios, <code>emerge</code> funciona exactamente igual — la gestión de paquetes no cambia. Lo que cambia es cómo administras servicios:</p>
+<table>
+<tr><th>Tarea</th><th>OpenRC (tu sistema)</th><th>systemd</th></tr>
+<tr><td>Habilitar servicio al arrancar</td><td><code>rc-update add sshd default</code></td><td><code>systemctl enable sshd</code></td></tr>
+<tr><td>Iniciar servicio ahora</td><td><code>rc-service sshd start</code></td><td><code>systemctl start sshd</code></td></tr>
+<tr><td>Ver estado</td><td><code>rc-service sshd status</code></td><td><code>systemctl status sshd</code></td></tr>
+<tr><td>Listar servicios habilitados</td><td><code>rc-update show</code></td><td><code>systemctl list-unit-files --state=enabled</code></td></tr>
+</table>
+<p>Portage también expone el USE flag global <code class="flag">systemd</code> en <code>make.conf</code> para paquetes que ofrecen integración opcional (unidades <code>.service</code>, journal, etc.) — en tu configuración OpenRC ese flag debe permanecer desactivado.</p>
+<h2 id="resumen">12. Tabla resumen — dónde se configura</h2>
+<table>
+<tr><th>Archivo / directorio</th><th>Propósito</th></tr>
+<tr><td><code>/etc/portage/make.conf</code></td><td>USE flags globales, opciones de compilación, mirrors, binhost. Se lee en cada <code>emerge</code>.</td></tr>
+<tr><td><code>/etc/portage/package.use/</code></td><td>USE flags específicos por paquete. Un archivo por paquete/tema (convención, no obligatorio).</td></tr>
+<tr><td><code>/etc/portage/package.accept_keywords/</code></td><td>Autoriza ramas inestables (<code>~amd64</code>) por paquete.</td></tr>
+<tr><td><code>/etc/portage/package.mask</code> / <code>package.unmask</code></td><td>Bloquea o desbloquea manualmente versiones específicas de paquetes.</td></tr>
+<tr><td><code>/etc/portage/repos.conf/gentoo.conf</code></td><td>Define cómo y desde dónde se sincroniza el árbol de ebuilds (<code>emerge --sync</code>).</td></tr>
+<tr><td><code>/var/db/repos/gentoo</code></td><td>Copia local del árbol de ebuilds sincronizado.</td></tr>
+</table>
+</div>
+<footer>Compendio Gentoo AMD64 · Portage / gestión de paquetes post-instalación</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-53-closing-thoughts.html">← Cap. 53: Capítulo 53 — Reflexiones finales Informativo</a>
+<a href="index.html">Índice del compendio</a>
+<span></span>
+</div>
+</body>
+</html>

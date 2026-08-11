@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 21 — Instalando el archivo stage</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222c;
+    --border: #2a2f3a;
+    --text: #e4e6eb;
+    --text-dim: #9aa1ac;
+    --accent: #7dd3fc;
+    --accent-2: #a78bfa;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --red: #f87171;
+    --code-bg: #0b0d12;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem 1rem 4rem;
+  }
+  .container { max-width: 780px; margin: 0 auto; }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .kicker {
+    color: var(--accent);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  h1 {
+    font-size: 1.7rem;
+    margin: 0.3rem 0 0.5rem;
+  }
+  .subtitle { color: var(--text-dim); font-size: 0.95rem; }
+
+  h2 {
+    font-size: 1.15rem;
+    color: var(--accent-2);
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+  }
+
+  .purpose {
+    background: linear-gradient(135deg, rgba(125,211,252,0.08), rgba(167,139,250,0.05));
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    margin: 0.8rem 0 1.2rem;
+    font-size: 0.95rem;
+  }
+  .purpose b { color: var(--accent); }
+
+  code, pre {
+    font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+    font-size: 0.88rem;
+  }
+  code.inline {
+    background: var(--code-bg);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    color: var(--yellow);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    color: var(--green);
+    margin: 0.6rem 0;
+  }
+
+  .risk {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+  .risk-low { background: rgba(74,222,128,0.15); color: var(--green); border: 1px solid rgba(74,222,128,0.4); }
+  .risk-med { background: rgba(250,204,21,0.15); color: var(--yellow); border: 1px solid rgba(250,204,21,0.4); }
+  .risk-high { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid rgba(248,113,113,0.4); }
+
+  details {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 0.6rem 0;
+    padding: 0.6rem 0.9rem;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+  }
+  summary:hover { color: var(--accent); }
+  details[open] summary { margin-bottom: 0.5rem; }
+
+  .flag-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .flag-table th, .flag-table td {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .flag-table th { color: var(--accent-2); font-weight: 600; }
+  .flag-table code { color: var(--yellow); background: none; padding: 0; }
+
+  .note {
+    background: rgba(250,204,21,0.07);
+    border-left: 3px solid var(--yellow);
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+    margin: 0.8rem 0;
+  }
+  .note b { color: var(--yellow); }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+  footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    margin-top: 2.5rem;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">V. Sistema base (stage3)</span>
+</div>
+<span class="jagg-badge">Cap. 21 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="container">
+<header>
+<div class="kicker">Compendio Gentoo · Instalación</div>
+<h1>Capítulo 21 — Instalando el archivo stage</h1>
+<div class="subtitle">Extraer el stage3 en tu partición raíz montada</div>
+</header>
+<div class="purpose">
+<b>¿Para qué sirve este paso?</b> El stage3 es un paquete comprimido con un sistema Gentoo mínimo y funcional.
+    Extraerlo en <code class="inline">/mnt/gentoo</code> es literalmente "sembrar" tu nuevo sistema operativo:
+    todo lo que instales después se construye sobre esta base.
+  </div>
+<h2>🧩 El comando principal</h2>
+<div class="card">
+<pre>tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner -C /mnt/gentoo</pre>
+<span class="risk risk-med">Riesgo medio</span>
+<span style="color:var(--text-dim); font-size:0.85rem;">— si falla o se interrumpe, se puede repetir sin problema (a diferencia de instalar el bootloader)</span>
+</div>
+<details>
+<summary>Ver qué hace cada bandera</summary>
+<table class="flag-table">
+<tr><th>Bandera</th><th>Qué hace</th></tr>
+<tr><td><code>x</code></td><td>Extract — extrae el contenido del archivo</td></tr>
+<tr><td><code>p</code></td><td>Preserva los permisos originales de cada archivo</td></tr>
+<tr><td><code>v</code></td><td>Verbose — muestra cada archivo mientras se extrae</td></tr>
+<tr><td><code>f</code></td><td>Indica que a continuación va el nombre del archivo</td></tr>
+<tr><td><code>--xattrs-include='*.*'</code></td><td>Conserva atributos extendidos (metadatos adicionales de algunos archivos)</td></tr>
+<tr><td><code>--numeric-owner</code></td><td>Mantiene los IDs numéricos de usuario/grupo tal cual, evitando líos de permisos</td></tr>
+<tr><td><code>-C /mnt/gentoo</code></td><td>Cambia de directorio antes de extraer, para que todo caiga en la partición raíz</td></tr>
+</table>
+</details>
+<h2>💡 El truco del punto de montaje</h2>
+<div class="card">
+<p><code class="inline">/mnt/gentoo</code> no es "un disco", es una <b>puerta de entrada</b> a tu partición real
+    (por ejemplo <code class="inline">/dev/sda3</code>), gracias al <code class="inline">mount</code> que hiciste en el capítulo 18.</p>
+<p>Cuando <code class="inline">tar</code> escribe con <code class="inline">-C /mnt/gentoo</code>, el kernel
+    redirige esa escritura al disco físico montado ahí. Si no hubiera nada montado, todo se perdería al reiniciar,
+    porque el entorno live vive en RAM.</p>
+</div>
+<h2>✅ Verificación rápida</h2>
+<div class="card">
+<p>Después de extraer, puedes confirmar que el stage se desempaquetó correctamente:</p>
+<pre>ls /mnt/gentoo</pre>
+<p style="margin-bottom:0; color:var(--text-dim); font-size:0.88rem;">
+      Deberías ver carpetas como <code class="inline">bin</code>, <code class="inline">etc</code>,
+      <code class="inline">usr</code>, <code class="inline">var</code>, etc. — la estructura típica de un sistema Linux.
+    </p>
+</div>
+<div class="note">
+<b>Nota:</b> El <code class="inline">*</code> en <code class="inline">stage3-*.tar.xz</code> es un comodín para
+    no escribir el nombre completo (que incluye arquitectura, fecha e init system, ej.
+    <code class="inline">stage3-amd64-openrc-20240107T170309Z.tar.xz</code>).
+  </div>
+<h2>➡️ Siguiente paso</h2>
+<div class="card" style="font-size:0.92rem;">
+    Con el sistema base ya extraído, el <b>capítulo 22</b> configura las variables de compilación
+    (<code class="inline">CFLAGS</code>, <code class="inline">MAKEOPTS</code>, etc.) en <code class="inline">make.conf</code>
+    antes de entrar al chroot.
+  </div>
+<div class="nav">
+<span>← Cap. 20: Descargando el stage file</span>
+<span>Cap. 22: Configurando opciones de compilación →</span>
+</div>
+<footer>Compendio Gentoo para principiantes · JorgeAGG</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-20-descargando-stage.html">← Cap. 20: Capítulo 20 — Descargando el archivo stage</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-22-opciones-compilacion.html">Cap. 22: Capítulo 22 — Configurando las opciones de compilación →</a>
+</div>
+</body>
+</html>

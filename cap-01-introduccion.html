@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 1 — Introducción a Gentoo</title>
+<style>
+  :root {
+    --bg: #12151c;
+    --bg-panel: #1a1f2b;
+    --bg-panel-2: #202636;
+    --border: #2c3344;
+    --text: #dbe1ee;
+    --text-dim: #9aa4b8;
+    --accent: #7cc6ff;
+    --accent-2: #a992f5;
+    --green: #74d99a;
+    --yellow: #f0c674;
+    --red: #f28b82;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height: 1.65;
+    margin: 0;
+    padding: 0 0 4rem 0;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1f2b 0%, #232a3d 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 1.5rem 2rem;
+    text-align: center;
+  }
+  header .kicker {
+    color: var(--accent-2);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-size: .8rem;
+    font-weight: 600;
+  }
+  header h1 {
+    margin: .4rem 0 .3rem;
+    font-size: 2rem;
+  }
+  header p.sub {
+    color: var(--text-dim);
+    margin: 0;
+    font-size: 1rem;
+  }
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem;
+  }
+  h2 {
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .4rem;
+    margin-top: 2.6rem;
+  }
+  h3 {
+    color: var(--accent-2);
+    margin-top: 1.8rem;
+  }
+  p { color: var(--text); }
+  .callout {
+    background: var(--bg-panel);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: .9rem 1.1rem;
+    margin: 1.1rem 0;
+  }
+  .callout strong.tag {
+    display: block;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--accent);
+    margin-bottom: .3rem;
+  }
+  .callout.analogy { border-left-color: var(--green); }
+  .callout.analogy strong.tag { color: var(--green); }
+  .callout.importante { border-left-color: var(--yellow); }
+  .callout.importante strong.tag { color: var(--yellow); }
+
+  .pillars {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .pillar {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.3rem;
+  }
+  .pillar h3 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .pillar .icon {
+    display: inline-block;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--bg-panel-2);
+    text-align: center;
+    line-height: 28px;
+    font-size: .95rem;
+  }
+
+  details {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 1rem 0;
+    padding: .2rem 1rem;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: .8rem 0;
+    color: var(--accent);
+    list-style: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before {
+    content: "▸ ";
+    color: var(--text-dim);
+  }
+  details[open] summary::before { content: "▾ "; }
+  details .content { padding-bottom: .9rem; color: var(--text-dim); }
+
+  .badge {
+    display: inline-block;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    font-weight: 700;
+    margin-left: .5rem;
+    vertical-align: middle;
+  }
+  .badge.info { background: rgba(124,198,255,.15); color: var(--accent); border: 1px solid rgba(124,198,255,.4); }
+  .badge.riesgo-nulo { background: rgba(116,217,154,.15); color: var(--green); border: 1px solid rgba(116,217,154,.4); }
+
+  ul { padding-left: 1.3rem; }
+  li { margin-bottom: .4rem; }
+
+  code {
+    background: var(--bg-panel-2);
+    padding: .1rem .4rem;
+    border-radius: 4px;
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: .9em;
+    color: var(--accent);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.2rem 0;
+    background: var(--bg-panel);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    text-align: left;
+    padding: .7rem .9rem;
+    border-bottom: 1px solid var(--border);
+    font-size: .93rem;
+  }
+  th {
+    background: var(--bg-panel-2);
+    color: var(--accent);
+    text-transform: uppercase;
+    font-size: .75rem;
+    letter-spacing: .05em;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: .85rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .toc {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.4rem;
+    margin: 1.5rem 0 2.5rem;
+  }
+  .toc a { color: var(--text-dim); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+  .toc ul { margin: .3rem 0; }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">I. Fundamentos</span>
+</div>
+<span class="jagg-badge">Cap. 01 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<div class="kicker">Compendio Gentoo · Capítulo 1</div>
+<h1>Introducción</h1>
+<p class="sub">La filosofía detrás de Gentoo, antes de tocar el teclado</p>
+</header>
+<main>
+<div class="toc">
+<strong>En este capítulo:</strong>
+<ul>
+<li><a href="#bienvenida">Bienvenida a Gentoo</a></li>
+<li><a href="#pilares">Los tres pilares de diseño</a></li>
+<li><a href="#estructura">Cómo está organizada la instalación</a></li>
+<li><a href="#opciones">Opciones de instalación</a></li>
+<li><a href="#problemas">Qué hacer si algo sale mal</a></li>
+</ul>
+</div>
+<h2 id="bienvenida">Bienvenida <span class="badge info">Conceptual</span></h2>
+<p>
+    Gentoo es un sistema operativo libre basado en Linux, pensado para ser
+    <strong>optimizado y personalizado</strong> para casi cualquier equipo o propósito.
+    A diferencia de otras distribuciones que entregan un sistema ya armado y "cerrado",
+    Gentoo no esconde nada de lo que ocurre por debajo: cada pieza del sistema es visible
+    y ajustable por quien lo instala.
+  </p>
+<div class="callout analogy">
+<strong class="tag">Para entenderlo fácil</strong>
+    La mayoría de las distribuciones de Linux son como comprar un mueble ya armado en una tienda:
+    funciona, pero viene con las decisiones de diseño de alguien más. Gentoo es más parecido a
+    comprar la madera y las herramientas: toma más tiempo armarlo, pero el resultado está hecho
+    exactamente a la medida de quien lo construyó.
+  </div>
+<h2 id="pilares">Los tres pilares de diseño</h2>
+<p>Todo el proyecto Gentoo se sostiene sobre tres principios que se repiten a lo largo del manual.</p>
+<div class="pillars">
+<div class="pillar">
+<h3><span class="icon">🔓</span> Apertura (Openness)</h3>
+<p>
+        Las herramientas principales de Gentoo están construidas con lenguajes de programación simples
+        y accesibles: <strong>Portage</strong> (el sistema que instala y administra programas) está
+        escrito en Python, y los <strong>ebuilds</strong> (las "recetas" que le dicen a Portage cómo
+        instalar cada programa) están escritos en bash. Cualquier persona puede leerlos, modificarlos
+        y proponer mejoras.
+      </p>
+<p>
+        Por diseño, los programas se instalan <strong>compilando su código fuente</strong> (es decir,
+        se construyen desde cero en la propia máquina), aunque también existe la opción de usar
+        paquetes ya compilados. La configuración del sistema se hace mediante archivos de texto simples,
+        no interfaces ocultas.
+      </p>
+</div>
+<div class="pillar">
+<h3><span class="icon">🎛️</span> Elección (Choice)</h3>
+<p>Gentoo evita imponer decisiones. A lo largo de la instalación se elige, entre otras cosas:</p>
+<ul>
+<li>El sistema de inicio: <strong>OpenRC</strong> o <strong>systemd</strong></li>
+<li>Cómo particionar el disco y qué sistema de archivos usar</li>
+<li>Un "perfil" base del sistema</li>
+<li>Qué características activar o quitar por programa mediante las <strong>USE flags</strong></li>
+<li>Bootloader, gestor de red, entorno de escritorio, y más</li>
+</ul>
+<div class="callout" style="margin-bottom:0;">
+<strong class="tag">Concepto: USE flags</strong>
+        Son como interruptores que le dicen a un programa qué funciones incluir al compilarlo.
+        Por ejemplo, agregar <code>ssl</code> compila un programa con soporte de cifrado SSL,
+        mientras que <code>-X</code> (con el signo menos) le quita el soporte para entornos gráficos.
+      </div>
+</div>
+<div class="pillar">
+<h3><span class="icon">⚡</span> Poder (Power)</h3>
+<p>
+        Al construirse desde el código fuente, Gentoo puede adaptarse a nuevas arquitecturas de
+        procesador y <strong>afinar cada programa instalado</strong> para sacarle el máximo provecho
+        al hardware específico de cada máquina.
+      </p>
+<p>
+        Este ajuste fino se controla principalmente desde un solo archivo:
+        <code>/etc/portage/make.conf</code>, que define las opciones de compilación que se aplican
+        a todo el sistema.
+      </p>
+</div>
+</div>
+<h2 id="estructura">Cómo está organizada la instalación</h2>
+<p>
+    El manual no es una única receta rígida; está pensado como un conjunto de pasos que se pueden
+    adaptar según las necesidades de cada persona. En términos generales, los pasos se clasifican así:
+  </p>
+<table>
+<tr><th>Tipo de paso</th><th>Qué significa</th></tr>
+<tr><td>Sugerido</td><td>Recomendado para la mayoría de las instalaciones</td></tr>
+<tr><td>Opcional</td><td>Depende de las necesidades particulares del usuario</td></tr>
+<tr><td>Obsoleto</td><td>Se mantiene por compatibilidad, pero ya no se recomienda</td></tr>
+<tr><td>Con alternativas</td><td>Tiene un valor por defecto, pero se documentan otras opciones</td></tr>
+</table>
+<div class="callout importante">
+<strong class="tag">A tener en cuenta</strong>
+    No todos los pasos del manual aplican a todas las instalaciones. Parte del proceso consiste en
+    decidir, capítulo a capítulo, cuáles pasos son necesarios para el sistema que se quiere construir.
+  </div>
+<h2 id="opciones">Opciones de instalación para Gentoo</h2>
+<p>
+    El capítulo menciona que existen distintas vías para llegar a un sistema Gentoo funcional
+    (por ejemplo, distintos medios de instalación y distintos puntos de partida), y que el resto
+    del manual va guiando esas decisiones paso a paso.
+  </p>
+<h2 id="problemas">Problemas (Troubles)</h2>
+<p>
+    Esta sección final del capítulo funciona como una guía de referencia para cuando algo no sale
+    como se espera durante la instalación, con enlaces a los canales de soporte oficiales de la
+    comunidad.
+  </p>
+<details>
+<summary>Canales de soporte de la comunidad Gentoo</summary>
+<div class="content">
+<ul>
+<li><strong>IRC:</strong> canal <code>#gentoo</code> en la red Libera Chat (accesible también vía webchat)</li>
+<li><strong>Foros oficiales</strong> de Gentoo</li>
+<li><strong>Listas de correo</strong></li>
+<li><strong>Sistema de reporte de bugs</strong></li>
+</ul>
+<p>Estos mismos canales se documentan con más detalle en el Capítulo 52 ("Where to go from here") al final del manual.</p>
+</div>
+</details>
+<h2>En resumen</h2>
+<div class="callout">
+<strong class="tag">Idea central del capítulo</strong>
+    El Capítulo 1 no instala nada todavía. Es la carta de presentación de Gentoo: un sistema que
+    prioriza la <strong>transparencia</strong>, la <strong>libertad de elección</strong> y el
+    <strong>rendimiento a medida</strong>, a cambio de un mayor involucramiento del usuario en su
+    configuración.
+  </div>
+</main>
+<footer>
+  Compendio Gentoo en español · Capítulo 1: Introducción<br/>
+  Basado en el Gentoo AMD64 Handbook oficial
+</footer>
+
+<div id="jagg-bottombar">
+<span></span>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-03-medios-instalacion.html">Cap. 03: Capítulo 3 — Medios de instalación de Gentoo →</a>
+</div>
+</body>
+</html>

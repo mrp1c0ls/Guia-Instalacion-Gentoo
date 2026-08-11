@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 33 · Información del sistema de archivos</title>
+<style>
+  :root{
+    --bg:#0f1115; --bg2:#161a22; --card:#1b202b; --border:#2a3140;
+    --text:#dbe1ea; --muted:#8b94a7; --accent:#5fb3ff; --accent2:#7ee6a8;
+    --warn:#ffb454; --danger:#ff6b6b; --code-bg:#10141c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); margin:0; padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:32px 20px 80px;}
+  h1{font-size:1.7rem; color:var(--accent); margin-bottom:4px;}
+  .subtitle{color:var(--muted); margin-top:0; margin-bottom:28px; font-size:0.95rem;}
+  h2{
+    font-size:1.15rem; color:var(--accent2); margin-top:40px;
+    padding-bottom:6px; border-bottom:1px solid var(--border);
+  }
+  h3{font-size:1rem; color:var(--text); margin-top:22px;}
+  p{margin:10px 0;}
+  code{
+    background:var(--code-bg); color:#a6e3a1; padding:2px 6px;
+    border-radius:4px; font-size:0.88em; font-family:"SFMono-Regular",Consolas,Menlo,monospace;
+  }
+  pre{
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; font-size:0.85rem;
+  }
+  pre code{background:none; padding:0; color:#c8d3e0;}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:0.9rem;}
+  th,td{border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top;}
+  th{background:var(--bg2); color:var(--accent);}
+  tr:nth-child(even){background:#161a24;}
+
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:16px 18px; margin:16px 0;
+  }
+  .callout{
+    border-left:3px solid var(--accent); background:#131826;
+    padding:10px 14px; margin:14px 0; border-radius:0 6px 6px 0; font-size:0.92rem;
+  }
+  .callout b{color:var(--accent);}
+  .callout.para-que{border-left-color:var(--accent2);}
+  .callout.para-que b{color:var(--accent2);}
+  .callout.warn{border-left-color:var(--warn);}
+  .callout.warn b{color:var(--warn);}
+
+  .risk{
+    display:inline-block; font-size:0.72rem; font-weight:600; letter-spacing:.03em;
+    padding:2px 9px; border-radius:99px; text-transform:uppercase; margin-left:8px; vertical-align:middle;
+  }
+  .risk-low{background:#123a26; color:var(--accent2);}
+  .risk-med{background:#3a2f10; color:var(--warn);}
+  .risk-high{background:#3a1414; color:var(--danger);}
+
+  .config-tag{
+    display:inline-flex; align-items:center; gap:6px; font-size:0.82rem;
+    background:#101826; border:1px solid var(--border); color:var(--muted);
+    padding:4px 10px; border-radius:6px; margin:6px 0 14px;
+  }
+  .config-tag b{color:var(--text); font-weight:600;}
+
+  details{
+    background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+    margin:12px 0; padding:0;
+  }
+  details > summary{
+    cursor:pointer; padding:10px 14px; font-weight:600; color:var(--accent);
+    list-style:none; display:flex; align-items:center; gap:8px;
+  }
+  details > summary::-webkit-details-marker{display:none;}
+  details > summary::before{content:"▸"; transition:transform .15s;}
+  details[open] > summary::before{transform:rotate(90deg);}
+  details .inner{padding:0 16px 14px;}
+
+  .toc{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 20px; margin-bottom:30px;}
+  .toc a{color:var(--muted); text-decoration:none; font-size:0.9rem;}
+  .toc a:hover{color:var(--accent);}
+  .toc ul{margin:4px 0; padding-left:20px;}
+
+  .nixos{
+    background:#101a2e; border:1px solid #23385c; border-radius:8px;
+    padding:10px 14px; margin:14px 0; font-size:0.88rem; color:#9fc4f0;
+  }
+  .nixos b{color:#6fb1ff;}
+
+  footer{margin-top:50px; color:var(--muted); font-size:0.8rem; text-align:center;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">IX. fstab y red permanente</span>
+</div>
+<span class="jagg-badge">Cap. 33 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<h1>Capítulo 33 · Información del sistema de archivos</h1>
+<p class="subtitle">Gentoo Handbook AMD64 — GPT + UEFI · OpenRC · Perfil multilib</p>
+<div class="toc">
+<b>Contenido</b>
+<ul>
+<li><a href="#intro">¿De qué trata este capítulo?</a></li>
+<li><a href="#331">33.1 Etiquetas y UUIDs del sistema de archivos</a></li>
+<li><a href="#332">33.2 Etiquetas y UUIDs de partición</a></li>
+<li><a href="#blkid">El comando <code>blkid</code> a fondo</a></li>
+<li><a href="#333">33.3 ¿Qué es fstab?</a></li>
+<li><a href="#334">33.4 Creando el archivo fstab</a></li>
+<li><a href="#extra">Extra: comprobando y depurando fstab</a></li>
+</ul>
+</div>
+<h2 id="intro">¿De qué trata este capítulo?</h2>
+<p>
+    Este capítulo resuelve una sola pregunta: <b>¿cómo le digo a Gentoo qué particiones montar,
+    dónde y con qué reglas, cada vez que arranca?</b> La respuesta vive en un único archivo:
+    <code>/etc/fstab</code>. Antes de editarlo hay que entender cómo identificar las particiones
+    de forma confiable (UUIDs), y para eso se usa el comando <code>blkid</code>.
+  </p>
+<div class="config-tag">📁 Se configura en: <b>/etc/fstab</b> — dentro del chroot</div>
+<h2 id="331">33.1 Etiquetas y UUIDs del sistema de archivos</h2>
+<p>
+    Cuando formateas una partición con <code>mkfs.xfs</code>, <code>mkfs.vfat</code>, etc., el
+    sistema de archivos resultante recibe automáticamente un <b>UUID</b> (identificador único) y,
+    opcionalmente, tú le puedes poner un <b>LABEL</b> (nombre legible).
+  </p>
+<div class="callout para-que">
+<b>¿Para qué sirve?</b> En vez de escribir <code>/dev/sda3</code> en <code>fstab</code> — que
+    puede cambiar de nombre si agregas/quitas discos — usas su UUID, que no cambia sin importar
+    el orden en que el kernel detecte los discos.
+  </div>
+<div class="callout warn">
+<b>Ojo:</b> si vuelves a formatear la partición, el UUID <i>cambia</i>, porque es una propiedad
+    del sistema de archivos, no del disco físico ni de la partición GPT.
+  </div>
+<h2 id="332">33.2 Etiquetas y UUIDs de partición</h2>
+<p>
+    Distinto al punto anterior: aquí GPT le asigna directamente a la <b>partición</b> (no al
+    sistema de archivos que vive dentro) un <code>PARTUUID</code> y opcionalmente un
+    <code>PARTLABEL</code>. Como usas GPT, tienes esto disponible de forma nativa.
+  </p>
+<table>
+<tr><th>Identificador</th><th>¿A qué pertenece?</th><th>¿Cambia si reformateo?</th></tr>
+<tr><td><code>UUID</code> / <code>LABEL</code></td><td>Sistema de archivos (xfs, vfat...)</td><td>Sí</td></tr>
+<tr><td><code>PARTUUID</code> / <code>PARTLABEL</code></td><td>La partición GPT en sí</td><td>No</td></tr>
+</table>
+<div class="callout">
+<b>Analogía:</b> el <code>PARTUUID</code> es el número de serie grabado en la caja fuerte;
+    el <code>UUID</code> es el código de la cerradura que pusiste adentro. Si cambias la cerradura
+    (reformateas), la caja sigue siendo la misma caja.
+  </div>
+<h2 id="blkid">El comando <code>blkid</code> a fondo</h2>
+<p>
+<code>blkid</code> es la herramienta que consulta y muestra ambos tipos de identificadores
+    (de sistema de archivos y de partición) para todos los dispositivos de bloque del sistema.
+    Viene incluido en <code>sys-apps/util-linux</code>, ya presente en el stage3.
+  </p>
+<details>
+<summary>Uso básico y opciones más útiles</summary>
+<div class="inner">
+<pre><code># Mostrar todo (recomendado, es lo que verás casi siempre)
+blkid
+
+# Consultar un solo dispositivo
+blkid /dev/sda3
+
+# Mostrar solo un campo específico (útil en scripts)
+blkid -s UUID -o value /dev/sda3
+blkid -s PARTUUID -o value /dev/sda1
+
+# Forzar un nuevo escaneo (ignora la caché de blkid)
+blkid -g</code></pre>
+<table>
+<tr><th>Opción</th><th>Qué hace</th></tr>
+<tr><td><code>-s CAMPO</code></td><td>Filtra y muestra solo ese campo (UUID, PARTUUID, LABEL, TYPE...)</td></tr>
+<tr><td><code>-o value</code></td><td>Imprime solo el valor, sin el nombre del campo — ideal para copiar/pegar o scripts</td></tr>
+<tr><td><code>-g</code></td><td>Regenera la caché interna de blkid en <code>/run/blkid</code></td></tr>
+<tr><td><code>-p</code></td><td>Modo "low-level probe", ignora la caché por completo (más lento pero más confiable)</td></tr>
+</table>
+<p>Salida típica dentro del chroot en tu configuración (GPT + UEFI):</p>
+<pre><code>/dev/sda1: UUID="A1B2-C3D4" TYPE="vfat" PARTUUID="c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
+/dev/sda2: UUID="1234abcd-..." TYPE="swap" PARTUUID="0657fd6d-a4ab-43c4-84e5-0933c84b4f4f"
+/dev/sda3: UUID="5678efgh-..." TYPE="xfs"  PARTUUID="4f68bce3-e8cd-4db1-96e7-fbcaf984b709"</code></pre>
+</div>
+</details>
+<h2 id="333">33.3 ¿Qué es fstab?</h2>
+<p>
+<code>/etc/fstab</code> ("filesystem table") es una tabla de texto plano con <b>6 columnas</b>
+    separadas por espacios o tabs. Cada línea = una partición a montar.
+  </p>
+<table>
+<tr><th>#</th><th>Campo</th><th>Explicación sencilla</th></tr>
+<tr><td>1</td><td>Dispositivo</td><td>Qué montar: ruta (<code>/dev/sda1</code>), <code>UUID=</code>, <code>LABEL=</code> o <code>PARTUUID=</code></td></tr>
+<tr><td>2</td><td>Punto de montaje</td><td>Carpeta donde aparecerá (<code>/</code>, <code>/efi</code>, etc.)</td></tr>
+<tr><td>3</td><td>Tipo de FS</td><td><code>xfs</code>, <code>vfat</code>, <code>swap</code>...</td></tr>
+<tr><td>4</td><td>Opciones</td><td>Reglas de montaje, separadas por comas (ver abajo)</td></tr>
+<tr><td>5</td><td>dump</td><td>Casi siempre <code>0</code> (respaldo con la utilidad <code>dump</code>, en desuso)</td></tr>
+<tr><td>6</td><td>fsck</td><td><code>1</code> para la raíz, <code>2</code> para el resto, <code>0</code> si no se revisa</td></tr>
+</table>
+<div class="callout warn">
+<b>Ojo:</b> el <code>/etc/fstab</code> que trae el stage3 por defecto <b>no es válido</b>,
+    es solo una plantilla de ejemplo. Hay que editarlo sí o sí.
+  </div>
+<pre><code>nano /etc/fstab</code></pre>
+<h2 id="334">33.4 Creando el archivo fstab</h2>
+<div class="config-tag">📁 Se configura en: <b>/etc/fstab</b> · Aplica: al arrancar, cada vez que el kernel monta el sistema de archivos raíz</div>
+<p>
+    Como tu esquema es <b>GPT + UEFI</b>, la sección que te aplica es <b>33.4.2 / 33.4.3</b>,
+    no la de DOS/BIOS heredado.
+  </p>
+<h3>Ejemplo con rutas de dispositivo (33.4.2)</h3>
+<pre><code>/dev/sda1  /efi   vfat    umask=0077,tz=UTC     0 2
+/dev/sda2  none   swap    sw                    0 0
+/dev/sda3  /      xfs     defaults,noatime      0 1</code></pre>
+<h3>Ejemplo recomendado con PARTUUID (33.4.3)</h3>
+<pre><code>PARTUUID=c12a7328-f81f-11d2-ba4b-00a0c93ec93b  /efi   vfat  umask=0077,tz=UTC    0 2
+PARTUUID=0657fd6d-a4ab-43c4-84e5-0933c84b4f4f  none   swap  sw                   0 0
+PARTUUID=4f68bce3-e8cd-4db1-96e7-fbcaf984b709  /      xfs   defaults,noatime     0 1</code></pre>
+<div class="callout">
+<b>¿Cuál usar?</b> PARTUUID es más robusto: si un día reformateas <code>/</code> de xfs a
+    ext4, el <code>UUID</code> del sistema de archivos cambia, pero el <code>PARTUUID</code>
+    de la partición no. Menos cosas que arreglar después.
+  </div>
+<div class="callout warn">
+<b>Tu caso con OpenRC:</b> el manual menciona que si usas <b>systemd</b> con UEFI y PARTUUIDs
+    en formato DPS, te puedes saltar la creación de fstab, porque systemd monta todo solo. Como
+    tú usas <b>OpenRC</b>, esto <u>no aplica</u> — el fstab es obligatorio en tu instalación.
+  </div>
+<details open="">
+<summary>Opciones de montaje más comunes explicadas <span class="risk risk-low">informativo</span></summary>
+<div class="inner">
+<table>
+<tr><th>Opción</th><th>Qué hace</th></tr>
+<tr><td><code>defaults</code></td><td>Paquete estándar: rw, suid, dev, exec, auto, nouser, async</td></tr>
+<tr><td><code>noatime</code></td><td>No registra la hora de "último acceso" al leer archivos → menos escrituras, más rendimiento (ideal en SSD)</td></tr>
+<tr><td><code>umask=0077</code></td><td>Permisos restrictivos; necesario en <code>/efi</code> porque FAT32 no entiende permisos Unix</td></tr>
+<tr><td><code>tz=UTC</code></td><td>Le dice al driver de FAT en qué zona horaria interpretar las fechas de archivos</td></tr>
+<tr><td><code>sw</code></td><td>Opción específica de swap (equivalente a "sin opciones especiales")</td></tr>
+<tr><td><code>noauto</code></td><td>No monta automáticamente al arrancar; hay que montarlo a mano</td></tr>
+<tr><td><code>user</code></td><td>Permite a usuarios sin privilegios montar ese dispositivo (típico en <code>/mnt/cdrom</code>)</td></tr>
+<tr><td><code>auto</code></td><td>Deja que el sistema adivine el tipo de FS; útil en medios removibles</td></tr>
+</table>
+<div class="callout warn">
+<b>No recomendado:</b> la opción <code>discard</code> (TRIM en cada borrado) degrada el
+        rendimiento. Es mejor programar <code>fstrim</code> periódico con cron o un timer, en vez
+        de ponerlo en fstab.
+      </div>
+</div>
+</details>
+<div class="nixos">
+<b>Puente con NixOS:</b> esto equivale a las entradas <code>fileSystems."/"</code> en tu
+    <code>configuration.nix</code> — la diferencia es que ahí lo declaras en Nix y el sistema lo
+    genera; aquí lo escribes tú mismo, a mano, en formato de tabla plana.
+  </div>
+<h2 id="extra">Extra: comprobando y depurando fstab</h2>
+<p>Esto no viene explícito en el capítulo del handbook, pero es útil añadirlo para tu flujo de trabajo:</p>
+<details>
+<summary>Verificar el fstab antes de reiniciar <span class="risk risk-low">bajo riesgo</span></summary>
+<div class="inner">
+<div class="callout para-que"><b>¿Para qué sirve?</b> Detectar errores de sintaxis en <code>/etc/fstab</code> sin tener que reiniciar y arriesgarte a que el sistema no arranque.</div>
+<pre><code># Simula el montaje de todo lo que no esté ya montado, sin montar de verdad
+mount -fav
+
+# Monta (de verdad) todo lo definido en fstab que aún no esté montado
+mount -a</code></pre>
+<p><code>mount -fav</code> es la forma segura de probar: <code>-f</code> = fake (no monta realmente), <code>-a</code> = todas las entradas, <code>-v</code> = verbose (te dice qué haría con cada línea).</p>
+</div>
+</details>
+<details>
+<summary>Errores comunes al escribir fstab <span class="risk risk-med">riesgo medio si se ignoran</span></summary>
+<div class="inner">
+<ul>
+<li>Usar tabs/espacios inconsistentes no rompe nada (cualquier espacio en blanco sirve como separador), pero mezclar mal el número de columnas sí.</li>
+<li>Olvidar la columna 6 (<code>fsck</code>) o ponerle <code>1</code> a más de una partición aparte de <code>/</code> — solo la raíz debería llevar <code>1</code>.</li>
+<li>Copiar un UUID mal (un carácter cambiado) hace que el sistema no encuentre la partición al arrancar → caerá en modo de rescate/emergencia.</li>
+<li>Olvidar <code>umask=0077</code> en <code>/efi</code>: no rompe el arranque, pero deja el ESP con permisos poco seguros.</li>
+</ul>
+</div>
+</details>
+<footer>Compendio Gentoo — Capítulo 33 · Generado para instalación GPT + UEFI + OpenRC</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-32-seleccion-kernel.html">← Cap. 32: Capítulo 32 — Selección del Kernel</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-34-networking.html">Cap. 34: Información de red →</a>
+</div>
+</body>
+</html>

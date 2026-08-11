@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Cap. 50 — Administración de usuarios</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --panel2:#1d2029; --border:#2a2e3a;
+    --text:#e4e6eb; --muted:#9aa0ac; --accent:#7aa2f7; --green:#4fd68c;
+    --yellow:#f0c674; --red:#f26d6d; --code:#0b0d12;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    max-width:880px; margin:0 auto; padding:32px 20px 80px; line-height:1.6;
+  }
+  h1{font-size:1.8rem; border-bottom:2px solid var(--accent); padding-bottom:10px;}
+  h2{font-size:1.3rem; color:var(--accent); margin-top:2.2rem;}
+  h3{font-size:1.05rem; color:#c8d3f5; margin-top:1.6rem;}
+  p{color:var(--text);}
+  .subtitle{color:var(--muted); margin-top:-8px; font-size:0.95rem;}
+  .callout{
+    background:var(--panel2); border-left:4px solid var(--accent); padding:12px 16px;
+    border-radius:6px; margin:14px 0;
+  }
+  .callout b{color:var(--accent);}
+  .badge{
+    display:inline-block; font-size:0.72rem; font-weight:700; padding:3px 9px;
+    border-radius:12px; margin-left:8px; vertical-align:middle; letter-spacing:.3px;
+  }
+  .badge.low{background:rgba(79,214,140,.15); color:var(--green); border:1px solid var(--green);}
+  .badge.med{background:rgba(240,198,116,.15); color:var(--yellow); border:1px solid var(--yellow);}
+  .badge.high{background:rgba(242,109,109,.15); color:var(--red); border:1px solid var(--red);}
+  code, pre{
+    font-family:"Cascadia Code","Fira Code",Consolas,monospace; font-size:0.88rem;
+  }
+  code{background:var(--code); padding:2px 6px; border-radius:4px; color:#a6e3a1;}
+  pre{
+    background:var(--code); padding:14px 16px; border-radius:8px; overflow-x:auto;
+    border:1px solid var(--border); margin:10px 0;
+  }
+  pre code{background:none; padding:0; color:#d4d8e8;}
+  .comment{color:#6b7280;}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:0.92rem;}
+  th, td{border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top;}
+  th{background:var(--panel2); color:var(--accent);}
+  tr:nth-child(even){background:var(--panel);}
+  details{
+    background:var(--panel); border:1px solid var(--border); border-radius:8px;
+    margin:12px 0; padding:10px 16px;
+  }
+  summary{cursor:pointer; font-weight:600; color:var(--accent); padding:6px 0;}
+  summary:hover{color:#a9c2fb;}
+  .steps{padding-left:22px;}
+  .steps li{margin-bottom:6px;}
+  .flag{
+    display:inline-block; background:var(--code); border:1px solid var(--border);
+    border-radius:5px; padding:1px 7px; margin:2px 3px 2px 0; font-family:monospace;
+    font-size:0.85rem; color:#f0c674;
+  }
+  hr{border:none; border-top:1px solid var(--border); margin:2.2rem 0;}
+  footer{color:var(--muted); font-size:0.8rem; text-align:center; margin-top:3rem;}
+  .tag{
+    display:inline-block; background:rgba(122,162,247,.12); border:1px solid var(--accent);
+    color:var(--accent); border-radius:5px; padding:1px 8px; font-size:0.78rem; margin-right:6px;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">XII. Finalizando la instalación</span>
+</div>
+<span class="jagg-badge">Cap. 50 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 50 — Administración de usuarios</h1>
+<p class="subtitle">Gentoo Handbook AMD64 · Perfil: OpenRC · Sistema con systemd omitido salvo notas comparativas</p>
+<div class="callout">
+<b>Para qué sirve este capítulo:</b> hasta ahora todo el trabajo se ha hecho como <code>root</code>, la cuenta con permisos totales sobre el sistema. Este capítulo crea una cuenta de usuario normal para el uso diario y define cómo recuperar permisos de <code>root</code> solo cuando se necesiten, en vez de tenerlos siempre activos.
+</div>
+<hr/>
+<h2>50.1 — Crear un usuario para uso diario</h2>
+<p>Trabajar como <code>root</code> de forma permanente es riesgoso: un comando mal escrito (por ejemplo un <code>rm -rf</code> con la ruta equivocada) puede dañar el sistema completo, porque <code>root</code> no tiene restricciones. Un usuario normal solo puede afectar sus propios archivos y lo que sus grupos le permitan.</p>
+<h3>Grupos relevantes</h3>
+<table>
+<tr><th>Grupo</th><th>Para qué sirve</th></tr>
+<tr><td><code>wheel</code></td><td>El más importante: permite usar <code>su</code> para volverse <code>root</code>. Sin este grupo, el usuario no puede elevar privilegios con <code>su</code>.</td></tr>
+<tr><td><code>users</code></td><td>Grupo genérico base para cuentas de usuario estándar.</td></tr>
+<tr><td><code>audio</code></td><td>Acceso a dispositivos de sonido.</td></tr>
+<tr><td><code>video</code></td><td>Acceso a hardware de video y aceleración gráfica.</td></tr>
+<tr><td><code>cdrom</code> / <code>usb</code></td><td>Acceso directo a unidades ópticas o dispositivos USB.</td></tr>
+<tr><td><code>cron</code></td><td>Permite programar tareas con cron (ver Cap. 37).</td></tr>
+</table>
+<h3>Comando: crear el usuario</h3>
+<pre><code><span class="comment"># Ejemplo con un usuario llamado "larry"</span>
+root # useradd -m -G users,wheel,audio -s /bin/bash larry
+root # passwd larry</code></pre>
+<details>
+<summary>Ver opciones de <code>useradd</code> usadas y disponibles</summary>
+<table>
+<tr><th>Flag</th><th>Función</th></tr>
+<tr><td><span class="flag">-m</span></td><td>Crea la carpeta home (<code>/home/larry</code>) junto con el usuario. Sin esta opción, el usuario no tiene home.</td></tr>
+<tr><td><span class="flag">-G grupo1,grupo2</span></td><td>Agrega el usuario a grupos secundarios (separados por coma, sin espacios).</td></tr>
+<tr><td><span class="flag">-s /bin/bash</span></td><td>Define la shell de login. Si se omite, puede quedar sin shell asignada o usar la que diga <code>/etc/default/useradd</code>.</td></tr>
+<tr><td><span class="flag">-u UID</span></td><td>(No usada arriba) Fuerza un UID específico en vez de que el sistema asigne el siguiente disponible.</td></tr>
+<tr><td><span class="flag">-c "comentario"</span></td><td>(No usada arriba) Campo GECOS: nombre completo u otra nota descriptiva.</td></tr>
+</table>
+</details>
+<h3>Pasos que ejecuta el proceso</h3>
+<ol class="steps">
+<li><code>useradd</code> crea la entrada del usuario en <code>/etc/passwd</code> y su grupo primario en <code>/etc/group</code>.</li>
+<li>Con <code>-m</code>, copia el contenido de <code>/etc/skel</code> a la nueva carpeta <code>/home/larry</code> y ajusta los permisos.</li>
+<li>Con <code>-G</code>, añade al usuario como miembro secundario de cada grupo listado (edita <code>/etc/group</code>).</li>
+<li><code>passwd larry</code> pide y confirma la contraseña, y la guarda cifrada en <code>/etc/shadow</code>.</li>
+</ol>
+<div class="callout">
+<b>Buena práctica:</b> usar una contraseña distinta y no relacionada con la de <code>root</code>, de al menos 16 caracteres.
+</div>
+<hr/>
+<h2>50.2 — Elevar privilegios temporalmente</h2>
+<p>Una vez que ya no se trabaja como <code>root</code> por defecto, se necesita una forma de recuperar esos permisos solo cuando haga falta. Hay tres caminos habituales:</p>
+<h3>Opción 1: <code>su -</code> (incluida de fábrica)</h3>
+<pre><code>user $ su -
+Password: <span class="comment"># contraseña de root</span></code></pre>
+<p><b>Para qué sirve:</b> abre una sesión completa como <code>root</code> (con el <code>-</code> además carga el entorno de <code>root</code>, como su <code>$PATH</code> y variables). Requiere conocer la contraseña de <code>root</code>. Es simple, pero todo o nada: no hay forma de limitar qué comandos se pueden correr.</p>
+<h3>Opción 2: <code>sudo</code> <span class="tag">app-admin/sudo</span></h3>
+<p><b>Para qué sirve:</b> ejecuta un comando puntual como <code>root</code> (u otro usuario) sin abrir una sesión aparte, pidiendo la <b>contraseña del propio usuario</b> (no la de root). Permite definir con precisión qué usuarios pueden ejecutar qué comandos.</p>
+<pre><code><span class="comment"># Instalación</span>
+root # emerge --ask app-admin/sudo
+
+<span class="comment"># Uso básico</span>
+user $ sudo comando
+
+<span class="comment"># Editar la configuración de forma segura (valida sintaxis antes de guardar)</span>
+root # visudo</code></pre>
+<details>
+<summary>Ver configuración y opciones comunes de sudo</summary>
+<table>
+<tr><th>Elemento</th><th>Descripción</th></tr>
+<tr><td><code>/etc/sudoers</code></td><td>Archivo principal de reglas. Se edita solo con <code>visudo</code> para evitar dejarlo con errores de sintaxis que bloqueen el acceso.</td></tr>
+<tr><td><code>%wheel ALL=(ALL) ALL</code></td><td>Regla típica: cualquier miembro del grupo <code>wheel</code> puede ejecutar cualquier comando como cualquier usuario.</td></tr>
+<tr><td><code>usuario ALL=(ALL) NOPASSWD: ALL</code></td><td>Permite a ese usuario usar sudo sin pedir contraseña (usar con cuidado).</td></tr>
+<tr><td><span class="flag">sudo -i</span></td><td>Abre una sesión interactiva como root, similar a <code>su -</code>.</td></tr>
+<tr><td><span class="flag">sudo -u usuario comando</span></td><td>Ejecuta el comando como otro usuario, no necesariamente root.</td></tr>
+<tr><td><code>/etc/sudoers.d/</code></td><td>Directorio para agregar reglas en archivos separados sin tocar el archivo principal.</td></tr>
+</table>
+</details>
+<h3>Opción 3: <code>doas</code> <span class="tag">app-admin/doas</span></h3>
+<p><b>Para qué sirve:</b> alternativa minimalista a sudo, con muchas menos opciones de configuración (menor superficie de ataque) y sintaxis más simple. Buena opción para sistemas de un solo usuario.</p>
+<pre><code><span class="comment"># Instalación</span>
+root # emerge --ask app-admin/doas
+
+<span class="comment"># Configuración: crear el archivo (no existe por defecto)</span>
+root # nano -w /etc/doas.conf</code></pre>
+<pre><code><span class="comment"># Ejemplo de regla en /etc/doas.conf: permite a "larry" usar doas
+# pidiendo su propia contraseña</span>
+permit persist larry as root</code></pre>
+<div class="callout">
+<b>persist</b> evita que se pida contraseña en cada comando durante unos minutos, igual que hace sudo por defecto.
+</div>
+<h3>Comparativa rápida</h3>
+<table>
+<tr><th>Método</th><th>Contraseña que pide</th><th>Configuración</th><th>Granularidad</th></tr>
+<tr><td><code>su -</code></td><td>La de root</td><td>Ninguna (viene listo)</td><td>Ninguna: todo o nada</td></tr>
+<tr><td><code>sudo</code></td><td>La del usuario</td><td><code>/etc/sudoers</code> vía <code>visudo</code></td><td>Alta: por comando, usuario, grupo, host</td></tr>
+<tr><td><code>doas</code></td><td>La del usuario</td><td><code>/etc/doas.conf</code></td><td>Media: reglas simples</td></tr>
+</table>
+<div class="callout">
+<b>Nota systemd:</b> en sistemas con systemd como gestor de servicios existe además <code>run0</code>, integrado en systemd, que cumple un rol similar a <code>sudo</code> sin necesidad de instalar un paquete aparte. No aplica en esta instalación (perfil OpenRC).
+</div>
+<hr/>
+<h2>50.3 — Deshabilitar el login de root <span class="badge med">RIESGO MEDIO</span></h2>
+<div class="callout">
+<b>Advertencia del handbook:</b> antes de deshabilitar el login de <code>root</code>, hay que confirmar que el usuario normal ya está en el grupo <code>wheel</code> y que <code>su</code>, <code>sudo</code> o <code>doas</code> funcionan correctamente. De lo contrario, el sistema queda sin forma de administrarse y se necesita un rescate desde el medio de instalación.
+</div>
+<h3>Comando: bloquear el login de root</h3>
+<pre><code>root # passwd -l root</code></pre>
+<p><b>Para qué sirve:</b> antepone un carácter inválido al hash de la contraseña en <code>/etc/shadow</code>, de forma que ningún login por contraseña puede tener éxito. La cuenta <code>root</code> sigue existiendo y sigue siendo accesible vía <code>su</code> desde una sesión ya elevada, o revirtiendo el bloqueo.</p>
+<h3>Alternativa: eliminar la contraseña por completo</h3>
+<pre><code>root # passwd -d root</code></pre>
+<p><b>Para qué sirve:</b> borra el hash de la contraseña de <code>root</code> en vez de invalidarlo. El resultado práctico es similar (no se puede iniciar sesión por contraseña), pero es un estado distinto a nivel de archivo: <code>-l</code> es reversible con <code>passwd -u root</code>; con <code>-d</code> hay que asignar una contraseña nueva desde cero.</p>
+<details>
+<summary>Ver otras opciones útiles de <code>passwd</code></summary>
+<table>
+<tr><th>Flag</th><th>Función</th></tr>
+<tr><td><span class="flag">-l</span></td><td>Bloquea (lock) la cuenta, invalidando el hash actual.</td></tr>
+<tr><td><span class="flag">-u</span></td><td>Desbloquea una cuenta previamente bloqueada con <code>-l</code>.</td></tr>
+<tr><td><span class="flag">-d</span></td><td>Elimina la contraseña de la cuenta.</td></tr>
+<tr><td><span class="flag">-e</span></td><td>Fuerza que la contraseña expire, obligando a cambiarla en el próximo login.</td></tr>
+<tr><td><span class="flag">-S</span></td><td>Muestra el estado de la cuenta (bloqueada, con contraseña, etc.) sin modificar nada.</td></tr>
+</table>
+</details>
+<hr/>
+<h2>Tabla resumen: ¿dónde se configura?</h2>
+<table>
+<tr><th>Elemento</th><th>Ubicación / comando</th></tr>
+<tr><td>Cuentas de usuario y su grupo primario</td><td><code>/etc/passwd</code> · gestionado con <code>useradd</code></td></tr>
+<tr><td>Membresía a grupos secundarios</td><td><code>/etc/group</code> · gestionado con <code>useradd -G</code> o <code>usermod -aG</code></td></tr>
+<tr><td>Contraseñas cifradas y estado de la cuenta</td><td><code>/etc/shadow</code> · gestionado con <code>passwd</code></td></tr>
+<tr><td>Reglas de sudo</td><td><code>/etc/sudoers</code> (y <code>/etc/sudoers.d/</code>) · editar solo con <code>visudo</code></td></tr>
+<tr><td>Reglas de doas</td><td><code>/etc/doas.conf</code></td></tr>
+<tr><td>Plantilla para nuevos home</td><td><code>/etc/skel</code> (se copia al crear usuario con <code>-m</code>)</td></tr>
+</table>
+<footer>Compendio Gentoo AMD64 Handbook · Capítulo 50 — Administración de usuarios</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-49-portage-maintenance.html">← Cap. 49: Capítulo 49 — Mantenimiento de Portage</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-51-limpieza-disco.html">Cap. 51: Limpieza de disco →</a>
+</div>
+</body>
+</html>

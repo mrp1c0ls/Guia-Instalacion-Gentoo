@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 6 — Arranque del medio de instalación | Compendio Gentoo</title>
+<style>
+  :root {
+    --bg: #12141a;
+    --bg-card: #1a1d26;
+    --bg-code: #0d0f14;
+    --border: #2a2e3a;
+    --text: #d8dae0;
+    --text-dim: #8a8f9c;
+    --accent: #7aa2f7;
+    --accent2: #bb9af7;
+    --green: #7dd88a;
+    --yellow: #e0c76b;
+    --red: #e88080;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    padding: 2rem 1rem 4rem;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .kicker {
+    color: var(--accent2);
+    font-size: 0.85rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  h1 {
+    font-size: 1.7rem;
+    margin: .3rem 0 .4rem;
+    color: #fff;
+  }
+  .subtitle { color: var(--text-dim); font-size: .95rem; }
+  h2 {
+    font-size: 1.25rem;
+    color: var(--accent);
+    margin-top: 2.4rem;
+    border-left: 3px solid var(--accent);
+    padding-left: .6rem;
+  }
+  h3 { font-size: 1.05rem; color: #fff; margin-top: 1.4rem; }
+  p { margin: .6rem 0; }
+  .callout {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: .8rem 1rem;
+    margin: 1rem 0;
+    font-size: .95rem;
+  }
+  .callout.warn { border-left-color: var(--red); }
+  .callout.tip { border-left-color: var(--green); }
+  .para-que-sirve {
+    font-size: .85rem;
+    color: var(--text-dim);
+    margin-top: .35rem;
+    padding-left: .6rem;
+    border-left: 2px solid var(--border);
+  }
+  .para-que-sirve b { color: var(--yellow); }
+  code {
+    background: var(--bg-code);
+    color: var(--green);
+    padding: .12rem .4rem;
+    border-radius: 4px;
+    font-size: .88em;
+    font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .9rem 1rem;
+    overflow-x: auto;
+    margin: .7rem 0;
+  }
+  pre code { background: none; padding: 0; color: var(--green); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: .8rem 0;
+    font-size: .88rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: .5rem .6rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--bg-card); color: var(--accent2); }
+  tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+  .badge {
+    display: inline-block;
+    font-size: .7rem;
+    font-weight: 700;
+    padding: .12rem .5rem;
+    border-radius: 20px;
+    letter-spacing: .03em;
+  }
+  .badge.opt { background: rgba(125,216,138,.15); color: var(--green); border: 1px solid var(--green); }
+  .badge.risk { background: rgba(232,128,128,.15); color: var(--red); border: 1px solid var(--red); }
+  .badge.def { background: rgba(122,162,247,.15); color: var(--accent); border: 1px solid var(--accent); }
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: .8rem 0;
+    padding: .2rem .9rem;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: .7rem 0;
+    color: #fff;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "▶";
+    font-size: .7em;
+    color: var(--accent);
+    transition: transform .15s;
+  }
+  details[open] summary::before { transform: rotate(90deg); }
+  details .inner { padding-bottom: .9rem; }
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps li {
+    counter-increment: step;
+    margin: .9rem 0;
+    padding-left: 2.4rem;
+    position: relative;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 0;
+    width: 1.7rem; height: 1.7rem;
+    background: var(--accent);
+    color: #0d0f14;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .85rem;
+  }
+  .keycap {
+    background: #2a2e3a;
+    border: 1px solid #444a5a;
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: .05rem .4rem;
+    font-family: monospace;
+    font-size: .85em;
+    color: #fff;
+  }
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: .8rem;
+    color: var(--text-dim);
+    text-align: center;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">II. Medio de instalación</span>
+</div>
+<span class="jagg-badge">Cap. 06 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header>
+<div class="kicker">Compendio Gentoo · Instalación paso a paso</div>
+<h1>Capítulo 6 — Arranque del medio de instalación</h1>
+<p class="subtitle">Cómo bootear tu USB/CD de Gentoo y qué hacer si tu hardware necesita ayuda extra.</p>
+</header>
+<h2>¿Qué logramos en este capítulo?</h2>
+<p>Ya tienes el medio de instalación grabado. Aquí aprendes a <b>arrancar la computadora desde ese medio</b> en lugar del disco interno, y a pasarle "pistas" al kernel si tu hardware es antiguo, raro, o simplemente no se detecta bien solo.</p>
+<div class="callout tip">
+<b>💡 Para la mayoría de los equipos modernos:</b> basta con cambiar el orden de arranque y presionar <span class="keycap">Enter</span>. Todo lo demás en este capítulo es "por si acaso".
+</div>
+<h2>Paso a paso</h2>
+<ol class="steps">
+<li>
+<b>Entra al firmware de la placa madre.</b> Reinicia la PC e inmediatamente presiona la tecla correspondiente (<span class="keycap">DEL</span>, <span class="keycap">F1</span>, <span class="keycap">F10</span> o <span class="keycap">ESC</span>, según el fabricante). Si no sabes cuál es, busca en internet el modelo exacto de tu placa.
+    <div class="para-que-sirve"><b>Para qué sirve:</b> sin esto, la PC nunca "verá" tu USB/CD y arrancará el disco interno vacío.</div>
+</li>
+<li>
+<b>Cambia el orden de arranque</b> para que el USB/CD tenga prioridad sobre el disco interno.
+    <div class="callout warn">⚠️ Si tu placa usa <b>UEFI</b>, verifica que el medio arranque en <b>modo UEFI</b>, no en modo BIOS/legacy. Elegir el modo equivocado aquí causa problemas más adelante al instalar el gestor de arranque (GRUB).</div>
+</li>
+<li>
+<b>Guarda cambios y reinicia.</b> Aparecerá un menú tipo GRUB con varias entradas de arranque.
+  </li>
+<li>
+<b>Elige el kernel.</b> Con <span class="keycap">Enter</span> arrancas con la opción por defecto (<code>gentoo</code>) — es lo que necesita casi todo el mundo. Solo si tu hardware da problemas, presiona <span class="keycap">e</span> para editar la línea y agregar parámetros (ver siguiente sección).
+    <div class="para-que-sirve"><b>Para qué sirve:</b> <span class="keycap">F1</span> muestra los kernels disponibles y <span class="keycap">F2</span> las opciones de arranque, por si necesitas consultarlas en el momento.</div>
+</li>
+<li>
+<b>Espera el login automático.</b> El sistema te deja como usuario <code>root</code> directamente en el Minimal CD. En el <b>LiveGUI</b>, abre una terminal y ejecuta <code>sudo -i</code> para volverte superusuario (la contraseña de root viene deshabilitada por defecto).
+  </li>
+</ol>
+<h2>Kernels disponibles</h2>
+<table>
+<tr><th>Kernel</th><th>Uso</th></tr>
+<tr><td><code>gentoo</code></td><td>Opción por defecto. Sirve para prácticamente todo el hardware moderno. <span class="badge def">Recomendado</span></td></tr>
+<tr><td><code>gentoo-nofb</code></td><td>Igual, pero sin framebuffer (pantalla gráfica en consola). Útil si la pantalla se ve rota.</td></tr>
+<tr><td><code>memtest86</code></td><td>No instala nada: solo prueba tu memoria RAM en busca de errores.</td></tr>
+</table>
+<h2>Cómo editar la línea de arranque</h2>
+<p>Resalta la entrada deseada, presiona <span class="keycap">e</span>, escribe la(s) opción(es) al final de la línea, separadas por espacio, y arranca con <span class="keycap">Ctrl</span>+<span class="keycap">X</span> o <span class="keycap">F10</span>.</p>
+<pre><code>linux /gentoo nodhcp nosmp</code></pre>
+<div class="para-que-sirve"><b>Para qué sirve:</b> este cambio es <i>temporal</i> — solo aplica a ese arranque, no modifica nada en disco.</div>
+<div class="callout warn">
+<b>Orden de evaluación:</b> el sistema revisa primero las opciones <code>no*</code> y después las <code>do*</code>. Si combinas ambas para el mismo tema, el orden en que las escribas puede "sobrescribirse" entre sí.
+</div>
+<h2>Opciones de hardware</h2>
+<details>
+<summary>Energía y arquitectura (ACPI, APM, APIC, SMP) <span class="badge risk">Solo si hay problemas</span></summary>
+<div class="inner">
+<table>
+<tr><th>Opción</th><th>Qué hace</th><th>Ejemplo</th></tr>
+<tr><td><code>acpi=on</code></td><td>Activa ACPI (gestión moderna de energía/hardware) y arranca <code>acpid</code>.</td><td>Placa nueva con hardware mal detectado</td></tr>
+<tr><td><code>acpi=off</code></td><td>Desactiva ACPI por completo. También desactiva Hyperthreading.</td><td>Equipo muy antiguo que se cuelga al iniciar</td></tr>
+<tr><td><code>doapm</code></td><td>Activa soporte APM (gestión de energía previa a ACPI). Requiere <code>acpi=off</code>.</td><td><code>acpi=off doapm</code></td></tr>
+<tr><td><code>noapic</code></td><td>Desactiva el controlador avanzado de interrupciones (placas modernas).</td><td>Hardware antiguo con conflictos de IRQ</td></tr>
+<tr><td><code>nolapic</code></td><td>Desactiva el APIC local en kernels de un solo procesador.</td><td>—</td></tr>
+<tr><td><code>nosmp</code></td><td>Desactiva multiprocesamiento simétrico, para aislar bugs de drivers/multinúcleo.</td><td>Placa con bug conocido en modo multiprocesador</td></tr>
+</table>
+</div>
+</details>
+<details>
+<summary>Almacenamiento y buses (SCSI, SATA, IDE, USB, PCMCIA)</summary>
+<div class="inner">
+<table>
+<tr><th>Opción</th><th>Qué hace</th><th>Ejemplo</th></tr>
+<tr><td><code>doscsi</code></td><td>Activa soporte SCSI. También necesario para arrancar desde USB, que usa este subsistema.</td><td>El instalador no ve tu pendrive</td></tr>
+<tr><td><code>dopcmcia</code></td><td>Activa soporte para tarjetas PCMCIA/Cardbus.</td><td>Laptop vieja con módem/red por PCMCIA</td></tr>
+<tr><td><code>ide=nodma</code></td><td>Desactiva DMA en IDE. Ayuda si el lector de CD da errores de lectura.</td><td>—</td></tr>
+<tr><td><code>nosata</code></td><td>Desactiva módulos Serial ATA.</td><td>Problemas con el subsistema SATA</td></tr>
+<tr><td><code>nousb</code></td><td>Desactiva la carga automática de módulos USB.</td><td>Depurar fallos relacionados a USB</td></tr>
+<tr><td><code>slowusb</code></td><td>Agrega pausas extra para lectores USB lentos.</td><td>Unidad óptica USB antigua</td></tr>
+<tr><td><code>sda=stroke</code></td><td>Permite particionar un disco completo aunque el BIOS sea muy antiguo. Sustituye <code>sda</code> por el disco real.</td><td>—</td></tr>
+<tr><td><code>nodmraid</code> / <code>dmraid=X</code></td><td>Desactiva o configura el RAID por software del kernel (device-mapper).</td><td><code>dmraid="-i -a no"</code></td></tr>
+</table>
+</div>
+</details>
+<details>
+<summary>Red y consola remota</summary>
+<div class="inner">
+<table>
+<tr><th>Opción</th><th>Qué hace</th><th>Ejemplo</th></tr>
+<tr><td><code>nodhcp</code></td><td>Desactiva la búsqueda automática de IP por DHCP.</td><td>Red que solo usa IP fija</td></tr>
+<tr><td><code>nonfs</code></td><td>Desactiva el arranque de portmap/nfsmount.</td><td>—</td></tr>
+<tr><td><code>console=X</code></td><td>Configura acceso por consola serial (instalar sin monitor). Formato: dispositivo + parámetros de conexión.</td><td><code>console=ttyS0,9600,8,n,1</code></td></tr>
+<tr><td><code>dosshd</code> + <code>passwd=X</code></td><td>Arranca sshd en el boot con la contraseña de root indicada. <span class="badge opt">Ideal para instalación remota</span></td><td><code>dosshd passwd=miclave123</code></td></tr>
+</table>
+<div class="para-que-sirve"><b>Para qué sirve la combinación <code>dosshd</code> + <code>passwd</code>:</b> te permite conectarte por SSH desde otra máquina y hacer toda la instalación sin teclado ni monitor conectados.</div>
+</div>
+</details>
+<details>
+<summary>Volúmenes lógicos (LVM)</summary>
+<div class="inner">
+<table>
+<tr><th>Opción</th><th>Qué hace</th><th>Ejemplo</th></tr>
+<tr><td><code>dolvm</code></td><td>Activa soporte del kernel para LVM (Logical Volume Manager), por si tu esquema de disco usa volúmenes lógicos en vez de particiones tradicionales.</td><td><code>gentoo dolvm</code></td></tr>
+</table>
+<div class="para-que-sirve"><b>Para qué sirve:</b> LVM te permite redimensionar "particiones" (volúmenes) después, sin las limitaciones rígidas del particionado clásico. No aplica a tu instalación actual (GPT simple), pero es bueno saber que existe.</div>
+</div>
+</details>
+<details>
+<summary>Depuración y otras opciones (debug, doload, nox, scandelay...)</summary>
+<div class="inner">
+<table>
+<tr><th>Opción</th><th>Qué hace</th><th>Ejemplo</th></tr>
+<tr><td><code>debug</code></td><td>Muestra mucha información de depuración en pantalla.</td><td>—</td></tr>
+<tr><td><code>docache</code></td><td>Copia todo el CD a RAM, permitiendo desmontar y montar otro disco. Requiere el doble de RAM que el tamaño del CD.</td><td>—</td></tr>
+<tr><td><code>doload=X</code> / <code>noload=X</code></td><td>Fuerza cargar (o evitar cargar) un módulo específico del kernel.</td><td><code>doload=e1000e</code></td></tr>
+<tr><td><code>nodetect</code></td><td>Desactiva toda autodetección de hardware y DHCP, para depurar por qué falla el arranque.</td><td>—</td></tr>
+<tr><td><code>nofirewire</code></td><td>Desactiva módulos Firewire.</td><td>—</td></tr>
+<tr><td><code>nogpm</code></td><td>Desactiva el mouse en consola.</td><td>—</td></tr>
+<tr><td><code>nohotplug</code></td><td>Desactiva scripts de hotplug/coldplug al arrancar.</td><td>—</td></tr>
+<tr><td><code>nokeymap</code></td><td>Desactiva selección de teclado no-US.</td><td>—</td></tr>
+<tr><td><code>nosound</code></td><td>Desactiva sonido y ajuste de volumen.</td><td>—</td></tr>
+<tr><td><code>nox</code></td><td>En un LiveCD con X, evita que arranque el entorno gráfico y deja la línea de comandos.</td><td>—</td></tr>
+<tr><td><code>scandelay</code> / <code>scandelay=X</code></td><td>Pausa de 10 s (o los segundos que definas) para dar tiempo a dispositivos lentos en inicializar.</td><td><code>scandelay=20</code></td></tr>
+</table>
+</div>
+</details>
+<h2>Para enriquecer: cosas que vale la pena saber</h2>
+<div class="callout">
+<b>🖥️ Teclado no-US:</b> si tu teclado no es inglés/US, presiona <span class="keycap">Alt</span>+<span class="keycap">F1</span> apenas veas la barra de progreso, para activar el modo detallado y elegir tu distribución. Si no seleccionas nada en 10 segundos, se usa el layout US por defecto.
+</div>
+<div class="callout">
+<b>🔀 Consolas virtuales:</b> una vez dentro del entorno live, puedes moverte entre varias consolas con <span class="keycap">Alt</span>+<span class="keycap">F2</span>, <span class="keycap">F3</span>, <span class="keycap">F4</span>, y volver a la principal con <span class="keycap">Alt</span>+<span class="keycap">F1</span>. Útil para tener una consola con documentación abierta y otra ejecutando comandos.
+</div>
+<div class="callout tip">
+<b>⏱️ Timeout de 15 segundos:</b> si no eliges nada en el menú de GRUB, el medio de instalación arranca el disco interno por defecto. Esto es intencional: permite reiniciar remotamente y que la máquina vuelva sola al sistema ya instalado, sin tener que quitar el USB/CD a mano.
+</div>
+<footer>
+  Compendio Gentoo · Capítulo 6 de la guía de instalación · Generado a partir del Gentoo AMD64 Handbook
+</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-05-grabar-medio.html">← Cap. 05: Capítulo 5 — Grabar el medio de arranque</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-07-red-automatica.html">Cap. 07: Capítulo 7 — Configuración automática de la red →</a>
+</div>
+</body>
+</html>

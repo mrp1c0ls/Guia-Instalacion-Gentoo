@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 29 — Referencias | Compendio Gentoo</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --purple: #a371f7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.2rem 4rem;
+  }
+  h1 {
+    font-size: 1.6rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.6rem;
+    margin-bottom: 0.3rem;
+  }
+  .subtitle { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 2rem; }
+  h2 { font-size: 1.15rem; color: var(--accent); margin-top: 2.2rem; }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+  }
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: rgba(88,166,255,0.08);
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  .callout b { color: var(--accent); }
+  .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+  .tag-info { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .tag-none { background: rgba(63,185,80,0.15); color: var(--green); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul { padding-left: 1.3rem; }
+  li { margin-bottom: 0.4rem; }
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem 1.1rem;
+    margin: 1rem 0;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--purple);
+  }
+  summary:hover { color: var(--accent); }
+  details[open] summary { margin-bottom: 0.6rem; }
+  code {
+    background: #21262d;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #79c0ff;
+  }
+  footer { margin-top: 3rem; color: var(--text-dim); font-size: 0.8rem; text-align: center; }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">VII. Configuración regional y hardware</span>
+</div>
+<span class="jagg-badge">Cap. 29 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 29 — Referencias <span class="tag tag-none">Sin comandos</span></h1>
+<p class="subtitle">Handbook de Gentoo AMD64 · Cierre del capítulo 28 (Configuración de locales)</p>
+<div class="callout">
+<b>¿Para qué sirve este capítulo?</b> No es un paso de instalación — es solo la bibliografía que respalda lo explicado en el capítulo de <em>locales</em>. Aquí no se ejecuta nada en la terminal; es información de contexto para quien quiera profundizar.
+</div>
+<h2>Las dos fuentes citadas</h2>
+<div class="card">
+<ul>
+<li>
+<b>Anuncio de paquetes binarios de Gentoo</b> (dic. 2023)<br/>
+<a href="https://www.gentoo.org/news/2023/12/29/Gentoo-binary.html" target="_blank">gentoo.org/news/2023/12/29/Gentoo-binary.html</a><br/>
+<span style="color:var(--text-dim); font-size:0.9rem;">Anuncia que Gentoo empezó a ofrecer binarios oficiales precompilados (además del modelo tradicional de compilar todo desde código fuente).</span>
+</li>
+<li style="margin-top:0.8rem;">
+<b>GLEP 23</b> — propuesta de mejora sobre licencias<br/>
+<a href="https://www.gentoo.org/glep/glep-0023.html#id7" target="_blank">gentoo.org/glep/glep-0023.html</a><br/>
+<span style="color:var(--text-dim); font-size:0.9rem;">El documento que define cómo Gentoo agrupa las licencias de software y cómo funciona la variable <code>ACCEPT_LICENSE</code>.</span>
+</li>
+</ul>
+</div>
+<h2>Contexto extra — ¿por qué importa el GLEP 23?</h2>
+<div class="callout">
+<b>Adelanto:</b> Vas a usar esta idea más adelante, en la configuración de Portage. GLEP significa <i>Gentoo Linux Enhancement Proposal</i> (como un "RFC" interno de Gentoo).
+</div>
+<p>La idea central es simple: Gentoo tiene miles de paquetes, y cada uno puede traer una licencia distinta (GPL, MIT, propietaria, etc.). En vez de que revises licencia por licencia, Gentoo las agrupa en <b>grupos de licencias</b> (por ejemplo <code>@FREE</code> para software libre). Así puedes decirle al sistema algo como "solo instala software con licencia libre" con una sola línea en <code>ACCEPT_LICENSE</code>, en lugar de aprobar cada paquete manualmente.</p>
+<details>
+<summary>Analogía con NixOS</summary>
+<p>Es parecido al flag <code>allowUnfree</code> de NixOS: en vez de aprobar paquete por paquete, defines una política general (permitir/rechazar cierto tipo de licencias) y el gestor de paquetes la aplica automáticamente en cada instalación.</p>
+</details>
+<h2>Resumen en una frase</h2>
+<div class="card" style="text-align:center; font-style:italic; color:var(--text-dim);">
+  Capítulo informativo, sin acción requerida — solo enlaces de respaldo al tema de locales y un adelanto de las licencias que verás en la configuración de Portage.
+</div>
+<footer>Compendio Gentoo · Capítulo 29 de 53 · Generado a partir del Handbook oficial AMD64</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-28-locales.html">← Cap. 28: Configurar los locales</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-30-firmware-microcodigo.html">Cap. 30: 30. Instalando Firmware y Microcódigo →</a>
+</div>
+</body>
+</html>

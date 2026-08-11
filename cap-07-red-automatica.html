@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Capítulo 7 — Configuración automática de la red</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --bg-card: #171a21;
+    --border: #2a2e38;
+    --text: #d7dae0;
+    --text-dim: #8b90a0;
+    --accent: #6fb3ff;
+    --green: #4caf82;
+    --yellow: #d9a441;
+    --red: #e05c5c;
+    --code-bg: #10131a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+    line-height: 1.55;
+  }
+  h1 { font-size: 1.6rem; color: #fff; margin-bottom: 4px; }
+  .subtitle { color: var(--text-dim); margin-bottom: 28px; font-size: 0.95rem; }
+  h2 {
+    font-size: 1.15rem; color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px; margin-top: 36px;
+  }
+  p { margin: 10px 0; }
+  code {
+    background: var(--code-bg); color: #e8c07d;
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; overflow-x: auto;
+    font-size: 0.88rem; margin: 10px 0;
+  }
+  pre code { background: none; padding: 0; color: #c9e28a; }
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--bg-card);
+    padding: 10px 14px; margin: 12px 0; border-radius: 0 6px 6px 0;
+    font-size: 0.92rem;
+  }
+  .callout b { color: var(--accent); }
+  .risk {
+    display: inline-block; font-size: 0.72rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 10px; margin-left: 8px;
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .risk.low { background: rgba(76,175,130,0.15); color: var(--green); }
+  .risk.info { background: rgba(111,179,255,0.15); color: var(--accent); }
+  details {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 16px; margin: 12px 0;
+  }
+  summary { cursor: pointer; font-weight: 600; color: #fff; }
+  summary::marker { color: var(--accent); }
+  .cmd-block { margin: 10px 0; }
+  .cmd-purpose {
+    font-size: 0.85rem; color: var(--text-dim); margin-top: 4px;
+  }
+  .cmd-purpose b { color: var(--yellow); }
+  ol, ul { margin: 8px 0; padding-left: 22px; }
+  li { margin: 4px 0; }
+  .footer {
+    margin-top: 50px; padding-top: 16px; border-top: 1px solid var(--border);
+    color: var(--text-dim); font-size: 0.82rem;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">III. Red durante la instalación (medio live)</span>
+</div>
+<span class="jagg-badge">Cap. 07 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 7 — Configuración automática de la red</h1>
+<div class="subtitle">Handbook de Gentoo AMD64 · Instalación · Networking (parte 1)</div>
+<div class="callout">
+<b>En una frase:</b> antes de instalar nada hace falta internet en el sistema live. Este capítulo revisa si la red ya funciona sola (lo más común) y cómo comprobarlo.
+</div>
+<h2>¿Por qué existe este paso?</h2>
+<p>
+Todo lo que sigue en la instalación (descargar el stage3, sincronizar Portage, compilar el kernel) necesita salir a internet. Antes de tocar cualquier configuración manual, el Handbook te pide comprobar si ya tienes conexión, porque en la mayoría de los casos <b>no hay que configurar nada</b>.
+</p>
+<h2>"A lo mejor ya funciona" <span class="risk info">Concepto</span></h2>
+<p>
+Si tu equipo está conectado por cable Ethernet a un router con DHCP —el caso típico en casa o en la oficina— es muy probable que la red ya haya quedado configurada sola al arrancar el medio de instalación.
+</p>
+<div class="callout">
+<b>Para qué sirve saber esto:</b> te ahorra tiempo. Si tienes cable y router normal, salta directo a la sección de "Comprobar la conexión" antes de intentar configurar nada a mano.
+</div>
+<h2>DHCP <span class="risk info">Concepto</span></h2>
+<p>
+DHCP (<i>Dynamic Host Configuration Protocol</i>) es el protocolo que le entrega automáticamente a tu equipo todo lo que necesita para hablar en la red: dirección IP, máscara de red, ruta por defecto, servidores DNS, etc.
+</p>
+<p>
+Para que funcione tiene que existir un servidor DHCP en la misma red local — normalmente es el propio router. Por defecto, el medio live de Gentoo usa <b>NetworkManager</b>, que intenta conectarse por DHCP automáticamente. Si eso no pasa, lo primero es revisar el cable físico.
+</p>
+<h2>Comprobar la conexión (Testing the network)</h2>
+<p>Tres chequeos, de lo más básico a lo más específico:</p>
+<details open="">
+<summary>1. ¿Hay una ruta por defecto? <span class="risk low">Bajo riesgo</span></summary>
+<div class="cmd-block">
+<pre><code>root # ip route
+default via 192.168.0.1 dev enp1s0</code></pre>
+<div class="cmd-purpose"><b>Para qué sirve:</b> la ruta por defecto es la "puerta de salida" hacia internet. Si el comando no muestra ninguna línea que empiece con <code>default</code>, no hay salida a internet configurada — ese es el problema a resolver primero.</div>
+</div>
+</details>
+<details open="">
+<summary>2. ¿Hay conectividad básica? <span class="risk low">Bajo riesgo</span></summary>
+<div class="cmd-block">
+<pre><code>root # ping -c 3 1.1.1.1</code></pre>
+<div class="cmd-purpose"><b>Para qué sirve:</b> confirma que hay salida real a internet. Se usa una <b>IP directa</b> (no un nombre de dominio) a propósito, para descartar de entrada cualquier problema de DNS y enfocarse solo en si hay conexión física/lógica.</div>
+</div>
+</details>
+<details open="">
+<summary>3. ¿Funciona DNS + HTTPS? <span class="risk low">Bajo riesgo</span></summary>
+<div class="cmd-block">
+<pre><code>root # curl --location gentoo.org --output /dev/null</code></pre>
+<div class="cmd-purpose"><b>Para qué sirve:</b> prueba en un solo paso que el nombre de dominio se resuelve (DNS) y que se puede descargar por HTTPS, que es justo lo que necesitará Portage más adelante.</div>
+</div>
+</details>
+<h2>Cómo interpretar los resultados</h2>
+<ul>
+<li><b>Todo funciona</b> → continuar directo con la preparación de discos.</li>
+<li><b><code>ping</code> funciona pero <code>curl</code> falla</b> → el problema es de DNS (se resuelve configurando <code>/etc/resolv.conf</code>, visto en un capítulo posterior).</li>
+<li><b>Nada funciona</b> → hay que revisar la información de las interfaces de red, probar con <code>nmtui</code>, o configurar la red manualmente (próximos capítulos).</li>
+</ul>
+<h2>Para enriquecer: ¿por qué probar con IP antes que con dominio?</h2>
+<div class="callout">
+Es una técnica útil fuera de la instalación también: separar capas del problema. Si el <code>ping</code> a una IP falla, el problema está en la capa de red (cable, router, DHCP). Si el <code>ping</code> a la IP funciona pero <code>curl</code> a un dominio falla, el problema está aislado a DNS. Este tipo de diagnóstico por capas se aplica en casi cualquier troubleshooting de red, no solo en Gentoo.
+</div>
+<div class="footer">
+Compendio Gentoo · Capítulo 7 de la sección de Networking · Basado en el Gentoo AMD64 Handbook
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-06-arranque.html">← Cap. 06: Capítulo 6 — Arranque del medio de instalación</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-09-wifi.html">Cap. 09: 📶 Configuración Inalámbrica (WiFi) →</a>
+</div>
+</body>
+</html>

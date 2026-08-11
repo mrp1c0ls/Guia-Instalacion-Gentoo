@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 39 · Acceso remoto por shell (SSH)</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --bg-card:#171a21;
+    --bg-code:#0b0d11;
+    --border:#262b36;
+    --text:#e6e8ec;
+    --text-dim:#9aa2b1;
+    --accent:#7aa2f7;
+    --accent-soft:#7aa2f722;
+    --risk-low:#3fb950;
+    --risk-low-bg:#3fb95022;
+    --risk-med:#e3b341;
+    --risk-med-bg:#e3b34122;
+    --risk-high:#f85149;
+    --risk-high-bg:#f8514922;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    padding:2rem 1rem;
+  }
+  .wrap{max-width:820px;margin:0 auto}
+  header.top{
+    border-bottom:1px solid var(--border);
+    padding-bottom:1.2rem;
+    margin-bottom:2rem;
+  }
+  .eyebrow{
+    color:var(--accent);
+    font-size:.8rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    font-weight:600;
+    margin-bottom:.4rem;
+  }
+  h1{font-size:1.6rem;margin:0 0 .3rem}
+  .subtitle{color:var(--text-dim);font-size:.95rem}
+  h2{
+    font-size:1.2rem;
+    margin-top:2.2rem;
+    padding-bottom:.4rem;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:.5rem;
+  }
+  h3{font-size:1.02rem;color:var(--accent);margin-top:1.4rem}
+  p{color:var(--text);margin:.6rem 0}
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:1.1rem 1.2rem;
+    margin:1rem 0;
+  }
+  .purpose{
+    background:var(--accent-soft);
+    border-left:3px solid var(--accent);
+    border-radius:6px;
+    padding:.7rem .9rem;
+    margin:.7rem 0;
+    font-size:.92rem;
+  }
+  .purpose b{color:var(--accent)}
+  code{
+    background:var(--bg-code);
+    padding:.15em .4em;
+    border-radius:4px;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:.88em;
+    color:#c9d1d9;
+  }
+  pre{
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:.9rem 1rem;
+    overflow-x:auto;
+    margin:.6rem 0;
+  }
+  pre code{background:none;padding:0;font-size:.86rem;color:#c9d1d9}
+  .risk{
+    display:inline-flex;
+    align-items:center;
+    gap:.3rem;
+    font-size:.72rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:.2rem .55rem;
+    border-radius:20px;
+    margin-left:.5rem;
+    vertical-align:middle;
+  }
+  .risk-low{background:var(--risk-low-bg);color:var(--risk-low)}
+  .risk-med{background:var(--risk-med-bg);color:var(--risk-med)}
+  .risk-high{background:var(--risk-high-bg);color:var(--risk-high)}
+  table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.9rem}
+  th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--border)}
+  th{color:var(--accent);font-weight:600}
+  td code{white-space:nowrap}
+  details{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:.7rem 1rem;
+    margin:.8rem 0;
+  }
+  summary{
+    cursor:pointer;
+    font-weight:600;
+    color:var(--accent);
+    list-style:none;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▶ ";font-size:.75em}
+  details[open] summary::before{content:"▼ "}
+  details > .content{margin-top:.7rem}
+  .path-tag{
+    display:inline-block;
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    color:var(--accent);
+    padding:.15rem .5rem;
+    border-radius:5px;
+    font-family:monospace;
+    font-size:.85rem;
+  }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .note{
+    border-left:3px solid var(--risk-med);
+    background:var(--risk-med-bg);
+    padding:.7rem .9rem;
+    border-radius:6px;
+    font-size:.9rem;
+    margin:.8rem 0;
+  }
+  footer{
+    margin-top:2.5rem;
+    padding-top:1rem;
+    border-top:1px solid var(--border);
+    color:var(--text-dim);
+    font-size:.82rem;
+    text-align:center;
+  }
+  ul{padding-left:1.2rem}
+  li{margin:.3rem 0}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">X. Configuración inicial del sistema y servicios</span>
+</div>
+<span class="jagg-badge">Cap. 39 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header class="top">
+<div class="eyebrow">Capítulo 39 · Instalación de Gentoo</div>
+<h1>Acceso remoto por shell (SSH)</h1>
+<div class="subtitle">Paso opcional — habilita el servidor SSH para administrar tu equipo desde otra máquina</div>
+</header>
+<div class="purpose">
+<b>¿Para qué sirve este capítulo?</b> Configura tu Gentoo para aceptar conexiones remotas por SSH desde el primer arranque, en vez de que solo puedas usarlo sentado frente al teclado/monitor.
+  </div>
+<h2>🧩 El concepto en simple</h2>
+<p>
+    El paquete que hace esto posible es <code>net-misc/openssh</code>, y ya viene instalado en el sistema base de Gentoo. El problema es que estar instalado no significa que arranque solo: en Gentoo, cada servicio debe <b>registrarse explícitamente</b> para iniciar con el sistema.
+  </p>
+<p>
+    Este capítulo simplemente le dice a OpenRC: "cuando el sistema arranque, enciende también el servidor SSH (<code>sshd</code>)".
+  </p>
+<h2>⚙️ Dónde se configura</h2>
+<table>
+<tr><th>Elemento</th><th>Ubicación</th></tr>
+<tr><td>Registrar el servicio para que arranque</td><td><span class="path-tag">rc-update</span> (comando, no archivo)</td></tr>
+<tr><td>Configuración del servidor SSH</td><td><span class="path-tag">/etc/ssh/sshd_config</span></td></tr>
+<tr><td>Consola serial (caso especial)</td><td><span class="path-tag">/etc/inittab</span></td></tr>
+<tr><td>Llaves del servidor (host keys)</td><td><span class="path-tag">/etc/ssh/</span></td></tr>
+</table>
+<h2>🚀 Activar el servicio <span class="risk risk-low">Riesgo bajo</span></h2>
+<div class="purpose">
+<b>Para qué sirve:</b> agrega <code>sshd</code> al runlevel <code>default</code>, que es el conjunto de servicios que arrancan en un uso normal del sistema (equivalente a "modo multiusuario").
+  </div>
+<pre><code>rc-update add sshd default</code></pre>
+<p>
+    Es exactamente el mismo patrón que usaste con <code>chronyd</code> o el logger del sistema: <code>rc-update add &lt;servicio&gt; &lt;runlevel&gt;</code>. En NixOS sería el equivalente a <code>services.openssh.enable = true;</code>, solo que aquí es un comando en vez de una declaración en un archivo.
+  </p>
+<p>Para verificar que quedó registrado:</p>
+<pre><code>rc-update show | grep sshd</code></pre>
+<p>Y si quieres probarlo sin reiniciar (útil incluso durante la instalación, dentro del entorno live):</p>
+<pre><code>rc-service sshd start</code></pre>
+<h2>🔐 Comportamiento por defecto y seguridad</h2>
+<div class="note">
+<b>Importante:</b> por defecto <code>sshd</code> <u>no permite login como root</u>. Necesitas un usuario normal ya creado (o crear uno) antes de poder conectarte remotamente.
+  </div>
+<p>Esto es intencional: reduce el riesgo de que alguien intente forzar el acceso directamente a la cuenta con más privilegios del sistema.</p>
+<details>
+<summary>¿Cómo permitir root por SSH? (no recomendado)</summary>
+<div class="content">
+<p>Si por alguna razón necesitas permitirlo (por ejemplo, en un entorno de pruebas aislado), se edita:</p>
+<pre><code>nano /etc/ssh/sshd_config</code></pre>
+<p>Y se ajusta la directiva <code>PermitRootLogin</code> (valores comunes: <code>no</code>, <code>yes</code>, <code>prohibit-password</code>). Después hay que reiniciar el servicio para que el cambio tome efecto:</p>
+<pre><code>rc-service sshd restart</code></pre>
+</div>
+</details>
+<h2>📡 Caso especial: consola serial</h2>
+<p>
+    Esto <b>solo aplica</b> si tu equipo es un servidor sin monitor que administras a través de un puerto serie (poco común en un equipo de escritorio). Si no es tu caso, puedes ignorar esta sección.
+  </p>
+<details>
+<summary>Configurar agetty en consola serial</summary>
+<div class="content">
+<pre><code>nano -w /etc/inittab</code></pre>
+<p>Se descomentan las líneas de la sección <code>SERIAL CONSOLES</code>:</p>
+<pre><code>s0:12345:respawn:/sbin/agetty 9600 ttyS0 vt100
+s1:12345:respawn:/sbin/agetty 9600 ttyS1 vt100</code></pre>
+</div>
+</details>
+<h2>🖥️ Referencia: equivalente en systemd</h2>
+<p>Solo para contraste, ya que tu instalación usa OpenRC — <b>no necesitas ejecutar esto</b>:</p>
+<pre><code>systemctl enable sshd</code></pre>
+<h2>✨ Vale la pena saber (no está en el manual, pero es útil)</h2>
+<div class="card">
+<h3>La primera conexión mostrará una "huella digital" (fingerprint)</h3>
+<p>La primera vez que te conectes por SSH a tu Gentoo recién instalado, el cliente SSH te pedirá confirmar la huella del servidor. Es normal — solo verifica que estás conectando al equipo correcto.</p>
+<h3>Si reinstalas el sistema, tu cliente SSH se quejará</h3>
+<p>Cuando reinstales Gentoo (mismo disco, mismo hostname/IP), tu computadora cliente pensará que alguien está suplantando al servidor, porque las llaves cambiaron. Hay que borrar la entrada vieja con:</p>
+<pre><code>ssh-keygen -R &lt;ip-o-hostname&gt;</code></pre>
+<h3>Opciones útiles en <code>sshd_config</code></h3>
+<table>
+<tr><th>Directiva</th><th>Qué controla</th></tr>
+<tr><td><code>Port</code></td><td>Puerto de escucha (por defecto 22)</td></tr>
+<tr><td><code>PermitRootLogin</code></td><td>Si root puede entrar directamente</td></tr>
+<tr><td><code>PasswordAuthentication</code></td><td>Permitir login con contraseña vs. solo llaves</td></tr>
+<tr><td><code>AllowUsers</code></td><td>Lista blanca de usuarios que pueden conectarse</td></tr>
+</table>
+<p>Cualquier cambio en este archivo requiere <code>rc-service sshd restart</code> para aplicarse.</p>
+</div>
+<h2>✅ Resumen rápido</h2>
+<div class="grid">
+<div class="card">
+<h3>Qué hacer</h3>
+<ul>
+<li><code>rc-update add sshd default</code></li>
+<li>Crear un usuario no-root para conectarte</li>
+<li>(Opcional) probar con <code>rc-service sshd start</code></li>
+</ul>
+</div>
+<div class="card">
+<h3>Cuándo saltarlo</h3>
+<ul>
+<li>Si vas a trabajar solo desde el teclado/monitor local</li>
+<li>Se puede activar después del primer arranque sin problema</li>
+</ul>
+</div>
+</div>
+<footer>Compendio Gentoo · Capítulo 39 — Acceso remoto por shell (SSH)</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-38-file-indexing.html">← Cap. 38: Capítulo 38 — Indexado de archivos</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-40-shell-completion.html">Cap. 40: Cap. 40 — Shell Completion (Bash) →</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 45-46 · Bootloaders alternativos (systemd-boot / EFI Stub)</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --bg-card:#171a21;
+    --bg-code:#0b0d11;
+    --border:#2a2f3a;
+    --text:#e4e6eb;
+    --text-dim:#9aa0ac;
+    --accent:#7aa2f7;
+    --accent-2:#bb9af7;
+    --ok:#9ece6a;
+    --warn:#e0af68;
+    --danger:#f7768e;
+    --info:#7dcfff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height:1.6;
+    padding:2rem 1rem 4rem;
+  }
+  .wrap{max-width:880px;margin:0 auto}
+  header.top{margin-bottom:2rem;border-bottom:1px solid var(--border);padding-bottom:1.5rem}
+  header.top h1{font-size:1.6rem;margin:0 0 .4rem}
+  header.top p{color:var(--text-dim);margin:0}
+  .badge{
+    display:inline-block;font-size:.72rem;font-weight:600;
+    padding:.15rem .55rem;border-radius:999px;margin-right:.4rem;
+    text-transform:uppercase;letter-spacing:.03em;
+  }
+  .badge.applies{background:#1d3a2a;color:var(--ok)}
+  .badge.noapply{background:#3a2a1d;color:var(--warn)}
+  .badge.openrc{background:#20304a;color:var(--info)}
+  .badge.systemd{background:#2c1f3d;color:var(--accent-2)}
+
+  h2{
+    font-size:1.25rem;color:var(--accent);
+    margin-top:2.5rem;border-left:3px solid var(--accent);
+    padding-left:.6rem;
+  }
+  h3{font-size:1.05rem;color:var(--text);margin-top:1.6rem}
+  p{color:var(--text)}
+  .lead{color:var(--text-dim);font-size:.95rem}
+
+  .callout{
+    border-radius:8px;padding:.9rem 1rem;margin:1rem 0;
+    border:1px solid var(--border);background:var(--bg-card);
+  }
+  .callout.para-que{border-left:4px solid var(--info)}
+  .callout.para-que .label{color:var(--info);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;display:block}
+  .callout.donde{border-left:4px solid var(--accent-2)}
+  .callout.donde .label{color:var(--accent-2);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;display:block}
+  .callout.riesgo{border-left:4px solid var(--danger)}
+  .callout.riesgo .label{color:var(--danger);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;display:block}
+  .callout.tip{border-left:4px solid var(--ok)}
+  .callout.tip .label{color:var(--ok);font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;display:block}
+
+  code{
+    background:var(--bg-code);color:var(--accent);
+    padding:.1rem .35rem;border-radius:4px;font-size:.88em;
+    font-family:"JetBrains Mono","Fira Code",monospace;
+  }
+  pre{
+    background:var(--bg-code);border:1px solid var(--border);
+    border-radius:8px;padding:1rem;overflow-x:auto;margin:.8rem 0;
+  }
+  pre code{background:none;padding:0;color:#c9d1d9;display:block}
+  .cmd-file{color:var(--text-dim);font-size:.78rem;margin-bottom:.3rem;font-family:monospace}
+
+  table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.92rem}
+  th,td{border:1px solid var(--border);padding:.5rem .7rem;text-align:left}
+  th{background:var(--bg-card);color:var(--accent)}
+  tr:nth-child(even){background:#14171d}
+
+  details{
+    background:var(--bg-card);border:1px solid var(--border);
+    border-radius:8px;margin:.9rem 0;padding:.7rem 1rem;
+  }
+  details summary{cursor:pointer;font-weight:600;color:var(--accent)}
+  details[open] summary{margin-bottom:.6rem}
+  details summary::marker{color:var(--accent)}
+
+  .flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1rem 0}
+  .flow .step{
+    background:var(--bg-code);border:1px solid var(--border);
+    border-radius:6px;padding:.4rem .7rem;font-size:.85rem;font-family:monospace;
+  }
+  .flow .arrow{color:var(--text-dim)}
+
+  footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--text-dim);font-size:.85rem}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">XI. Bootloader</span>
+</div>
+<span class="jagg-badge">Cap. 45-46 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header class="top">
+<h1>Cap. 45–46 · Bootloaders alternativos</h1>
+<p class="lead">systemd-boot y EFI Stub — la instalación de referencia usa <strong>GRUB</strong>, así que estos capítulos son contexto, no ejecución.</p>
+<div style="margin-top:.8rem">
+<span class="badge noapply">No aplica a tu instalación (usas GRUB)</span>
+<span class="badge openrc">OpenRC</span>
+<span class="badge systemd">systemd</span>
+</div>
+</header>
+<h2 id="contexto">¿Por qué existen 3 formas de arrancar?</h2>
+<p>Un firmware UEFI ya sabe ejecutar un archivo <code>.efi</code> directamente — técnicamente no necesita un "bootloader". Las tres opciones del Handbook son distintos niveles de comodidad sobre esa base:</p>
+<table>
+<tr><th></th><th>GRUB</th><th>systemd-boot</th><th>EFI Stub</th></tr>
+<tr><td>Qué hace</td><td>Bootloader completo con menú, detección automática, scripting</td><td>Chainloader delgado, solo lee entradas de texto</td><td>El kernel <em>es</em> el ejecutable EFI; no hay intermediario</td></tr>
+<tr><td>Detecta kernels solo</td><td>Sí (<code>grub-mkconfig</code>)</td><td>Sí (convención de archivos)</td><td>No — se registra cada uno a mano</td></tr>
+<tr><td>OpenRC</td><td>✅</td><td>✅</td><td>✅</td></tr>
+<tr><td>systemd</td><td>✅</td><td>✅ (su entorno natural)</td><td>✅</td></tr>
+<tr><td>Complejidad configuración</td><td>Alta</td><td>Baja</td><td>Media (todo manual)</td></tr>
+</table>
+<div class="callout para-que">
+<span class="label">Para qué sirve saber esto</span>
+  Si en el futuro migras a un equipo distinto, cambias a systemd, o simplemente el firmware de una placa da problemas con GRUB, tener claro el panorama te permite elegir la alternativa correcta sin partir de cero.
+</div>
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0"/>
+<h2 id="systemd-boot">45 · systemd-boot</h2>
+<p>Es un cargador minimalista: no tiene lenguaje de configuración propio, solo lee archivos <code>.conf</code> por cada entrada de arranque. Funciona igual de bien en OpenRC que en systemd, porque solo necesita el binario y la herramienta <code>bootctl</code> — no arrastra el resto del ecosistema systemd (PID 1, journald, etc.).</p>
+<h3>45.1 Emerge — instalar el paquete correcto</h3>
+<div class="callout donde">
+<span class="label">Dónde se configura</span>
+<code>/etc/portage/package.use/systemd-boot</code>
+</div>
+<pre><div class="cmd-file">FILE /etc/portage/package.use/systemd-boot</div><code>sys-apps/systemd boot          # sistemas con systemd
+sys-apps/systemd-utils boot    # sistemas con OpenRC</code></pre>
+<pre><code>root # emerge --ask sys-apps/systemd        <span style="color:var(--accent-2)"># systemd</span>
+root # emerge --ask sys-apps/systemd-utils  <span style="color:var(--info)"># OpenRC</span></code></pre>
+<p>El USE flag <code>boot</code> es el interruptor que activa el componente de instalación/gestión de systemd-boot dentro de ese paquete. Sin él, el paquete se compila sin esa funcionalidad.</p>
+<h3>45.2 Instalación — un solo comando</h3>
+<pre><code>root # bootctl install</code></pre>
+<div class="callout para-que">
+<span class="label">Para qué sirve</span>
+  Copia el binario <code>systemd-bootx64.efi</code> a la ESP (tu <code>/efi</code>) y lo registra en el firmware. No existe un paso equivalente a <code>grub-mkconfig</code>: las entradas de arranque las genera <code>installkernel</code> automáticamente cada vez que instalas un kernel, no bootctl.
+</div>
+<div class="callout riesgo">
+<span class="label">Riesgo: bajo, pero con condición</span>
+  La ESP debe estar montada (en <code>/efi</code>) <em>antes</em> de correr el comando, o systemd-boot no tendrá dónde escribir.
+</div>
+<details>
+<summary>Verificar que la entrada de arranque quedó registrada</summary>
+<pre><code>root # bootctl list</code></pre>
+<p>Muestra las entradas detectadas. Si el kernel line de arranque parece incorrecto (por ejemplo, usa parámetros del live CD), crea manualmente <code>/etc/kernel/cmdline</code> con la línea correcta y reinstala el kernel.</p>
+</details>
+<h3>45.3 Secure Boot (opcional)</h3>
+<p>Dos caminos según qué acepte tu firmware:</p>
+<table>
+<tr><th>Escenario</th><th>Qué hacer</th></tr>
+<tr><td>El firmware acepta certificados propios</td><td>Activar USE flag <code>secureboot</code> globalmente → Portage firma el ejecutable automáticamente, <code>bootctl install</code> instala la versión ya firmada.</td></tr>
+<tr><td>El firmware solo confía en Microsoft (caso más común)</td><td>Usar <strong>shim</strong> como intermediario pre-firmado.</td></tr>
+</table>
+<details>
+<summary>Configurar shim paso a paso</summary>
+<pre><code>root # emerge --ask sys-boot/shim sys-boot/mokutil sys-boot/efibootmgr
+root # bootctl install --no-variables
+root # cp /usr/share/shim/BOOTX64.EFI /efi/EFI/systemd/shimx64.efi
+root # cp /usr/share/shim/mmx64.efi /efi/EFI/systemd/mmx64.efi</code></pre>
+<p>Shim ya está firmado por Microsoft, así que casi cualquier placa lo acepta por defecto. Shim, a su vez, confía en tu certificado propio — hay que "presentárselo":</p>
+<pre><code>root # openssl x509 -in /path/kernel_key.pem -inform PEM -out /path/kernel_key.der -outform DER
+root # mokutil --import /path/kernel_key.der</code></pre>
+<p>Registrar shim con el firmware (reemplaza <code>boot-disk</code> y <code>boot-partition-id</code>):</p>
+<pre><code>root # efibootmgr --create --disk /dev/boot-disk --part boot-partition-id \
+  --loader '\EFI\systemd\shimx64.efi' \
+  --label 'Systemd-boot via Shim' \
+  --unicode '\EFI\systemd\systemd-bootx64.efi'</code></pre>
+<div class="callout tip">
+<span class="label">Nota</span>
+    La importación no se completa hasta reiniciar. Al arrancar aparecerá <strong>MokManager</strong> pidiendo la contraseña que definiste en <code>mokutil --import</code> — ahí confirmas que confías en esa llave, y luego ya puedes activar Secure Boot en el menú UEFI.
+  </div>
+</details>
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0"/>
+<h2 id="efistub">46 · EFI Stub — arranque sin bootloader</h2>
+<p>El enfoque minimalista: el kernel compilado <em>es</em> el ejecutable EFI. No hay menú, no hay configuración intermedia — cada entrada se registra directamente en el firmware.</p>
+<div class="flow">
+<span class="step">firmware UEFI</span>
+<span class="arrow">→</span>
+<span class="step">lee entrada NVRAM (efibootmgr)</span>
+<span class="arrow">→</span>
+<span class="step">ejecuta bzImage.efi directamente</span>
+</div>
+<h3>Preparar el USE flag y el kernel</h3>
+<div class="callout donde">
+<span class="label">Dónde se configura</span>
+<code>/etc/portage/package.accept_keywords/installkernel</code> y <code>/etc/portage/package.use/installkernel</code>
+</div>
+<pre><div class="cmd-file">FILE /etc/portage/package.accept_keywords/installkernel</div><code>sys-kernel/installkernel **</code></pre>
+<pre><div class="cmd-file">FILE /etc/portage/package.use/installkernel</div><code>sys-kernel/installkernel efistub</code></pre>
+<div class="callout riesgo">
+<span class="label">Por qué hay que aceptar keywords "testing"</span>
+  EFI Stub no está garantizado en todas las implementaciones UEFI (varían mucho entre fabricantes), por eso el flag <code>efistub</code> está enmascarado como inestable — Gentoo te obliga a aceptarlo explícitamente.
+</div>
+<pre><code>root # emerge --ask sys-kernel/installkernel
+root # mkdir -p /efi/EFI/Gentoo
+root # emerge --ask --config sys-kernel/gentoo-kernel{,-bin}   <span style="color:var(--text-dim)"># kernels de distro</span>
+root # make install                                             <span style="color:var(--text-dim)"># kernel manual</span></code></pre>
+<details>
+<summary>Alternativa: copiar el kernel a mano (sin installkernel)</summary>
+<pre><code>root # mkdir -p /efi/EFI/Gentoo
+root # cp /boot/vmlinuz-* /efi/EFI/Gentoo/bzImage.efi</code></pre>
+</details>
+<h3>Registrar la entrada de arranque</h3>
+<pre><code>root # emerge --ask sys-boot/efibootmgr
+root # efibootmgr --create --disk /dev/sda --part 1 --label "gentoo" \
+  --loader "\EFI\Gentoo\bzImage.efi"</code></pre>
+<div class="callout para-que">
+<span class="label">Para qué sirve efibootmgr</span>
+  No es el bootloader en sí — es la herramienta que edita las <strong>variables EFI</strong> (la lista de entradas de arranque que vive en el firmware, tipo NVRAM). Con GRUB o systemd-boot esto lo hacen ellos solos; aquí lo haces tú manualmente por cada kernel.
+</div>
+<p>Si usas initramfs, se agrega como parámetro extra en la misma entrada:</p>
+<pre><code>root # efibootmgr --create --disk /dev/sda --part 1 --label "gentoo" \
+  --loader "\EFI\Gentoo\bzImage.efi" \
+  --unicode "initrd=\EFI\Gentoo\initramfs.img"</code></pre>
+<div class="callout riesgo">
+<span class="label">Nota importante</span>
+  El separador de rutas en definiciones UEFI es <code>\</code> (backslash), no <code>/</code> — es una convención heredada de Windows que el estándar UEFI mantuvo.
+</div>
+<h3>46.1 Unified Kernel Image (UKI)</h3>
+<p>Un UKI empaqueta en <strong>un solo archivo <code>.efi</code></strong>: kernel + initramfs + línea de comandos de arranque. Es la forma más "limpia" de usar EFI Stub, porque reduces todo a un único ejecutable en vez de gestionar kernel e initramfs por separado.</p>
+<table>
+<tr><th>Init</th><th>Paquete/flag necesario</th></tr>
+<tr><td>systemd</td><td><code>sys-apps/systemd boot</code></td></tr>
+<tr><td>OpenRC</td><td><code>sys-apps/systemd-utils boot kernel-install</code></td></tr>
+</table>
+<p>Requiere un "stub loader" — actualmente solo existe <code>systemd-stub</code>, por eso aparece systemd/systemd-utils aunque estés en OpenRC.</p>
+<details>
+<summary>Generar el UKI con dracut o ukify</summary>
+<pre><div class="cmd-file">FILE /etc/portage/package.use/uki (con dracut)</div><code>sys-kernel/installkernel dracut uki</code></pre>
+<pre><div class="cmd-file">FILE /etc/portage/package.use/uki (con ukify)</div><code>sys-kernel/installkernel dracut ukify uki</code></pre>
+<p><code>dracut</code> puede generar initramfs <em>y</em> UKI. <code>ukify</code> solo genera el UKI final — el initramfs lo sigue haciendo dracut por detrás.</p>
+<pre><code>root # emerge --ask sys-kernel/installkernel</code></pre>
+<p>Entrada de arranque para el UKI ya generado (queda en <code>/efi/EFI/Linux/</code>):</p>
+<pre><code>root # efibootmgr --create --disk /dev/sda --part 1 --label "gentoo" \
+  --loader "\EFI\Linux\gentoox.y.z.efi"</code></pre>
+</details>
+<div class="callout riesgo">
+<span class="label">Con Secure Boot activo</span>
+  El cmdline queda "grabado" dentro del UKI firmado. El firmware <strong>ignora</strong> cualquier parámetro pasado desde fuera — es intencional, para que nadie altere el arranque sin volver a firmar el archivo.
+</div>
+<hr style="border:none;border-top:1px solid var(--border);margin:2rem 0"/>
+<h2 id="resumen">En tu instalación (GRUB + dracut)</h2>
+<p>No ejecutas nada de este capítulo. El único punto de contacto real con tu setup: <strong>dracut</strong> también genera tu initramfs para GRUB — es la misma herramienta, solo que aquí se usa de forma "fusionada" (UKI) en vez de como archivo separado.</p>
+</div>
+<footer>
+  Compendio Gentoo · Capítulos 45–46 (Handbook AMD64) · Referencia, no aplica a la instalación con GRUB
+</footer>
+
+
+<div id="jagg-bottombar">
+<a href="cap-44-grub.html">← Cap. 44: Capítulo 44 · Bootloader — GRUB y alternativas</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-47-otras-alternativas.html">Cap. 47: Capítulo 47 — Otras alternativas de bootloader No aplica a tu instalación →</a>
+</div>
+</body>
+</html>

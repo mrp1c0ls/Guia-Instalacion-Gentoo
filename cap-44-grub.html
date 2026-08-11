@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 44 — Bootloader: GRUB y alternativas</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --bg-card:#171a21;
+    --bg-code:#0b0d11;
+    --border:#2a2f3a;
+    --text:#dbe1ea;
+    --text-dim:#8b93a3;
+    --accent:#7dabf8;
+    --accent-soft:#2a3a55;
+    --green:#5fd68a;
+    --yellow:#e8c464;
+    --red:#e8747a;
+    --purple:#b48ce8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65;
+    margin:0;
+    padding:0 0 4rem;
+  }
+  header{
+    padding:2.5rem 1.5rem 1.5rem;
+    max-width:880px;
+    margin:0 auto;
+    border-bottom:1px solid var(--border);
+  }
+  header h1{
+    font-size:1.7rem;
+    margin:0 0 .3rem;
+    color:#fff;
+  }
+  header p.sub{
+    color:var(--text-dim);
+    margin:0;
+    font-size:.95rem;
+  }
+  main{
+    max-width:880px;
+    margin:0 auto;
+    padding:0 1.5rem;
+  }
+  h2{
+    color:var(--accent);
+    font-size:1.25rem;
+    margin-top:2.5rem;
+    padding-bottom:.4rem;
+    border-bottom:1px solid var(--border);
+  }
+  h3{
+    color:#fff;
+    font-size:1.05rem;
+    margin-top:1.6rem;
+  }
+  p{color:var(--text);}
+  .callout{
+    background:var(--bg-card);
+    border-left:3px solid var(--accent);
+    border-radius:6px;
+    padding:.8rem 1rem;
+    margin:.9rem 0;
+    font-size:.92rem;
+  }
+  .callout b{color:var(--accent);}
+  .callout.warn{border-left-color:var(--red);}
+  .callout.warn b{color:var(--red);}
+  .callout.tip{border-left-color:var(--green);}
+  .callout.tip b{color:var(--green);}
+  code, pre{
+    font-family:"SF Mono",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:.85rem;
+  }
+  code{
+    background:var(--bg-code);
+    padding:.15rem .4rem;
+    border-radius:4px;
+    color:var(--yellow);
+  }
+  pre{
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:.9rem 1rem;
+    overflow-x:auto;
+    margin:.6rem 0 1rem;
+    position:relative;
+  }
+  pre code{
+    background:none;
+    padding:0;
+    color:#c8e1ff;
+  }
+  .cmd-label{
+    display:inline-block;
+    font-size:.7rem;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:.35rem;
+  }
+  .risk{
+    display:inline-block;
+    font-size:.7rem;
+    font-weight:600;
+    letter-spacing:.03em;
+    padding:.15rem .55rem;
+    border-radius:999px;
+    margin-left:.5rem;
+    vertical-align:middle;
+  }
+  .risk.low{background:rgba(95,214,138,.15);color:var(--green);}
+  .risk.med{background:rgba(232,196,100,.15);color:var(--yellow);}
+  .risk.high{background:rgba(232,116,122,.15);color:var(--red);}
+  .purpose{
+    font-size:.85rem;
+    color:var(--text-dim);
+    margin:.3rem 0 .8rem;
+  }
+  .purpose b{color:var(--purple);}
+  details{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:.9rem 0;
+    padding:.2rem 1rem;
+  }
+  summary{
+    cursor:pointer;
+    padding:.7rem 0;
+    font-weight:600;
+    color:var(--accent);
+    list-style:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{
+    content:"▸ ";
+    color:var(--text-dim);
+  }
+  details[open] summary::before{
+    content:"▾ ";
+  }
+  details > *:last-child{margin-bottom:1rem;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1rem 0;
+    font-size:.88rem;
+  }
+  th, td{
+    border:1px solid var(--border);
+    padding:.6rem .7rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{
+    background:var(--bg-card);
+    color:var(--accent);
+    font-weight:600;
+  }
+  tr:nth-child(even){background:rgba(255,255,255,.02);}
+  .step-path{
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    padding:.3rem .7rem;
+    border-radius:6px;
+    font-size:.82rem;
+    color:var(--text-dim);
+    margin:.5rem 0 1rem;
+  }
+  .step-path b{color:var(--yellow);font-weight:500;}
+  ul, ol{padding-left:1.3rem;}
+  li{margin-bottom:.35rem;}
+  .badge-row{margin:.3rem 0 1rem;}
+  footer{
+    max-width:880px;
+    margin:3rem auto 0;
+    padding:1.5rem;
+    border-top:1px solid var(--border);
+    color:var(--text-dim);
+    font-size:.82rem;
+    text-align:center;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">XI. Bootloader</span>
+</div>
+<span class="jagg-badge">Cap. 44 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<h1>Capítulo 44 · Bootloader — GRUB y alternativas</h1>
+<p class="sub">Instalación de Gentoo · Configuración: GPT + UEFI · dracut · OpenRC</p>
+</header>
+<main>
+<h2>¿Para qué sirve este capítulo?</h2>
+<p>El <b>bootloader</b> es el primer programa que corre después del firmware (UEFI). Su único trabajo es encontrar el kernel de Linux, cargarlo en memoria y arrancarlo con los parámetros correctos. Sin bootloader, el firmware enciende pero no sabe qué sistema operativo cargar.</p>
+<div class="callout">
+<b>Dos verbos distintos</b><br/>
+<b>Emerge</b> = descargar/compilar el paquete con Portage (reversible, sin riesgo).<br/>
+<b>Install</b> = escribir el bootloader físicamente en el disco o en la partición EFI (ESP) — esto es lo que lo activa para el próximo arranque.
+</div>
+<div style="background:#0d1117;border:1px solid #2a3140;border-radius:10px;padding:1rem 1rem .5rem;margin:1.2rem auto;max-width:760px;">
+<svg viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#7aa2f7"/>
+    </marker>
+  </defs>
+  <g font-family="monospace" font-size="11">
+    <rect x="10" y="55" width="130" height="60" rx="8" fill="#1a1e28" stroke="#3a4150"/>
+    <text x="75" y="80" text-anchor="middle" fill="#dbe1ea">Firmware</text>
+    <text x="75" y="96" text-anchor="middle" fill="#8b93a3" font-size="10">UEFI</text>
+
+    <line x1="140" y1="85" x2="180" y2="85" stroke="#7aa2f7" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+    <rect x="182" y="55" width="150" height="60" rx="8" fill="#132116" stroke="#2d4a2d"/>
+    <text x="257" y="76" text-anchor="middle" fill="#9ece6a">ESP · /efi</text>
+    <text x="257" y="92" text-anchor="middle" fill="#8b93a3" font-size="10">grubx64.efi</text>
+    <text x="257" y="106" text-anchor="middle" fill="#6b7280" font-size="9">grub-install</text>
+
+    <line x1="332" y1="85" x2="372" y2="85" stroke="#7aa2f7" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+    <rect x="374" y="55" width="150" height="60" rx="8" fill="#1c1720" stroke="#4a3860"/>
+    <text x="449" y="76" text-anchor="middle" fill="#c792ea">grub.cfg</text>
+    <text x="449" y="92" text-anchor="middle" fill="#8b93a3" font-size="10">/boot/grub/</text>
+    <text x="449" y="106" text-anchor="middle" fill="#6b7280" font-size="9">grub-mkconfig</text>
+
+    <line x1="524" y1="85" x2="564" y2="85" stroke="#7aa2f7" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+    <rect x="566" y="40" width="180" height="90" rx="8" fill="#0f1e33" stroke="#2a4568"/>
+    <text x="656" y="62" text-anchor="middle" fill="#7dd3fc">kernel + initramfs</text>
+    <text x="656" y="80" text-anchor="middle" fill="#8b93a3" font-size="10">vmlinuz-*</text>
+    <text x="656" y="96" text-anchor="middle" fill="#8b93a3" font-size="10">initramfs (dracut)</text>
+    <text x="656" y="114" text-anchor="middle" fill="#facc15" font-size="10">→ sistema arrancado</text>
+  </g>
+</svg>
+<p style="text-align:center;color:#8b93a3;font-size:.78rem;margin:.4rem 0 0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">Flujo de arranque con GRUB en tu configuración (GPT + UEFI + dracut).</p></div><h2>44.1 — Emerge (instalar el paquete GRUB)</h2>
+<p class="purpose"><b>Para qué sirve:</b> descargar y compilar GRUB con las opciones necesarias para tu firmware (UEFI en tu caso).</p>
+<div class="step-path">📍 Se configura en: <b>/etc/portage/make.conf</b></div>
+<span class="cmd-label">Habilitar soporte UEFI antes de compilar</span><span class="risk low">RIESGO BAJO</span>
+<pre><code>echo 'GRUB_PLATFORMS="efi-64"' &gt;&gt; /etc/portage/make.conf
+emerge --ask sys-boot/grub</code></pre>
+<div class="callout tip">
+<b>Opciones de GRUB_PLATFORMS</b><br/>
+No solo existe <code>efi-64</code>. GRUB soporta múltiples plataformas de arranque en la misma variable (separadas por espacio): <code>pc</code> (BIOS legacy), <code>efi-32</code>, <code>efi-64</code>, <code>coreboot</code>, <code>ieee1275</code> (Open Firmware/PowerPC), entre otras. Solo necesitas la que corresponda a tu firmware real.
+</div>
+<p>Si ya compilaste GRUB sin esa variable, se recompila así:</p>
+<span class="cmd-label">Recompilar con nuevas USE/variables</span><span class="risk low">RIESGO BAJO</span>
+<pre><code>emerge --ask --update --newuse --verbose sys-boot/grub</code></pre>
+<h2>44.2 — Install (grabar GRUB en el disco/ESP)</h2>
+<p class="purpose"><b>Para qué sirve:</b> copiar los archivos ejecutables de GRUB a la partición donde el firmware los va a buscar al encender la máquina.</p>
+<div class="callout warn">
+<b>Punto de no retorno</b><br/>
+Este es el paso más delicado de toda la instalación. Si la partición ESP (<code>/efi</code>) no está montada al ejecutar el comando, GRUB puede instalarse en la carpeta equivocada <b>sin mostrar ningún error</b>, dejando el sistema sin forma de arrancar.
+</div>
+<h3>44.2.1 — Legacy BIOS (no aplica a tu setup)</h3>
+<div class="step-path">📍 Se ejecuta en: <b>chroot, con el disco completo como destino</b></div>
+<span class="cmd-label">Instalar en el MBR del disco</span><span class="risk high">RIESGO ALTO</span>
+<pre><code>grub-install /dev/sda</code></pre>
+<p class="purpose">Se instala en el disco entero (no en una partición), porque BIOS legacy no usa un sistema de archivos para el bootloader.</p>
+<h3>44.2.2 — UEFI (tu caso)</h3>
+<div class="step-path">📍 Requiere: <b>/efi</b> ya montada</div>
+<span class="cmd-label">Instalar en la partición EFI</span><span class="risk high">RIESGO ALTO</span>
+<pre><code>grub-install --efi-directory=/efi</code></pre>
+<p class="purpose">Copia los archivos (como <code>grubx64.efi</code>) dentro de <code>/efi/EFI/Gentoo/</code>. El firmware UEFI guarda una entrada de arranque apuntando a esa ruta.</p>
+<details>
+<summary>Firmware UEFI "raro" que solo busca /EFI/BOOT/</summary>
+<p>Algunas placas madre con implementaciones UEFI defectuosas ignoran las entradas de arranque registradas y solo cargan el archivo ubicado en la ruta genérica <code>/EFI/BOOT/BOOTX64.EFI</code>. Para ese caso, se usa la opción <code>--removable</code>, que fuerza a GRUB a instalarse también ahí:</p>
+<span class="cmd-label">Instalación en modo "removable"</span><span class="risk med">RIESGO MEDIO</span>
+<pre><code>grub-install --target=x86_64-efi --efi-directory=/efi --removable</code></pre>
+</details>
+<details>
+<summary>Secure Boot (opcional, no lo necesitas por defecto)</summary>
+<p class="purpose"><b>Para qué sirve:</b> permitir que el sistema arranque con Secure Boot activo en el firmware, verificando que el bootloader y el kernel estén firmados con una llave de confianza.</p>
+<p>El mecanismo usa <b>shim</b>, un pequeño pre-cargador ya firmado por Microsoft y aceptado por la mayoría de los firmwares UEFI por defecto. El flujo general:</p>
+<ol>
+<li>Convertir el certificado de tu llave de firma a formato DER</li>
+<li>Importarlo a la lista de confianza de shim (pide una contraseña temporal)</li>
+<li>Registrar shim ante el firmware UEFI como entrada de arranque</li>
+</ol>
+<span class="cmd-label">Convertir certificado</span><span class="risk low">RIESGO BAJO</span>
+<pre><code>openssl x509 -in /path/to/kernel_key.pem -inform PEM -out /path/to/kernel_key.der -outform DER</code></pre>
+<span class="cmd-label">Importar a MOKlist de shim</span><span class="risk low">RIESGO BAJO</span>
+<pre><code>mokutil --import /path/to/kernel_key.der</code></pre>
+<span class="cmd-label">Registrar shim en el firmware</span><span class="risk med">RIESGO MEDIO</span>
+<pre><code>efibootmgr --create --disk /dev/boot-disk --part boot-partition-id \
+  --loader '\EFI\Gentoo\shimx64.efi' --label 'GRUB via Shim' --unicode</code></pre>
+<div class="callout">
+<b>Nota</b><br/>
+El proceso no termina hasta reiniciar: al arrancar, shim mostrará MokManager pidiendo la contraseña definida en el paso de importación. Ahí se confirma la llave y recién entonces el firmware confía en tu GRUB firmado.
+</div>
+</details>
+<details>
+<summary>Depurar errores de grub-install</summary>
+<p>Si aparece el mensaje <code>"EFI variables are not supported on this system"</code>, casi siempre significa que el medio live se arrancó en modo <b>Legacy/BIOS</b> en vez de UEFI. La solución habitual es repetir la instalación con <code>--removable</code> (ver arriba), ya que sobrescribe la ruta genérica que el firmware sí reconoce en modo legacy accidental.</p>
+</details>
+<h2>44.3 — Configure (generar grub.cfg)</h2>
+<p class="purpose"><b>Para qué sirve:</b> generar el archivo real que GRUB lee al arrancar: qué kernel cargar, qué initramfs usar, y con qué parámetros.</p>
+<div class="step-path">📍 Se configura en: <b>/etc/default/grub</b> (opciones) · Se genera en: <b>/boot/grub/grub.cfg</b></div>
+<span class="cmd-label">Generar la configuración final</span><span class="risk low">RIESGO BAJO</span>
+<pre><code>grub-mkconfig -o /boot/grub/grub.cfg</code></pre>
+<p>GRUB escanea <code>/boot/</code> automáticamente y detecta:</p>
+<ul>
+<li>El kernel más reciente disponible (<code>vmlinuz-...</code>)</li>
+<li>La imagen initramfs correspondiente — en tu caso, la que genera <b>dracut</b></li>
+</ul>
+<div class="callout warn">
+<b>Verificación obligatoria</b><br/>
+La salida del comando debe mostrar al menos un <code>Found linux image</code> y, por usar dracut, también un <code>Found initrd image</code>. Si falta alguno, revisa <code>/boot/</code> con <code>ls</code> — probablemente algo falló antes en la instalación del kernel.
+</div>
+<p>Personalizar parámetros de arranque (por ejemplo, agregar opciones al kernel) se hace editando la variable <code>GRUB_CMDLINE_LINUX</code> en <code>/etc/default/grub</code> y volviendo a correr <code>grub-mkconfig</code>.</p>
+<details>
+<summary>Extra: dual-boot con Windows u otra distro</summary>
+<p class="purpose"><b>Para qué sirve:</b> detectar automáticamente otros sistemas operativos instalados en discos conectados y agregarlos al menú de GRUB.</p>
+<span class="cmd-label">Instalar detector de otros SO</span><span class="risk low">RIESGO BAJO</span>
+<pre><code>emerge --ask sys-boot/os-prober
+grub-mkconfig -o /boot/grub/grub.cfg</code></pre>
+<p>Detecta Windows 7/8.1/10 y otras distros de Linux automáticamente.</p>
+</details>
+<h2>Alternativas a GRUB</h2>
+<p>GRUB es la opción por defecto porque es flexible (menú, parámetros editables en caliente, soporte multi-SO), pero en sistemas puramente UEFI existen alternativas más simples. Aquí es donde entra <b>systemd-boot</b>, que — a diferencia de GRUB — <b>no requiere systemd como init</b>: funciona tanto en sistemas OpenRC como systemd, porque solo necesita el paquete <code>sys-apps/systemd-utils</code> (versión mínima sin el init completo).</p>
+<table>
+<tr><th>Bootloader</th><th>Qué es</th><th>Cuándo conviene</th></tr>
+<tr>
+<td><b>GRUB</b></td>
+<td>Bootloader completo con su propio menú, shell de rescate y soporte para BIOS legacy y UEFI. Puede detectar otros SO (dual-boot) y editar parámetros de arranque interactivamente antes de bootear.</td>
+<td>Es el estándar de Gentoo. Ideal si quieres flexibilidad, dual-boot, o si algo falla y necesitas un shell de rescate.</td>
+</tr>
+<tr>
+<td><b>systemd-boot</b></td>
+<td>Un "chainloader" delgado: no tiene menú configurable ni shell propio, solo lista las entradas <code>.conf</code> que le pongas en la ESP y las carga directo. Funciona en OpenRC o systemd.</td>
+<td>Sistemas puramente UEFI, sin necesidad de dual-boot complejo. Arranca más rápido y es más simple de mantener. Buen soporte para Secure Boot.</td>
+</tr>
+<tr>
+<td><b>EFI Stub</b></td>
+<td>No es un bootloader separado: el propio kernel de Linux se compila para ser directamente ejecutable por el firmware UEFI (usando la USE flag <code>efistub</code>). El firmware "bootea" el kernel sin intermediarios.</td>
+<td>Setups minimalistas donde no quieres ninguna capa extra. Más rígido: cambiar parámetros de arranque requiere recompilar el kernel o usar <code>efibootmgr</code>, no hay menú interactivo.</td>
+</tr>
+</table>
+<details>
+<summary>Comandos: instalar systemd-boot</summary>
+<p class="purpose"><b>Para qué sirve:</b> habilitar el chainloader ligero de systemd como alternativa a GRUB, compatible con tu init OpenRC.</p>
+<div class="step-path">📍 Se configura en: <b>/etc/portage/package.use/systemd-boot</b></div>
+<span class="cmd-label">Habilitar USE flag "boot" y compilar</span><span class="risk low">RIESGO BAJO</span>
+<pre><code># /etc/portage/package.use/systemd-boot
+sys-apps/systemd-utils boot
+
+emerge --ask sys-apps/systemd-utils</code></pre>
+<span class="cmd-label">Instalar en la ESP</span><span class="risk high">RIESGO ALTO</span>
+<pre><code>bootctl install</code></pre>
+<div class="callout">
+<b>Nota para OpenRC</b><br/>
+En sistemas con systemd se usa el paquete <code>sys-apps/systemd</code>; en OpenRC (tu caso) se usa <code>sys-apps/systemd-utils</code>, que trae solo las herramientas de boot sin instalar el init de systemd.
+</div>
+</details>
+<details>
+<summary>Comandos: arrancar el kernel como EFI Stub</summary>
+<p class="purpose"><b>Para qué sirve:</b> eliminar la capa de bootloader por completo, dejando que el firmware ejecute el kernel directamente.</p>
+<div class="step-path">📍 Se configura en: <b>/etc/portage/package.accept_keywords/installkernel</b> (USE flag testing)</div>
+<span class="cmd-label">Habilitar soporte EFI Stub en el kernel</span><span class="risk med">RIESGO MEDIO</span>
+<pre><code>emerge --ask sys-boot/efibootmgr</code></pre>
+<p>Requiere recompilar el kernel con soporte EFI Stub habilitado y la USE flag <code>efistub</code> en <code>sys-kernel/installkernel</code> (está bajo keyword <i>testing</i>, no es estable). Los parámetros de arranque se "incrustan" en el propio kernel vía <code>CONFIG_CMDLINE</code>, o se agregan como entrada de arranque con <code>efibootmgr</code>.</p>
+</details>
+<div class="callout tip">
+<b>Recomendación para tu setup</b><br/>
+Dado que ya definiste GRUB + dracut como tu stack, no necesitas cambiar nada — esta sección es solo referencia. GRUB es la opción con más margen de maniobra si algo sale mal durante el arranque (tiene shell de rescate propio), algo valioso mientras sigues aprendiendo Gentoo.
+</div>
+</main>
+<footer>
+  Compendio Gentoo · Capítulo 44 — Bootloader (GRUB y alternativas) · Basado en Gentoo AMD64 Handbook
+</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-43-seleccion-bootloader.html">← Cap. 43: Cap. 43–47 · Seleccionar e instalar el Bootloader</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-45-46-bootloaders-alternativos.html">Cap. 45-46: Cap. 45–46 · Bootloaders alternativos →</a>
+</div>
+</body>
+</html>

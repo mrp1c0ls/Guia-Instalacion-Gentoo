@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 37 — Cron Daemon | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --bg-alt:#161922;
+    --card:#1a1e29;
+    --border:#2a2f3d;
+    --text:#dfe3ec;
+    --text-dim:#9aa2b4;
+    --accent:#7dd3fc;
+    --accent2:#a78bfa;
+    --green:#4ade80;
+    --yellow:#fbbf24;
+    --red:#f87171;
+    --code-bg:#11131a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height:1.6;
+    padding:0 0 60px 0;
+  }
+  header{
+    background:linear-gradient(135deg, #1a1e29 0%, #161922 100%);
+    border-bottom:1px solid var(--border);
+    padding:36px 24px 28px;
+    text-align:center;
+  }
+  header .kicker{
+    color:var(--accent);
+    letter-spacing:2px;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  header h1{
+    margin:8px 0 6px;
+    font-size:1.9rem;
+    color:#fff;
+  }
+  header p.sub{
+    color:var(--text-dim);
+    margin:0;
+    font-size:0.95rem;
+  }
+  main{
+    max-width:820px;
+    margin:0 auto;
+    padding:28px 20px;
+  }
+  h2{
+    color:var(--accent);
+    font-size:1.3rem;
+    margin-top:38px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--border);
+  }
+  h3{
+    color:var(--accent2);
+    font-size:1.05rem;
+    margin-top:26px;
+  }
+  p{color:var(--text);}
+  .callout{
+    background:var(--bg-alt);
+    border-left:4px solid var(--accent);
+    padding:12px 16px;
+    border-radius:6px;
+    margin:14px 0;
+    font-size:0.92rem;
+  }
+  .callout strong{color:var(--accent);}
+  .callout.para-que-sirve{
+    border-left-color:var(--green);
+  }
+  .callout.para-que-sirve strong{color:var(--green);}
+  .callout.donde{
+    border-left-color:var(--accent2);
+  }
+  .callout.donde strong{color:var(--accent2);}
+  code{
+    background:var(--code-bg);
+    color:#e5e7eb;
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:'Cascadia Code','Fira Code',Consolas,monospace;
+    font-size:0.88em;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    margin:12px 0;
+    position:relative;
+  }
+  pre code{
+    background:none;
+    padding:0;
+    color:#a5f3c8;
+    font-size:0.9rem;
+  }
+  .cmd-block{margin:14px 0;}
+  .cmd-block .label{
+    font-size:0.75rem;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:4px;
+  }
+  .risk{
+    display:inline-block;
+    font-size:0.72rem;
+    font-weight:700;
+    padding:2px 9px;
+    border-radius:12px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .risk.low{background:rgba(74,222,128,0.15); color:var(--green); border:1px solid rgba(74,222,128,0.4);}
+  .risk.med{background:rgba(251,191,36,0.15); color:var(--yellow); border:1px solid rgba(251,191,36,0.4);}
+  .risk.high{background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.4);}
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:16px 0;
+    font-size:0.9rem;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:10px 12px;
+    text-align:left;
+  }
+  th{
+    background:var(--bg-alt);
+    color:var(--accent);
+    font-weight:600;
+  }
+  tr:nth-child(even){background:rgba(255,255,255,0.02);}
+
+  details{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:14px 0;
+    padding:0;
+    overflow:hidden;
+  }
+  details summary{
+    cursor:pointer;
+    padding:12px 16px;
+    font-weight:600;
+    color:var(--text);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  details summary::-webkit-details-marker{display:none;}
+  details summary::after{
+    content:"+";
+    color:var(--accent);
+    font-size:1.2rem;
+    font-weight:400;
+  }
+  details[open] summary::after{content:"–";}
+  details summary:hover{background:rgba(255,255,255,0.03);}
+  details .content{
+    padding:0 16px 16px;
+    border-top:1px solid var(--border);
+  }
+  details .content{padding-top:12px;}
+
+  ul{padding-left:22px;}
+  li{margin:6px 0;}
+
+  .summary-box{
+    background:var(--bg-alt);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 20px;
+    margin:20px 0;
+  }
+  .summary-box h3{margin-top:0; color:var(--accent);}
+
+  footer{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:0.8rem;
+    margin-top:50px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">X. Configuración inicial del sistema y servicios</span>
+</div>
+<span class="jagg-badge">Cap. 37 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<div class="kicker">Compendio Gentoo · Instalación paso a paso</div>
+<h1>Capítulo 37 — Cron Daemon</h1>
+<p class="sub">Automatización de tareas programadas en tu sistema</p>
+</header>
+<main>
+<div class="summary-box">
+<h3>En una frase</h3>
+<p>Un <strong>cron daemon</strong> es un programa que corre en segundo plano y ejecuta comandos automáticamente según un horario que tú definas (cada hora, cada día, cada semana...). En Gentoo, con OpenRC, la opción recomendada y más sencilla es <code>cronie</code>.</p>
+</div>
+<h2>¿Qué problema resuelve?</h2>
+<p>Hay tareas de mantenimiento que un sistema necesita hacer con regularidad: limpiar archivos temporales, actualizar bases de datos, respaldar información, sincronizar algo, etc. En lugar de acordarte tú de ejecutarlas manualmente, un cron daemon lo hace por ti, con la periodicidad que definas.</p>
+<div class="callout para-que-sirve">
+<strong>¿Para qué sirve?</strong> Automatizar tareas repetitivas del sistema sin intervención humana. Es la pieza que le falta a tu servidor/PC para "acordarse" de hacer mantenimiento por sí mismo.
+  </div>
+<div class="callout donde">
+<strong>¿Dónde se configura?</strong> El horario de las tareas vive en archivos llamados <em>crontabs</em>. El más importante para el sistema es <code>/etc/crontab</code> (tareas a nivel sistema, ejecutadas por root u otros usuarios especificados en el propio archivo). Cada usuario también puede tener su propio crontab personal, editable con <code>crontab -e</code>, y que normalmente se guarda internamente en <code>/var/spool/cron/crontabs/&lt;usuario&gt;</code> (la ubicación exacta depende del demonio elegido).
+  </div>
+<h2>Las 4 opciones disponibles en Gentoo</h2>
+<p>Todas cumplen la misma función básica (ejecutar comandos programados), pero difieren en filosofía: seguridad, simplicidad o funciones extra.</p>
+<table>
+<tr><th>Demonio</th><th>Paquete</th><th>Enfoque</th><th>¿Cuándo elegirlo?</th></tr>
+<tr>
+<td><strong>cronie</strong> (default)</td>
+<td><code>sys-process/cronie</code></td>
+<td>El cron "clásico" (basado en Vixie cron) con mejoras de seguridad: soporta PAM y SELinux.</td>
+<td>Uso general. Es la opción recomendada por el manual y la más compatible/documentada.</td>
+</tr>
+<tr>
+<td>dcron</td>
+<td><code>sys-process/dcron</code></td>
+<td>Minimalista: simple y seguro, solo lo esencial.</td>
+<td>Sistemas donde quieres el mínimo software posible corriendo.</td>
+</tr>
+<tr>
+<td>fcron</td>
+<td><code>sys-process/fcron</code></td>
+<td>Extiende cron con capacidades tipo <em>anacron</em> (ejecuta tareas perdidas si el equipo estuvo apagado).</td>
+<td>Laptops o equipos que no están encendidos 24/7 y no quieres perder tareas programadas.</td>
+</tr>
+<tr>
+<td>bcron</td>
+<td><code>sys-process/bcron</code></td>
+<td>Diseño moderno centrado en seguridad: divide responsabilidades en varios procesos pequeños con comunicación controlada entre ellos.</td>
+<td>Entornos donde el aislamiento/seguridad de procesos es prioridad.</td>
+</tr>
+</table>
+<h2>Instalación y uso — opción por defecto: cronie</h2>
+<div class="cmd-block">
+<div class="label">Instalar el paquete</div>
+<pre><code>root # emerge --ask sys-process/cronie</code></pre>
+<span class="risk low">Riesgo bajo</span>
+</div>
+<div class="callout para-que-sirve"><strong>Qué hace:</strong> descarga, compila e instala cronie. <code>--ask</code> te muestra qué se va a instalar antes de confirmar.</div>
+<div class="cmd-block">
+<div class="label">Activar el servicio en el arranque</div>
+<pre><code>root # rc-update add cronie default</code></pre>
+<span class="risk low">Riesgo bajo — reversible</span>
+</div>
+<div class="callout para-que-sirve"><strong>Qué hace:</strong> agrega el servicio <code>cronie</code> al runlevel <code>default</code> de OpenRC, para que arranque automáticamente cada vez que enciendas el sistema. Sin esto, cronie no se ejecutaría a menos que lo inicies manualmente con <code>rc-service cronie start</code> cada vez.</div>
+<h3>¿Y cómo le doy tareas para que ejecute?</h3>
+<p>Aquí hay dos caminos, según quién debe ejecutar la tarea:</p>
+<details>
+<summary>Opción 1 — Crontab del sistema: <code>/etc/crontab</code></summary>
+<div class="content">
+<p>Se edita directamente como root y permite especificar <strong>qué usuario</strong> ejecuta cada línea. Formato:</p>
+<pre><code>minuto hora día-mes mes día-semana usuario  comando</code></pre>
+<p>Ejemplo — ejecutar un script cada día a las 3:00 AM como root:</p>
+<pre><code>0 3 * * * root /usr/local/bin/mi_backup.sh</code></pre>
+<p>Los campos aceptan <code>*</code> (cualquier valor), rangos (<code>1-5</code>), listas (<code>1,15</code>) y saltos (<code>*/6</code> = cada 6 unidades).</p>
+</div>
+</details>
+<details>
+<summary>Opción 2 — Crontab personal de un usuario: <code>crontab -e</code></summary>
+<div class="content">
+<p>Cada usuario (incluido root) puede tener su propio crontab, sin necesidad de indicar el usuario en cada línea (ya se sabe de quién es):</p>
+<pre><code>$ crontab -e      # abre tu crontab personal en el editor
+$ crontab -l      # lista tus tareas programadas actuales
+$ crontab -r      # elimina tu crontab (¡cuidado, sin confirmación!)</code></pre>
+<span class="risk med">Riesgo medio — <code>crontab -r</code> borra todo sin preguntar</span>
+</div>
+</details>
+<h2>Alternativas: pasos de instalación específicos</h2>
+<details>
+<summary>dcron — requiere inicialización manual</summary>
+<div class="content">
+<pre><code>root # emerge --ask sys-process/dcron
+root # crontab /etc/crontab</code></pre>
+<p>El segundo comando es necesario porque dcron, a diferencia de cronie, no lee <code>/etc/crontab</code> automáticamente — hay que "cargarlo" explícitamente la primera vez.</p>
+</div>
+</details>
+<details>
+<summary>fcron — requiere paso de configuración post-emerge</summary>
+<div class="content">
+<pre><code>root # emerge --ask sys-process/fcron
+root # emerge --config sys-process/fcron</code></pre>
+<p><code>emerge --config</code> ejecuta un script de configuración interactivo que trae el propio paquete (no todos los paquetes lo requieren, pero fcron sí). Esto suele encargarse de crear las estructuras internas que fcron necesita para funcionar correctamente.</p>
+</div>
+</details>
+<details>
+<summary>bcron — instalación simple, sin pasos extra</summary>
+<div class="content">
+<pre><code>root # emerge --ask sys-process/bcron</code></pre>
+<p>El manual no indica pasos adicionales de activación para bcron más allá de la instalación estándar.</p>
+</div>
+</details>
+<h2>Caso especial: usuarios de <code>modprobed-db</code></h2>
+<p>Si compilaste tu kernel manualmente (en vez de usar <code>gentoo-kernel</code> con configuración automática) y usaste la herramienta <code>modprobed-db</code> para detectar qué módulos usa tu hardware, aquí se programa que escanee el sistema periódicamente.</p>
+<div class="cmd-block">
+<div class="label">Agregar a /etc/crontab</div>
+<pre><code># Ejecutar modprobed-db cada 6 horas
+0 */6 * * * /usr/bin/modprobed-db store &amp;&gt; /dev/null</code></pre>
+<span class="risk low">Riesgo bajo</span>
+</div>
+<div class="callout"><strong>Nota:</strong> como en tu instalación usas <code>sys-kernel/gentoo-kernel</code>, esta sección probablemente no te aplica — es relevante solo para quienes compilan el kernel a mano y usan esa herramienta de detección de módulos.</div>
+<h2>Verificar que todo funciona</h2>
+<div class="cmd-block">
+<div class="label">Confirmar que el servicio está corriendo</div>
+<pre><code>root # rc-service cronie status</code></pre>
+</div>
+<div class="cmd-block">
+<div class="label">Revisar los logs de ejecución de cron</div>
+<pre><code>root # tail -f /var/log/cron.log</code></pre>
+<p style="font-size:0.85rem;color:var(--text-dim);">La ruta exacta del log puede variar según el logger del sistema que instalaste (sysklogd, syslog-ng, etc. — capítulo 36).</p>
+</div>
+<h2>Si usaras systemd (referencia)</h2>
+<p>systemd no necesita un cron daemon aparte: trae <strong>timers</strong> integrados, que cumplen la misma función (ejecutar servicios en horarios programados) mediante unidades <code>.timer</code>. Para la mayoría de instalaciones systemd, instalar un cron adicional es innecesario — solo se justifica si necesitas compatibilidad específica con sintaxis crontab tradicional.</p>
+<h2>Resumen rápido</h2>
+<ul>
+<li><strong>Qué es:</strong> un programa que ejecuta comandos en horarios definidos.</li>
+<li><strong>Recomendado:</strong> <code>cronie</code> — simple, seguro, compatible.</li>
+<li><strong>Se configura en:</strong> <code>/etc/crontab</code> (sistema) o <code>crontab -e</code> (por usuario).</li>
+<li><strong>Para activarlo en el arranque:</strong> <code>rc-update add cronie default</code>.</li>
+<li><strong>Alternativas:</strong> dcron (ligero), fcron (recupera tareas perdidas), bcron (seguridad por diseño).</li>
+</ul>
+</main>
+<footer>
+  Compendio Gentoo — Capítulo 37 · Generado a partir del Gentoo AMD64 Handbook
+</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-36-system-logger.html">← Cap. 36: Capítulo 36 — System Logger</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-38-file-indexing.html">Cap. 38: Capítulo 38 — Indexado de archivos →</a>
+</div>
+</body>
+</html>

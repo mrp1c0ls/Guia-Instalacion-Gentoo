@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 36 · System Logger — Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#12151a;
+    --bg-panel:#1a1e25;
+    --bg-panel-2:#20252d;
+    --border:#2b313c;
+    --text:#dfe4ea;
+    --text-dim:#8b93a1;
+    --accent:#5ec9a6;
+    --accent-2:#e0a458;
+    --danger:#e0685f;
+    --code-bg:#0d1014;
+    --code-text:#c9d4de;
+    --link:#7fb8e0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height:1.6;
+    padding:0 0 4rem 0;
+  }
+  header{
+    padding:2.5rem 1.5rem 1.5rem;
+    max-width:820px;
+    margin:0 auto;
+    border-bottom:1px solid var(--border);
+  }
+  .eyebrow{
+    color:var(--accent);
+    font-size:0.8rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  h1{
+    font-size:1.9rem;
+    margin:0.4rem 0 0.3rem;
+    color:#fff;
+  }
+  .subtitle{color:var(--text-dim); font-size:0.98rem; margin:0;}
+
+  main{max-width:820px; margin:0 auto; padding:0 1.5rem;}
+
+  section{margin-top:2.2rem;}
+
+  h2{
+    font-size:1.25rem;
+    color:#fff;
+    border-left:3px solid var(--accent);
+    padding-left:0.6rem;
+    margin-bottom:0.8rem;
+  }
+  h3{
+    font-size:1.05rem;
+    color:var(--accent-2);
+    margin-top:1.4rem;
+    margin-bottom:0.5rem;
+  }
+  p{margin:0.6rem 0;}
+
+  .callout{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-left:3px solid var(--accent);
+    border-radius:6px;
+    padding:0.8rem 1rem;
+    margin:1rem 0;
+    font-size:0.94rem;
+  }
+  .callout .tag{
+    display:block;
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:0.3rem;
+  }
+
+  .config-path{
+    background:var(--bg-panel-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:0.7rem 1rem;
+    margin:1rem 0;
+    font-size:0.92rem;
+    display:flex;
+    gap:0.6rem;
+    align-items:baseline;
+  }
+  .config-path .tag{
+    color:var(--link);
+    font-weight:700;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    white-space:nowrap;
+  }
+  .config-path code{color:var(--accent-2);}
+
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:0.9rem 1rem;
+    overflow-x:auto;
+    font-size:0.88rem;
+    margin:0.7rem 0;
+  }
+  code{
+    font-family: "JetBrains Mono","Fira Code", Consolas, monospace;
+    color:var(--code-text);
+  }
+  p code, li code{
+    background:var(--bg-panel-2);
+    padding:0.1rem 0.35rem;
+    border-radius:4px;
+    color:var(--accent-2);
+    font-size:0.88em;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1rem 0;
+    font-size:0.9rem;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:0.55rem 0.7rem;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{
+    background:var(--bg-panel-2);
+    color:var(--accent);
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+  tr:nth-child(even) td{background:rgba(255,255,255,0.02);}
+
+  .risk{
+    display:inline-block;
+    font-size:0.7rem;
+    font-weight:700;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:0.15rem 0.5rem;
+    border-radius:4px;
+    margin-left:0.5rem;
+  }
+  .risk-low{background:rgba(94,201,166,0.15); color:var(--accent);}
+  .risk-med{background:rgba(224,164,88,0.15); color:var(--accent-2);}
+
+  details{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:6px;
+    margin:0.9rem 0;
+    padding:0.2rem 1rem;
+  }
+  details summary{
+    cursor:pointer;
+    padding:0.7rem 0;
+    font-weight:600;
+    color:var(--link);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+  }
+  details summary::-webkit-details-marker{display:none;}
+  details summary::before{
+    content:"▸";
+    color:var(--accent);
+    transition:transform 0.15s ease;
+  }
+  details[open] summary::before{transform:rotate(90deg);}
+  details[open] summary{border-bottom:1px solid var(--border); margin-bottom:0.6rem;}
+  details .content{padding-bottom:0.8rem;}
+
+  .nixos-note{
+    background:rgba(127,184,224,0.07);
+    border:1px dashed var(--link);
+    border-radius:6px;
+    padding:0.7rem 1rem;
+    margin:1rem 0;
+    font-size:0.9rem;
+    color:var(--text-dim);
+  }
+  .nixos-note strong{color:var(--link);}
+
+  footer{
+    max-width:820px;
+    margin:2.5rem auto 0;
+    padding:1rem 1.5rem 0;
+    border-top:1px solid var(--border);
+    color:var(--text-dim);
+    font-size:0.82rem;
+  }
+
+  ul{padding-left:1.3rem;}
+  li{margin:0.35rem 0;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">X. Configuración inicial del sistema y servicios</span>
+</div>
+<span class="jagg-badge">Cap. 36 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<span class="eyebrow">Compendio Gentoo · Instalación</span>
+<h1>Capítulo 36 — System Logger</h1>
+<p class="subtitle">Elegir y activar el registrador de eventos del sistema (perfil OpenRC)</p>
+</header>
+<main>
+<section>
+<h2>¿Qué es y por qué el stage3 no trae uno?</h2>
+<p>
+      El <strong>system logger</strong> es el servicio que guarda en archivos (normalmente dentro de
+      <code>/var/log/</code>) todo lo que va pasando en el sistema: errores, advertencias, eventos de arranque,
+      intentos de acceso, etc. Sin él, esos mensajes se pierden apenas se generan.
+    </p>
+<p>
+      Gentoo <strong>no incluye ninguno por defecto</strong> en el stage3 porque existen varios paquetes que
+      hacen lo mismo con distinto enfoque, y prefiere que el usuario elija el que le conviene en vez de imponer uno.
+    </p>
+<div class="nixos-note">
+<strong>Analogía NixOS:</strong> es como declarar <code>services.journald</code> o cualquier otro logger en
+      <code>configuration.nix</code> — nada corre "gratis" sin que lo pidas explícitamente en el sistema.
+    </div>
+</section>
+<section>
+<h2>Opciones disponibles</h2>
+<table>
+<tr>
+<th>Paquete</th>
+<th>Perfil</th>
+<th>Rotación de logs</th>
+<th>Notas</th>
+</tr>
+<tr>
+<td><code>app-admin/sysklogd</code></td>
+<td>Principiante <span class="risk risk-low">recomendado</span></td>
+<td>Sí (incluida, v2.0+)</td>
+<td>Funciona bien "tal cual", sin configurar nada extra.</td>
+</tr>
+<tr>
+<td><code>app-admin/syslog-ng</code></td>
+<td>Avanzado</td>
+<td>No — requiere <code>logrotate</code> aparte</td>
+<td>Muy potente, pero necesita configuración manual para sacarle provecho.</td>
+</tr>
+<tr>
+<td><code>app-admin/metalog</code></td>
+<td>Avanzado</td>
+<td>Configurable</td>
+<td>Altamente personalizable, orientado a filtrado fino de mensajes.</td>
+</tr>
+</table>
+<div class="callout">
+<span class="tag">Para qué sirve elegir bien</span>
+      Si sólo quieres logs funcionando sin complicarte, <code>sysklogd</code> es la elección estándar del
+      handbook para principiantes. Si más adelante necesitas reenviar logs a un servidor central o filtrar
+      mensajes por reglas complejas, ahí es cuando <code>syslog-ng</code> o <code>metalog</code> valen la pena.
+    </div>
+</section>
+<section>
+<h2>Instalación y activación (sysklogd)</h2>
+<div class="config-path">
+<span class="tag">Corre en</span>
+      chroot, como root
+    </div>
+<h3>1. Instalar el paquete <span class="risk risk-low">bajo riesgo</span></h3>
+<pre><code>root # emerge --ask app-admin/sysklogd</code></pre>
+<div class="callout">
+<span class="tag">Para qué sirve</span>
+      Descarga y compila (o instala binario, si configuraste binhost) el logger. El flag
+      <code>--ask</code> te muestra qué se va a instalar y pide confirmación antes de proceder — es "emerger",
+      es decir, reversible: si te arrepientes, luego lo desinstalas sin dejar el sistema en mal estado.
+    </div>
+<h3>2. Activarlo en el arranque <span class="risk risk-low">bajo riesgo</span></h3>
+<pre><code>root # rc-update add sysklogd default</code></pre>
+<div class="callout">
+<span class="tag">Para qué sirve</span>
+      Instalar el paquete <strong>no</strong> lo hace arrancar solo. <code>rc-update add</code> es el comando de
+      OpenRC que registra el servicio en un <em>runlevel</em> (aquí, <code>default</code>, el que se activa en
+      un arranque normal). Sin este paso, sysklogd quedaría instalado pero apagado.
+    </div>
+<details>
+<summary>Comandos útiles después de instalarlo</summary>
+<div class="content">
+<table>
+<tr><th>Comando</th><th>Qué hace</th></tr>
+<tr><td><code>rc-service sysklogd start</code></td><td>Lo arranca de inmediato (sin esperar el próximo reboot).</td></tr>
+<tr><td><code>rc-service sysklogd status</code></td><td>Muestra si está corriendo.</td></tr>
+<tr><td><code>tail -f /var/log/messages</code></td><td>Ver los logs en vivo mientras se generan.</td></tr>
+<tr><td><code>rc-update show</code></td><td>Lista todos los servicios y en qué runlevel están activos.</td></tr>
+</table>
+</div>
+</details>
+<details>
+<summary>¿Y si prefiero syslog-ng o metalog?</summary>
+<div class="content">
+<p>El patrón es idéntico, solo cambia el nombre del paquete y del servicio:</p>
+<pre><code>root # emerge --ask app-admin/syslog-ng
+root # rc-update add syslog-ng default</code></pre>
+<div class="callout">
+<span class="tag">Advertencia</span>
+          Si eliges <code>syslog-ng</code>, instala también <code>app-admin/logrotate</code> — de lo contrario
+          el archivo de log crecerá indefinidamente sin rotarse ni comprimirse.
+        </div>
+</div>
+</details>
+</section>
+<section>
+<h2>Dónde vive todo esto</h2>
+<div class="config-path">
+<span class="tag">Binario / servicio</span>
+<code>/etc/init.d/sysklogd</code>
+</div>
+<div class="config-path">
+<span class="tag">Configuración</span>
+<code>/etc/syslog.conf</code>
+</div>
+<div class="config-path">
+<span class="tag">Salida de logs</span>
+<code>/var/log/messages</code>, <code>/var/log/syslog</code>
+</div>
+<p>
+      El archivo <code>/etc/syslog.conf</code> define <em>qué</em> se registra y <em>dónde</em>: por ejemplo,
+      puedes mandar solo los mensajes críticos del kernel a un archivo separado. Para un sistema doméstico,
+      la configuración por defecto suele ser suficiente y no hace falta tocarla.
+    </p>
+</section>
+<section>
+<h2>Referencia: si usaras systemd</h2>
+<p>
+      No aplica a tu instalación (usas OpenRC), pero para completar el panorama: los sistemas con systemd
+      ya traen <code>systemd-journald</code> integrado, que cubre casi toda la funcionalidad de un logger
+      tradicional. La mayoría de esas instalaciones se saltan por completo este paso. Para consultar esos logs
+      se usa <code>journalctl</code> en vez de leer archivos de texto plano.
+    </p>
+</section>
+</main>
+<footer>
+  Capítulo 36 del Gentoo AMD64 Handbook · Perfil: OpenRC · multilib · GPT+UEFI
+</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-35-system-information.html">← Cap. 35: Capítulo 35 · System Information</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-37-cron-daemon.html">Cap. 37: Capítulo 37 — Cron Daemon →</a>
+</div>
+</body>
+</html>

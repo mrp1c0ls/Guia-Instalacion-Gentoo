@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 38 — Indexado de archivos (mlocate)</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --bg-card:#171a21;
+    --bg-code:#0b0d11;
+    --border:#2a2e37;
+    --text:#e4e6eb;
+    --text-dim:#9aa0ab;
+    --accent:#6ea8fe;
+    --accent-soft:#1c2a3d;
+    --ok:#3fb950;
+    --ok-bg:#0f2415;
+    --warn:#e3b341;
+    --warn-bg:#2b2410;
+    --risk-low:#3fb950;
+    --risk-low-bg:#122016;
+    --risk-med:#e3b341;
+    --risk-med-bg:#2b2410;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    max-width:820px;
+    margin:0 auto;
+    padding:2.5rem 1.5rem 4rem;
+  }
+  h1{
+    font-size:1.6rem;
+    border-bottom:2px solid var(--accent);
+    padding-bottom:.6rem;
+    margin-bottom:.3rem;
+  }
+  .subtitle{color:var(--text-dim); font-size:.95rem; margin-bottom:2rem;}
+  h2{
+    font-size:1.2rem;
+    color:var(--accent);
+    margin-top:2.4rem;
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+  }
+  h2 .num{
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:.85rem;
+    padding:.15rem .55rem;
+    border-radius:6px;
+    font-weight:600;
+  }
+  p{margin:.6rem 0;}
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:1.1rem 1.3rem;
+    margin:1rem 0;
+  }
+  .purpose{
+    background:var(--accent-soft);
+    border-left:3px solid var(--accent);
+    padding:.7rem 1rem;
+    border-radius:0 6px 6px 0;
+    margin:.8rem 0;
+    font-size:.95rem;
+  }
+  .purpose b{color:var(--accent);}
+  .risk{
+    display:inline-block;
+    font-size:.75rem;
+    font-weight:700;
+    letter-spacing:.03em;
+    padding:.2rem .6rem;
+    border-radius:5px;
+    margin-bottom:.6rem;
+    text-transform:uppercase;
+  }
+  .risk-low{background:var(--risk-low-bg); color:var(--risk-low);}
+  .risk-med{background:var(--risk-med-bg); color:var(--risk-med);}
+  code{
+    background:var(--bg-code);
+    color:#c9d1d9;
+    padding:.15rem .4rem;
+    border-radius:4px;
+    font-family:"SF Mono",Consolas,Monaco,monospace;
+    font-size:.88em;
+  }
+  pre{
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:.9rem 1.1rem;
+    overflow-x:auto;
+    margin:.7rem 0;
+  }
+  pre code{background:none; padding:0; font-size:.87rem;}
+  .prompt{color:#e879f9;}
+  .comment{color:#6a9955;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:.8rem 0;
+    font-size:.9rem;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:.5rem .7rem;
+    text-align:left;
+  }
+  th{background:var(--bg-code); color:var(--accent);}
+  tr:nth-child(even){background:#151821;}
+  details{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:.6rem 1rem;
+    margin:.8rem 0;
+  }
+  summary{
+    cursor:pointer;
+    font-weight:600;
+    color:var(--accent);
+    padding:.3rem 0;
+  }
+  summary:hover{color:#8fbcff;}
+  details[open] summary{margin-bottom:.5rem;}
+  .path{color:var(--warn); font-family:monospace;}
+  ul{padding-left:1.3rem;}
+  li{margin:.3rem 0;}
+  .footer{
+    margin-top:3rem;
+    padding-top:1rem;
+    border-top:1px solid var(--border);
+    color:var(--text-dim);
+    font-size:.85rem;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">X. Configuración inicial del sistema y servicios</span>
+</div>
+<span class="jagg-badge">Cap. 38 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 38 — Indexado de archivos</h1>
+<p class="subtitle">Instalación de Gentoo · Sección opcional · Herramienta: <code>mlocate</code></p>
+<div class="purpose">
+<b>¿Para qué sirve este capítulo?</b> Instalar una herramienta que crea un "catálogo" de todos los archivos del sistema, para poder buscarlos por nombre de forma casi instantánea, en vez de recorrer el disco completo cada vez.
+</div>
+<h2><span class="num">38.1</span> El concepto: índice vs. búsqueda en vivo</h2>
+<p>Cuando buscas un archivo en Linux tienes dos caminos:</p>
+<table>
+<tr><th>Método</th><th>Cómo funciona</th><th>Velocidad</th></tr>
+<tr><td><code>find /</code></td><td>Recorre el disco carpeta por carpeta en el momento de la búsqueda</td><td>Lento en discos grandes</td></tr>
+<tr><td><code>locate</code></td><td>Consulta una base de datos ya construida de antemano</td><td>Casi instantáneo</td></tr>
+</table>
+<p>La base de datos se actualiza periódicamente (normalmente vía <code>cron</code>, que ya configuraste en el capítulo 37). Es el mismo comando <code>locate</code> que probablemente conoces de Debian/Ubuntu.</p>
+<h2><span class="num">38.2</span> Instalación</h2>
+<div class="card">
+<span class="risk risk-low">RIESGO BAJO — Reversible</span>
+<div class="purpose"><b>Para qué sirve:</b> descarga e instala el paquete <code>mlocate</code>, que incluye el comando de búsqueda (<code>locate</code>) y el generador de la base de datos (<code>updatedb</code>).</div>
+<pre><code><span class="prompt">root #</span> emerge --ask sys-apps/mlocate</code></pre>
+</div>
+<h2><span class="num">38.3</span> Cómo se usa</h2>
+<h3 style="color:var(--text); font-size:1rem; margin-top:1.2rem;">Construir/actualizar el índice</h3>
+<div class="card">
+<div class="purpose"><b>Para qué sirve:</b> escanea todo el sistema de archivos y guarda la lista en la base de datos. Sin este paso, <code>locate</code> no encuentra nada nuevo.</div>
+<pre><code><span class="comment"># Ejecutar manualmente cuando lo necesites</span>
+<span class="prompt">root #</span> updatedb</code></pre>
+<p style="margin-top:.5rem; font-size:.9rem; color:var(--text-dim);">En un sistema normal no necesitas correrlo a mano: <code>cron</code> lo ejecuta automáticamente todos los días (revisa <code>/etc/cron.daily/</code>).</p>
+</div>
+<h3 style="color:var(--text); font-size:1rem; margin-top:1.2rem;">Buscar archivos</h3>
+<div class="card">
+<pre><code><span class="prompt">$</span> locate nombre_archivo</code></pre>
+<p>Devuelve todas las rutas que contienen ese texto, aunque no sea el nombre exacto.</p>
+</div>
+<h2><span class="num">38.4</span> Opciones más útiles de <code>locate</code></h2>
+<table>
+<tr><th>Opción</th><th>Qué hace</th></tr>
+<tr><td><code>-i</code></td><td>Ignora mayúsculas/minúsculas</td></tr>
+<tr><td><code>-c</code></td><td>Solo cuenta cuántos resultados hay, no los lista</td></tr>
+<tr><td><code>-l N</code></td><td>Limita la salida a N resultados</td></tr>
+<tr><td><code>-e</code></td><td>Verifica que el archivo aún exista en disco (más lento)</td></tr>
+<tr><td><code>-r</code></td><td>Interpreta el patrón como expresión regular</td></tr>
+</table>
+<pre><code><span class="comment"># Ejemplo: buscar archivos .conf sin importar mayúsculas, máximo 10 resultados</span>
+<span class="prompt">$</span> locate -i -l 10 .conf</code></pre>
+<h2><span class="num">38.5</span> Dónde se configura</h2>
+<div class="card">
+<p>El archivo de configuración es <span class="path">/etc/updatedb.conf</span>. Ahí se ajusta:</p>
+<ul>
+<li><code>PRUNE_PATHS</code> — carpetas que <b>no</b> se deben indexar (ej. <code>/tmp</code>, <code>/mnt</code>, puntos de montaje temporales)</li>
+<li><code>PRUNE_BIND_MOUNTS</code> — si se ignoran los montajes tipo bind (normalmente <code>"yes"</code>)</li>
+<li><code>PRUNEFS</code> — tipos de sistema de archivos a excluir (ej. <code>nfs</code>, <code>tmpfs</code>)</li>
+</ul>
+<pre><code><span class="prompt">root #</span> nano -w /etc/updatedb.conf</code></pre>
+</div>
+<details>
+<summary>Nota de seguridad (información adicional, no está en el manual)</summary>
+<p>La base de datos de <code>mlocate</code> se genera respetando permisos: un usuario normal no puede ver rutas de archivos que no tiene permiso de leer. Aun así, si guardas datos sensibles fuera de tu carpeta personal, revisa <code>PRUNE_PATHS</code> para excluirlos del índice.</p>
+</details>
+<details>
+<summary>¿Y si no me interesa buscar archivos por terminal?</summary>
+<p>Este capítulo es <b>opcional</b>. Puedes saltarlo sin que afecte el resto de la instalación — no tiene relación con el arranque, el kernel ni el bootloader. El siguiente paso crítico sigue siendo GRUB (capítulo 44).</p>
+</details>
+<div class="footer">
+Compendio Gentoo — Capítulo 38 basado en el Gentoo AMD64 Handbook.
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-37-cron-daemon.html">← Cap. 37: Capítulo 37 — Cron Daemon</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-39-ssh.html">Cap. 39: Acceso remoto por shell (SSH) →</a>
+</div>
+</body>
+</html>

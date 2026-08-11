@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cap. 48 — Reiniciar el sistema | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --bg-alt:#171a21;
+    --card:#1b1f27;
+    --border:#2a2f3a;
+    --text:#e4e6eb;
+    --text-dim:#9aa1ac;
+    --accent:#7ab8ff;
+    --accent2:#c792ea;
+    --green:#7fd88f;
+    --yellow:#f2c94c;
+    --red:#ff6b6b;
+    --code-bg:#11141a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height:1.6;
+    margin:0;
+    padding:0 0 60px 0;
+  }
+  header{
+    background:linear-gradient(135deg, #1a1f2b, #12151c);
+    border-bottom:1px solid var(--border);
+    padding:36px 24px 28px;
+    text-align:center;
+  }
+  header .kicker{
+    color:var(--accent2);
+    letter-spacing:2px;
+    font-size:0.78em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  header h1{
+    margin:8px 0 6px;
+    font-size:1.9em;
+  }
+  header p.sub{
+    color:var(--text-dim);
+    margin:0;
+    font-size:0.95em;
+  }
+  main{
+    max-width:820px;
+    margin:0 auto;
+    padding:0 20px;
+  }
+  section{
+    margin-top:34px;
+  }
+  h2{
+    font-size:1.25em;
+    color:var(--accent);
+    border-left:4px solid var(--accent);
+    padding-left:10px;
+    margin-bottom:14px;
+  }
+  h3{
+    font-size:1.05em;
+    color:var(--accent2);
+    margin:20px 0 8px;
+  }
+  p{margin:8px 0;}
+  code{
+    background:var(--code-bg);
+    color:#9fe6a0;
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:"Cascadia Code","Fira Code",Consolas,monospace;
+    font-size:0.92em;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    margin:10px 0;
+  }
+  pre code{
+    background:none;
+    padding:0;
+    color:#d5f5d5;
+  }
+  .callout{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-left:4px solid var(--accent);
+    border-radius:8px;
+    padding:14px 16px;
+    margin:14px 0;
+  }
+  .callout.para-que-sirve{border-left-color:var(--green);}
+  .callout.para-que-sirve .tag{color:var(--green);}
+  .callout.nota{border-left-color:var(--yellow);}
+  .callout.nota .tag{color:var(--yellow);}
+  .callout.alerta{border-left-color:var(--red);}
+  .callout.alerta .tag{color:var(--red);}
+  .callout .tag{
+    font-weight:700;
+    text-transform:uppercase;
+    font-size:0.75em;
+    letter-spacing:1px;
+    display:block;
+    margin-bottom:6px;
+  }
+  .badge{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:20px;
+    font-size:0.75em;
+    font-weight:700;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+  }
+  .badge.riesgo-bajo{background:rgba(127,216,143,0.15); color:var(--green); border:1px solid var(--green);}
+  .badge.riesgo-medio{background:rgba(242,201,76,0.15); color:var(--yellow); border:1px solid var(--yellow);}
+  .badge.riesgo-alto{background:rgba(255,107,107,0.15); color:var(--red); border:1px solid var(--red);}
+  .badge.init{background:rgba(122,184,255,0.15); color:var(--accent); border:1px solid var(--accent);}
+  details{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:10px 0;
+    padding:10px 16px;
+  }
+  details summary{
+    cursor:pointer;
+    font-weight:600;
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  details[open] summary{
+    margin-bottom:10px;
+    border-bottom:1px solid var(--border);
+    padding-bottom:8px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:12px 0;
+    font-size:0.92em;
+  }
+  th, td{
+    border:1px solid var(--border);
+    padding:8px 10px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{
+    background:var(--bg-alt);
+    color:var(--accent);
+  }
+  tr:nth-child(even){background:rgba(255,255,255,0.02);}
+  ul{padding-left:20px;}
+  li{margin:4px 0;}
+  .step-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;height:22px;
+    background:var(--accent);
+    color:#0f1115;
+    border-radius:50%;
+    font-weight:700;
+    font-size:0.8em;
+    margin-right:8px;
+  }
+  footer{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:0.85em;
+    margin-top:50px;
+  }
+  a{color:var(--accent);}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">XII. Finalizando la instalación</span>
+</div>
+<span class="jagg-badge">Cap. 48 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<div class="kicker">Compendio Gentoo Handbook · AMD64 · OpenRC</div>
+<h1>Capítulo 48 — Reiniciar el sistema</h1>
+<p class="sub">La prueba de fuego: salir del chroot, desmontar todo y arrancar el Gentoo recién instalado</p>
+<span class="badge riesgo-bajo">Riesgo: bajo (comandos no destructivos)</span>
+<span class="badge init">Aplica igual en OpenRC y systemd</span>
+</header>
+<main>
+<section>
+<div class="callout para-que-sirve">
+<span class="tag">¿Para qué sirve este capítulo?</span>
+    Hasta ahora todo el trabajo (particiones, base del sistema, kernel, bootloader) vivía "dentro" del entorno chroot,
+    montado sobre el live media. Este capítulo cierra esa sesión de forma limpia y reinicia la máquina apuntando
+    al disco real. Es el momento en el que se comprueba si GRUB, el kernel y <code>/etc/fstab</code> quedaron bien configurados.
+  </div>
+</section>
+<section>
+<h2>Los 4 comandos, en orden</h2>
+<details open="">
+<summary><span class="step-num">1</span> Salir del chroot</summary>
+<pre><code>(chroot) livecd # exit</code></pre>
+<p>Regresa el prompt al entorno live normal. No se puede desmontar una partición mientras la terminal
+    sigue "parada" dentro de ella (dentro del chroot), así que este paso es obligatorio antes de desmontar.</p>
+</details>
+<details open="">
+<summary><span class="step-num">2</span> Moverte fuera de <code>/mnt/gentoo</code></summary>
+<pre><code>livecd~# cd</code></pre>
+<p><code>cd</code> sin argumentos manda al <code>$HOME</code> del usuario actual (normalmente <code>/root</code>).
+    Es un detalle práctico: si la terminal seguía posicionada dentro de <code>/mnt/gentoo/algo</code>, el
+    desmontaje de abajo fallaría con <code>target is busy</code>.</p>
+</details>
+<details open="">
+<summary><span class="step-num">3</span> Desmontar <code>/dev</code> y sus submontajes</summary>
+<pre><code>livecd~# umount -l /mnt/gentoo/dev{/shm,/pts,}</code></pre>
+<ul>
+<li><code>{/shm,/pts,}</code> es expansión de llaves de bash: equivale a escribir tres rutas
+      (<code>/mnt/gentoo/dev/shm</code>, <code>/mnt/gentoo/dev/pts</code>, <code>/mnt/gentoo/dev</code>) en un solo comando.</li>
+<li><code>-l</code> (<em>lazy unmount</em>): desconecta el punto de montaje del árbol de archivos de inmediato,
+      pero si algún proceso lo sigue usando, espera a que termine antes de liberarlo por completo "por debajo".</li>
+</ul>
+<p><code>/dev</code> se desmonta aparte porque tiene submontajes anidados; hacerlo explícito aquí evita
+    problemas de orden en el paso siguiente.</p>
+</details>
+<details open="">
+<summary><span class="step-num">4</span> Desmontar todo lo demás</summary>
+<pre><code>livecd~# umount -R /mnt/gentoo</code></pre>
+<p><code>-R</code> (recursivo) desmonta <code>/mnt/gentoo</code> y todo lo que quedó montado debajo:
+    <code>/proc</code>, <code>/sys</code>, <code>/run</code>, la partición raíz y <code>/efi</code>. Portage/el kernel
+    se encargan del orden correcto automáticamente.</p>
+</details>
+<details open="">
+<summary><span class="step-num">5</span> Reiniciar</summary>
+<pre><code>livecd~# reboot</code></pre>
+<p>El comando final. La máquina se reinicia y, si todo salió bien, debería arrancar el Gentoo recién instalado
+    en vez del live media.</p>
+</details>
+<div class="callout alerta">
+<span class="tag">Antes de que reinicie</span>
+    Retira el USB/CD del medio de instalación. Si no lo haces, el firmware puede volver a bootear el live
+    environment en vez del disco, dependiendo del orden de arranque configurado en la UEFI.
+  </div>
+</section>
+<section>
+<h2>Checklist antes de presionar "reboot"</h2>
+<p>Estos comandos no revisan nada por ti — vale la pena confirmar manualmente antes de desmontar, sobre todo
+  porque una vez reiniciado, corregir un error del bootloader requiere volver a bootear el live media.</p>
+<ul>
+<li><strong>GRUB instalado:</strong> <code>grub-install</code> terminó sin errores y <code>grub-mkconfig -o /boot/grub/grub.cfg</code>
+    generó un archivo con entradas de arranque (revisado en el capítulo 44).</li>
+<li><strong><code>/etc/fstab</code> correcto:</strong> las UUID o rutas de las particiones raíz, <code>/efi</code> y swap
+    coinciden con <code>blkid</code>.</li>
+<li><strong>Kernel e initramfs presentes:</strong> en <code>/boot</code> debe existir el kernel y, dado tu setup con
+    <code>dracut</code>, el <code>initramfs-*.img</code> correspondiente.</li>
+<li><strong>Contraseña de root establecida:</strong> si no se hizo, quedarás sin forma de iniciar sesión al reiniciar.</li>
+<li><strong>Hostname configurado:</strong> revisar <code>/etc/conf.d/hostname</code> (OpenRC) para que el sistema no
+    arranque como <code>localhost</code>.</li>
+</ul>
+</section>
+<section>
+<h2>Diferencia OpenRC vs. systemd en este paso</h2>
+<p>Ninguna. Los comandos <code>exit</code>, <code>cd</code>, <code>umount</code> y <code>reboot</code> son utilidades
+  genéricas de Linux/util-linux, no dependen del sistema de init. La diferencia entre OpenRC y systemd aparece
+  <em>después</em> del reinicio: qué servicios arrancan (<code>rc-update</code> vs. <code>systemctl enable</code>)
+  y cómo depurar fallas de arranque (logs de OpenRC en <code>/var/log/</code> vs. <code>journalctl</code> en systemd).
+  Como tu instalación usa OpenRC, cualquier problema post-reinicio se investiga con las herramientas clásicas
+  (<code>dmesg</code>, <code>/var/log/rc.log</code> si está habilitado) en vez de <code>journalctl</code>.</p>
+</section>
+<section>
+<h2>Si el sistema no arranca</h2>
+<div class="callout nota">
+<span class="tag">No entres en pánico</span>
+    Nada de lo hecho en este capítulo es destructivo. Si el arranque falla, vuelve a bootear con el live media,
+    monta la partición raíz, y repite los pasos de "reanudar la instalación": copiar <code>resolv.conf</code>,
+    montar <code>/proc</code>, <code>/sys</code>, <code>/dev</code>, <code>/run</code> y <code>/efi</code>, luego
+    <code>chroot /mnt/gentoo /bin/bash</code> para diagnosticar (revisar <code>grub.cfg</code>, volver a correr
+    <code>grub-install</code>, o regenerar el initramfs con <code>dracut</code>).
+  </div>
+</section>
+<section>
+<h2>Dónde se configura / revisa cada cosa</h2>
+<table>
+<tr><th>Elemento</th><th>Ubicación</th><th>Se revisa en</th></tr>
+<tr><td>Configuración de GRUB</td><td><code>/boot/grub/grub.cfg</code></td><td>Cap. 44</td></tr>
+<tr><td>Tabla de montajes al arrancar</td><td><code>/etc/fstab</code></td><td>Cap. previo a chroot</td></tr>
+<tr><td>Hostname</td><td><code>/etc/conf.d/hostname</code> (OpenRC)</td><td>Cap. 35</td></tr>
+<tr><td>Generador de initramfs</td><td><code>dracut</code>, invocado por <code>installkernel</code></td><td>Config. inicial (USE flags)</td></tr>
+<tr><td>Punto de montaje EFI</td><td><code>/efi</code></td><td>Preparación del bootloader</td></tr>
+</table>
+</section>
+<footer>
+  Compendio personal — Gentoo AMD64 Handbook · Cap. 48: Rebooting the system
+</footer>
+</main>
+
+<div id="jagg-bottombar">
+<a href="cap-47-otras-alternativas.html">← Cap. 47: Capítulo 47 — Otras alternativas de bootloader No aplica a tu instalación</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-49-portage-maintenance.html">Cap. 49: Capítulo 49 — Mantenimiento de Portage →</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cap. 49 — Portage Maintenance | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --bg-card:#161b22;
+    --bg-card-alt:#1c2129;
+    --border:#30363d;
+    --text:#c9d1d9;
+    --text-dim:#8b949e;
+    --accent:#58a6ff;
+    --accent-2:#79c0ff;
+    --green:#3fb950;
+    --yellow:#d29922;
+    --red:#f85149;
+    --purple:#bc8cff;
+    --code-bg:#010409;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    margin:0;
+    padding:0 0 60px;
+  }
+  header{
+    background:linear-gradient(135deg,#1c2129 0%,#161b22 100%);
+    border-bottom:1px solid var(--border);
+    padding:36px 24px 28px;
+    text-align:center;
+  }
+  header .kicker{
+    color:var(--accent-2);
+    font-size:0.85em;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  header h1{
+    margin:0 0 6px;
+    font-size:1.9em;
+    color:#fff;
+  }
+  header p{
+    color:var(--text-dim);
+    margin:0;
+    font-size:0.95em;
+  }
+  main{
+    max-width:880px;
+    margin:0 auto;
+    padding:0 20px;
+  }
+  section{
+    margin-top:34px;
+  }
+  h2{
+    color:#fff;
+    border-left:4px solid var(--accent);
+    padding-left:12px;
+    font-size:1.3em;
+    margin-bottom:14px;
+  }
+  h3{
+    color:var(--accent-2);
+    font-size:1.08em;
+    margin:22px 0 10px;
+  }
+  p{margin:10px 0;}
+  code{
+    background:var(--code-bg);
+    color:var(--accent-2);
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:0.9em;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    margin:12px 0;
+  }
+  pre code{
+    background:none;
+    padding:0;
+    color:#a5d6ff;
+  }
+  .callout{
+    background:var(--bg-card-alt);
+    border-left:4px solid var(--purple);
+    border-radius:6px;
+    padding:12px 16px;
+    margin:14px 0;
+  }
+  .callout .label{
+    color:var(--purple);
+    font-weight:600;
+    font-size:0.85em;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:4px;
+    display:block;
+  }
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 20px;
+    margin:16px 0;
+  }
+  .badge{
+    display:inline-block;
+    font-size:0.72em;
+    font-weight:700;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    padding:3px 10px;
+    border-radius:20px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .badge-safe{background:rgba(63,185,80,0.15);color:var(--green);border:1px solid rgba(63,185,80,0.4);}
+  .badge-caution{background:rgba(210,153,34,0.15);color:var(--yellow);border:1px solid rgba(210,153,34,0.4);}
+  .badge-optional{background:rgba(88,166,255,0.15);color:var(--accent);border:1px solid rgba(88,166,255,0.4);}
+  details{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:12px 0;
+    padding:2px 16px;
+  }
+  details summary{
+    cursor:pointer;
+    padding:12px 0;
+    font-weight:600;
+    color:var(--accent-2);
+    list-style:none;
+  }
+  details summary::-webkit-details-marker{display:none;}
+  details summary::before{
+    content:"▸ ";
+    color:var(--accent);
+  }
+  details[open] summary::before{
+    content:"▾ ";
+  }
+  details .inner{
+    padding-bottom:14px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0;
+    font-size:0.92em;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:9px 12px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{
+    background:var(--bg-card-alt);
+    color:var(--accent-2);
+  }
+  tr:nth-child(even) td{
+    background:rgba(255,255,255,0.02);
+  }
+  .steps{
+    list-style:none;
+    counter-reset:step;
+    padding:0;
+    margin:12px 0;
+  }
+  .steps li{
+    counter-increment:step;
+    position:relative;
+    padding:6px 0 6px 38px;
+    margin-bottom:4px;
+  }
+  .steps li::before{
+    content:counter(step);
+    position:absolute;
+    left:0;
+    top:6px;
+    width:24px;
+    height:24px;
+    background:var(--accent);
+    color:#000;
+    font-weight:700;
+    font-size:0.8em;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .nixnote{
+    display:none; /* estilo permite, pero el contenido no debe llevar analogías de NixOS */
+  }
+  .comparison{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin:14px 0;
+  }
+  @media (max-width:640px){
+    .comparison{grid-template-columns:1fr;}
+  }
+  .comparison .col{
+    background:var(--bg-card-alt);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+  }
+  .comparison .col h4{
+    margin:0 0 8px;
+    color:var(--accent-2);
+    font-size:0.95em;
+  }
+  footer{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:0.85em;
+    margin-top:50px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+  }
+  .toc{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 22px;
+    margin-top:26px;
+  }
+  .toc a{color:var(--accent-2);text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc ul{margin:6px 0 0;padding-left:20px;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">XII. Finalizando la instalación</span>
+</div>
+<span class="jagg-badge">Cap. 49 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<div class="kicker">Compendio Gentoo Handbook · AMD64</div>
+<h1>Capítulo 49 — Mantenimiento de Portage</h1>
+<p>Limpieza de caché: distfiles y binpkgs con <code>gentoolkit</code> / <code>eclean</code></p>
+</header>
+<main>
+<nav class="toc">
+<strong>Contenido</strong>
+<ul>
+<li><a href="#concepto">1. El problema: el caché de Portage crece indefinidamente</a></li>
+<li><a href="#paraqsirve">2. Para qué sirve limpiarlo</a></li>
+<li><a href="#instalacion">3. Instalar gentoolkit</a></li>
+<li><a href="#eclean-dist">4. eclean-dist — limpiar tarballs de código fuente</a></li>
+<li><a href="#eclean-pkg">5. eclean-pkg — limpiar paquetes binarios</a></li>
+<li><a href="#modos">6. Modos de protección (seguro vs. profundo)</a></li>
+<li><a href="#opciones">7. Tabla de opciones disponibles</a></li>
+<li><a href="#exclusion">8. Archivos de exclusión (proteger paquetes específicos)</a></li>
+<li><a href="#extra">9. Extra: otras herramientas de gentoolkit útiles</a></li>
+<li><a href="#resumen">10. Dónde se configura — resumen</a></li>
+</ul>
+</nav>
+<section id="concepto">
+<h2>1. El problema</h2>
+<p>Cada vez que <code>emerge</code> instala o actualiza un paquete, guarda una copia local del trabajo realizado:</p>
+<table>
+<tr><th>Tipo de archivo</th><th>Ubicación por defecto</th><th>Variable en <code>make.conf</code></th></tr>
+<tr><td>Tarballs de código fuente descargado</td><td><code>/var/cache/distfiles</code></td><td><code>DISTDIR</code></td></tr>
+<tr><td>Paquetes binarios compilados (binpkgs)</td><td><code>/var/cache/binhost/gentoo</code></td><td><code>PKGDIR</code></td></tr>
+</table>
+<p>El detalle clave: <strong>cuando actualizas un paquete, Portage no borra la versión anterior descargada</strong>. Se queda ahí. Si nunca limpias, estos directorios crecen sin límite — se han reportado casos de varios gigabytes acumulados solo en <code>DISTDIR</code> tras meses de uso normal.</p>
+</section>
+<section id="paraqsirve">
+<h2>2. Para qué sirve conservarlos (y por qué limpiarlos igual)</h2>
+<div class="comparison">
+<div class="col">
+<h4>✔ Ventaja de conservarlos</h4>
+<p>Si necesitas reinstalar o hacer <em>downgrade</em> de un paquete, ya tienes el archivo local — no hay que descargarlo ni recompilarlo de nuevo. También sirve como respaldo si algún día el mirror de Gentoo deja de tener disponible esa versión específica.</p>
+</div>
+<div class="col">
+<h4>✘ Desventaja de no limpiar</h4>
+<p>Versiones antiguas que ya nadie va a volver a instalar simplemente ocupan espacio en disco de forma indefinida, sin ningún beneficio real.</p>
+</div>
+</div>
+<div class="callout">
+<span class="label">Para qué sirve eclean</span>
+  Es la herramienta que resuelve ese balance: identifica automáticamente qué archivos ya no corresponden a ningún paquete instalado (o a ningún ebuild disponible, según el modo) y los elimina, dejando intactos los que sí podrías necesitar.
+</div>
+</section>
+<section id="instalacion">
+<h2>3. Instalar gentoolkit</h2>
+<p><code>gentoolkit</code> es un paquete que agrupa varias utilidades de administración para sistemas Gentoo. <code>eclean</code> es una de ellas (junto con <code>equery</code>, <code>eread</code>, <code>revdep-rebuild</code>, entre otras).</p>
+<pre><code>root # emerge --ask app-portage/gentoolkit</code></pre>
+<ol class="steps">
+<li>Portage resuelve las dependencias del paquete <code>app-portage/gentoolkit</code>.</li>
+<li><code>--ask</code> muestra el plan de instalación y pide confirmación antes de proceder.</li>
+<li>Se compila (o se instala desde binpkg si aplica) y queda disponible en el sistema.</li>
+<li>A partir de aquí, los comandos <code>eclean-dist</code> y <code>eclean-pkg</code> están disponibles como atajos de <code>eclean</code>.</li>
+</ol>
+</section>
+<section id="eclean-dist">
+<h2>4. <code>eclean-dist</code> — limpiar tarballs de código fuente <span class="badge badge-safe">Seguro por defecto</span></h2>
+<p>Limpia archivos obsoletos dentro de <code>DISTDIR</code> (<code>/var/cache/distfiles</code>).</p>
+<pre><code>root # eclean-dist</code></pre>
+<details>
+<summary>Proceso paso a paso de qué hace este comando</summary>
+<div class="inner">
+<ol class="steps">
+<li>Escanea el árbol de ebuilds de Portage (y overlays, si tienes) para saber qué versiones de qué paquetes existen actualmente como ebuilds disponibles.</li>
+<li>Recorre <code>DISTDIR</code> comparando cada archivo contra esa lista.</li>
+<li>Por defecto (modo seguro), conserva cualquier tarball que aún corresponda a <strong>algún</strong> ebuild disponible en el repositorio — esté o no instalado ese paquete en tu sistema.</li>
+<li>Borra únicamente los tarballs que ya no corresponden a ningún ebuild existente (paquetes descontinuados o versiones eliminadas del árbol de Portage).</li>
+<li>Muestra un resumen del espacio liberado al terminar.</li>
+</ol>
+</div>
+</details>
+<div class="callout">
+<span class="label">Nota sobre velocidad</span>
+  Este modo por defecto es el más lento de los tres disponibles, porque necesita revisar todo el árbol de Portage completo (incluyendo overlays) para decidir qué proteger.
+</div>
+</section>
+<section id="eclean-pkg">
+<h2>5. <code>eclean-pkg</code> — limpiar paquetes binarios <span class="badge badge-optional">Útil sobre todo con binpkgs</span></h2>
+<p>Limpia archivos obsoletos dentro de <code>PKGDIR</code> (<code>/var/cache/binhost/gentoo</code>).</p>
+<pre><code>root # eclean-pkg</code></pre>
+<p>Funciona con la misma lógica que <code>eclean-dist</code>, pero sobre paquetes ya compilados en formato binario en vez de código fuente. Es especialmente relevante si usas la característica <code>FEATURES="buildpkg"</code> (que genera un binpkg cada vez que compilas algo) o si configuraste un host de binpkgs.</p>
+</section>
+<section id="modos">
+<h2>6. Modos de protección</h2>
+<p><code>eclean</code> tiene tres niveles de "qué tan agresivo" es al limpiar. Se controlan principalmente con la opción <code>-d</code> / <code>--deep</code>:</p>
+<div class="comparison">
+<div class="col">
+<h4>Modo por defecto (seguro)</h4>
+<p>Protege todo lo que corresponda a <strong>cualquier ebuild disponible</strong> en el árbol de Portage, esté instalado o no. Ideal si quieres poder reinstalar cualquier cosa sin volver a descargar. Más lento y deja más archivos.</p>
+</div>
+<div class="col">
+<h4><code>--deep</code> / <code>-d</code></h4>
+<p>Solo protege archivos que correspondan a paquetes <strong>instalados actualmente</strong>, en su versión exacta. Libera mucho más espacio, pero si desinstalaste algo por error tendrás que volver a descargarlo. Es el modo más rápido.</p>
+</div>
+</div>
+<p>Un punto intermedio: combinar <code>--deep</code> con <code>-n</code> / <code>--package-names</code> protege <strong>todas</strong> las versiones de los paquetes instalados (no solo la versión exacta actual), en lugar de solo la última.</p>
+<pre><code># Modo agresivo: solo conserva lo mínimo para reinstalar lo que ya tienes
+root # eclean-dist --deep
+
+# Modo intermedio: conserva todas las versiones de paquetes instalados
+root # eclean-pkg --deep --package-names</code></pre>
+</section>
+<section id="opciones">
+<h2>7. Tabla de opciones disponibles</h2>
+<h3>Opciones globales (aplican a ambos comandos)</h3>
+<table>
+<tr><th>Opción</th><th>Qué hace</th></tr>
+<tr><td><code>-p</code>, <code>--pretend</code></td><td>Solo muestra qué se borraría, sin borrar nada. <strong>Siempre recomendable correrlo primero.</strong></td></tr>
+<tr><td><code>-i</code>, <code>--interactive</code></td><td>Pide confirmación antes de cada eliminación.</td></tr>
+<tr><td><code>-d</code>, <code>--deep</code></td><td>Solo conserva lo mínimo necesario para reinstalar los paquetes ya instalados.</td></tr>
+<tr><td><code>-n</code>, <code>--package-names</code></td><td>Con <code>--deep</code>: protege todas las versiones instaladas, no solo la exacta actual.</td></tr>
+<tr><td><code>-t</code>, <code>--time-limit=&lt;tiempo&gt;</code></td><td>No borra archivos modificados recientemente (ej. <code>1y</code>, <code>2w</code>, <code>3d</code>).</td></tr>
+<tr><td><code>-e</code>, <code>--exclude-file=&lt;ruta&gt;</code></td><td>Usa un archivo de exclusión personalizado (ver sección 8).</td></tr>
+<tr><td><code>-q</code>, <code>--quiet</code></td><td>Salida mínima, solo errores.</td></tr>
+<tr><td><code>-C</code>, <code>--nocolor</code></td><td>Desactiva colores en la salida.</td></tr>
+</table>
+<h3>Opciones exclusivas de <code>eclean-dist</code></h3>
+<table>
+<tr><th>Opción</th><th>Qué hace</th></tr>
+<tr><td><code>-s</code>, <code>--size-limit=&lt;tamaño&gt;</code></td><td>No borra archivos más grandes que el tamaño indicado (ej. <code>50M</code>).</td></tr>
+<tr><td><code>-f</code>, <code>--fetch-restricted</code></td><td>Con <code>--deep</code>: protege archivos marcados como "fetch-restricted" (los que hay que descargar manualmente, no vía mirror).</td></tr>
+<tr><td><code>--skip-vcs</code></td><td>Protege fuentes de control de versiones (ebuilds "live") no instalados.</td></tr>
+</table>
+<h3>Opciones exclusivas de <code>eclean-pkg</code></h3>
+<table>
+<tr><th>Opción</th><th>Qué hace</th></tr>
+<tr><td><code>--changed-deps</code></td><td>Borra binpkgs cuyas dependencias del ebuild original ya cambiaron (quedaron desactualizados respecto al árbol actual).</td></tr>
+<tr><td><code>-i</code>, <code>--ignore-failure</code></td><td>Ignora el error si no logra localizar <code>PKGDIR</code>.</td></tr>
+</table>
+<div class="callout">
+<span class="label">Flujo recomendado</span>
+  1) Corre con <code>--pretend</code> para ver qué se borraría → 2) revisa la lista → 3) si todo se ve bien, vuelve a correr el comando sin <code>--pretend</code>.
+</div>
+<pre><code># Paso 1: revisar qué se limpiaría, sin tocar nada
+root # eclean-dist --pretend
+
+# Paso 2: ejecutar de verdad
+root # eclean-dist</code></pre>
+</section>
+<section id="exclusion">
+<h2>8. Archivos de exclusión</h2>
+<p>Si quieres proteger paquetes específicos de la limpieza (por ejemplo, porque sabes que vas a reinstalar algo pronto), puedes crear un archivo de exclusión:</p>
+<table>
+<tr><th>Comando</th><th>Archivo de exclusión usado por defecto</th></tr>
+<tr><td><code>eclean-dist</code></td><td><code>/etc/eclean/distfiles.exclude</code></td></tr>
+<tr><td><code>eclean-pkg</code></td><td><code>/etc/eclean/packages.exclude</code></td></tr>
+</table>
+<p>Formato del archivo (líneas de texto plano):</p>
+<pre><code># Proteger toda una categoría
+sys-apps
+
+# Proteger un paquete específico (todas sus versiones)
+app-shells/bash
+
+# Excluir un paquete de una protección de categoría
+!sys-apps/portage
+
+# Proteger un archivo distfile específico por nombre
+openoffice-i18n-3.0.tar.gz
+
+# Proteger archivos que coincidan con una expresión regular
+.*\.sig$</code></pre>
+</section>
+<section id="extra">
+<h2>9. Extra: otras herramientas de gentoolkit</h2>
+<p>Ya que instalaste <code>gentoolkit</code>, vienen incluidas otras utilidades que valen la pena conocer para el mantenimiento continuo del sistema:</p>
+<table>
+<tr><th>Herramienta</th><th>Para qué sirve</th></tr>
+<tr><td><code>equery</code></td><td>Consultar información de Portage: dependencias, metadatos y archivos instalados de un paquete.</td></tr>
+<tr><td><code>eread</code></td><td>Mostrar los mensajes "elog" que Portage guarda durante instalaciones (avisos, notas post-instalación de cada paquete).</td></tr>
+<tr><td><code>revdep-rebuild</code></td><td>Detecta binarios rotos por dependencias faltantes tras actualizaciones y los reconstruye.</td></tr>
+<tr><td><code>quickpkg</code></td><td>Crea un binpkg de un paquete ya instalado, sin recompilarlo.</td></tr>
+</table>
+<div class="callout">
+<span class="label">Relación con otros comandos del handbook</span>
+<code>eclean</code> limpia archivos <em>descargados/compilados</em> que ya no se usan. Es distinto de <code>emerge --depclean</code> (visto en capítulos anteriores), que desinstala <strong>paquetes completos</strong> que ya no son necesarios en el sistema. Ambos se complementan: primero <code>--depclean</code> para quitar paquetes sobrantes, luego <code>eclean-dist</code> / <code>eclean-pkg</code> para limpiar el caché de descargas.
+</div>
+</section>
+<section id="resumen">
+<h2>10. Dónde se configura — resumen</h2>
+<table>
+<tr><th>Elemento</th><th>Ubicación</th></tr>
+<tr><td>Directorio de tarballs fuente</td><td><code>/var/cache/distfiles</code> (variable <code>DISTDIR</code> en <code>make.conf</code>)</td></tr>
+<tr><td>Directorio de binpkgs</td><td><code>/var/cache/binhost/gentoo</code> (variable <code>PKGDIR</code> en <code>make.conf</code>)</td></tr>
+<tr><td>Instalar la herramienta</td><td><code>emerge --ask app-portage/gentoolkit</code></td></tr>
+<tr><td>Limpiar tarballs fuente</td><td><code>eclean-dist</code></td></tr>
+<tr><td>Limpiar binpkgs</td><td><code>eclean-pkg</code></td></tr>
+<tr><td>Exclusión de distfiles</td><td><code>/etc/eclean/distfiles.exclude</code></td></tr>
+<tr><td>Exclusión de binpkgs</td><td><code>/etc/eclean/packages.exclude</code></td></tr>
+</table>
+<div class="callout">
+<span class="label">Nota sobre OpenRC / systemd</span>
+  Este capítulo no tiene pasos diferenciados por sistema de init — <code>eclean</code> es una herramienta de Portage que funciona igual sin importar si el sistema usa OpenRC o systemd. No requiere ningún servicio corriendo ni configuración de arranque.
+</div>
+</section>
+<footer>
+  Compendio personal — Gentoo AMD64 Handbook · Capítulo 49 · OpenRC / GRUB / dracut
+</footer>
+</main>
+
+<div id="jagg-bottombar">
+<a href="cap-48-reboot.html">← Cap. 48: Capítulo 48 — Reiniciar el sistema</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-50-administracion-usuarios.html">Cap. 50: Capítulo 50 — Administración de usuarios →</a>
+</div>
+</body>
+</html>

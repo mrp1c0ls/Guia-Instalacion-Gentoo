@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 15 · Particionar el disco con GPT para UEFI</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --bg-panel:#171a21;
+    --bg-code:#0b0d11;
+    --border:#2a2f3a;
+    --text:#dfe3ea;
+    --text-dim:#93999f;
+    --accent:#7aa2f7;
+    --ok:#7ee787;
+    --warn:#e3b341;
+    --danger:#f47067;
+    --pill-bg:#1c2029;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    line-height:1.6;
+    padding:2rem 1rem 4rem;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header{margin-bottom:2rem;border-bottom:1px solid var(--border);padding-bottom:1.5rem;}
+  h1{font-size:1.6rem;margin:0 0 .4rem;color:#fff;}
+  .subtitle{color:var(--text-dim);font-size:.95rem;}
+  h2{font-size:1.2rem;color:var(--accent);margin-top:2.4rem;border-left:3px solid var(--accent);padding-left:.6rem;}
+  h3{font-size:1.02rem;color:#fff;margin-top:1.6rem;}
+  p{color:var(--text);}
+  table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.9rem;}
+  th,td{border:1px solid var(--border);padding:.5rem .6rem;text-align:left;}
+  th{background:var(--bg-panel);color:var(--accent);}
+  td{background:var(--bg-panel);}
+  code{
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    padding:.1rem .35rem;
+    border-radius:4px;
+    font-family:'Cascadia Code','Fira Code',monospace;
+    font-size:.88em;
+    color:#e6db74;
+  }
+  pre{
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:1rem;
+    overflow-x:auto;
+    font-size:.85rem;
+    font-family:'Cascadia Code','Fira Code',monospace;
+    color:#c9d1d9;
+  }
+  .cmd-block{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:1rem 1.1rem;
+    margin:1rem 0;
+  }
+  .cmd-block .pfs{
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    margin-bottom:.6rem;
+    flex-wrap:wrap;
+  }
+  .tag{
+    display:inline-block;
+    font-size:.72rem;
+    font-weight:600;
+    padding:.15rem .55rem;
+    border-radius:999px;
+    background:var(--pill-bg);
+    border:1px solid var(--border);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  .tag.riesgo-bajo{color:var(--ok);border-color:#2e4a34;}
+  .tag.riesgo-medio{color:var(--warn);border-color:#4a3e20;}
+  .tag.riesgo-alto{color:var(--danger);border-color:#4a2620;}
+  .para-que{
+    font-size:.88rem;
+    color:var(--text-dim);
+    margin:.3rem 0 .7rem;
+  }
+  .para-que strong{color:var(--text);}
+  details{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin:1rem 0;
+    padding:.7rem 1rem;
+  }
+  summary{
+    cursor:pointer;
+    font-weight:600;
+    color:var(--accent);
+    list-style:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  .callout{
+    border-radius:8px;
+    padding:.8rem 1rem;
+    margin:1rem 0;
+    font-size:.9rem;
+    border:1px solid var(--border);
+  }
+  .callout.nota{background:#141c2b;border-color:#28374f;}
+  .callout.importante{background:#2b1f14;border-color:#4a3820;}
+  .callout.peligro{background:#2b1414;border-color:#4a2020;}
+  .callout strong{display:block;margin-bottom:.25rem;}
+  ul{padding-left:1.3rem;}
+  li{margin-bottom:.35rem;}
+  footer{margin-top:3rem;color:var(--text-dim);font-size:.8rem;border-top:1px solid var(--border);padding-top:1rem;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">IV. Preparando el disco</span>
+</div>
+<span class="jagg-badge">Cap. 15 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header>
+<h1>Capítulo 15 · Particionar el disco con GPT para UEFI</h1>
+<p class="subtitle">Guía práctica con <code>fdisk</code> para crear la ESP, la swap y la partición raíz — Manual de instalación de Gentoo AMD64</p>
+</header>
+<section>
+<h2>¿Qué se hace en este capítulo?</h2>
+<p>Aquí dejamos la teoría atrás y ejecutamos los comandos reales para dividir el disco en tres particiones usando <code>fdisk</code>, que funciona como un pequeño programa interactivo: lo abres, respondes preguntas de una letra, y al final confirmas para escribir los cambios de verdad.</p>
+<table>
+<thead><tr><th>Partición</th><th>Punto de montaje</th><th>Sistema de archivos</th><th>Función</th></tr></thead>
+<tbody>
+<tr><td><code>/dev/sda1</code></td><td><code>/efi</code></td><td>vfat (FAT32)</td><td>ESP — donde el firmware UEFI busca el arrancador</td></tr>
+<tr><td><code>/dev/sda2</code></td><td>—</td><td>swap</td><td>Memoria de intercambio en disco</td></tr>
+<tr><td><code>/dev/sda3</code></td><td><code>/</code></td><td>xfs (o el que elijas)</td><td>Raíz del sistema</td></tr>
+</tbody>
+</table>
+<div class="callout peligro">
+<strong>⚠️ Antes de empezar</strong>
+    Todo lo que se escribe dentro de <code>fdisk</code> queda solo en memoria hasta presionar <code>w</code>. Pero una vez que guardas, cualquier dato previo en esas particiones se pierde. Confirma que <code>/dev/sda</code> es el disco correcto (usa <code>lsblk</code> antes de entrar) — sobre todo si hay más de un disco conectado.
+  </div>
+</section>
+<section>
+<h2>Comandos paso a paso</h2>
+<div class="cmd-block">
+<div class="pfs"><span class="tag riesgo-bajo">riesgo bajo</span></div>
+<pre>root # fdisk /dev/sda</pre>
+<p class="para-que"><strong>Para qué sirve:</strong> abre el disco en modo interactivo. No modifica nada todavía; es seguro entrar y salir sin guardar.</p>
+</div>
+<div class="cmd-block">
+<div class="pfs"><span class="tag riesgo-bajo">riesgo bajo</span></div>
+<pre>Command (m for help): p</pre>
+<p class="para-que"><strong>Para qué sirve:</strong> imprime la tabla de particiones actual (tamaño del disco, tipo de disklabel, particiones existentes). Úsalo para verificar antes y después de cada cambio.</p>
+</div>
+<div class="cmd-block">
+<div class="pfs"><span class="tag riesgo-medio">riesgo medio</span></div>
+<pre>Command (m for help): g</pre>
+<p class="para-que"><strong>Para qué sirve:</strong> crea una tabla de particiones GPT nueva y vacía. Si el disco ya tiene una GPT que quieres conservar, en vez de esto borra particiones una por una con <code>d</code>.</p>
+</div>
+<div class="cmd-block">
+<div class="pfs"><span class="tag riesgo-medio">riesgo medio</span></div>
+<pre>Command (m for help): n
+Partition number (1-128, default 1): 1
+First sector: [Enter]
+Last sector: +1G
+Command (m for help): t
+Partition type or alias: 1</pre>
+<p class="para-que"><strong>Para qué sirve:</strong> crea la partición 1 (1 GiB) y la marca como <em>EFI System</em>. Esta es la ESP; sin marcarla correctamente el firmware UEFI no encontrará el arrancador.</p>
+</div>
+<div class="cmd-block">
+<div class="pfs"><span class="tag riesgo-medio">riesgo medio</span></div>
+<pre>Command (m for help): n
+Partition number (2-128, default 2): 2
+First sector: [Enter]
+Last sector: +4G
+Command (m for help): t
+Partition type or alias: 19</pre>
+<p class="para-que"><strong>Para qué sirve:</strong> crea la partición 2 como swap (aquí 4 GiB de ejemplo — ajusta el tamaño a tu RAM y necesidades). El tipo <code>19</code> es el alias de "Linux swap" en <code>fdisk</code> moderno.</p>
+</div>
+<div class="cmd-block">
+<div class="pfs"><span class="tag riesgo-medio">riesgo medio</span></div>
+<pre>Command (m for help): n
+Partition number (3-128, default 3): 3
+First sector: [Enter]
+Last sector: [Enter]</pre>
+<p class="para-que"><strong>Para qué sirve:</strong> crea la partición 3 usando todo el espacio restante del disco — será la raíz (<code>/</code>). Dejar el "last sector" en blanco le dice a fdisk que use todo lo que sobra.</p>
+</div>
+<div class="cmd-block">
+<div class="pfs"><span class="tag riesgo-alto">riesgo alto</span></div>
+<pre>Command (m for help): w</pre>
+<p class="para-que"><strong>Para qué sirve:</strong> escribe la tabla de particiones al disco físico y sale. Es el único paso que realmente modifica el disco — hasta este momento puedes salir con <code>q</code> sin guardar nada.</p>
+</div>
+</section>
+<details>
+<summary>¿Qué es cada tecla que usamos dentro de fdisk?</summary>
+<ul>
+<li><code>p</code> — imprimir (print) la tabla de particiones actual</li>
+<li><code>g</code> — crear un disklabel GPT nuevo</li>
+<li><code>n</code> — nueva partición (new)</li>
+<li><code>d</code> — borrar partición (delete)</li>
+<li><code>t</code> — cambiar el tipo de una partición</li>
+<li><code>w</code> — escribir cambios y salir (write)</li>
+<li><code>q</code> — salir sin guardar nada (quit)</li>
+<li><code>m</code> — mostrar la ayuda con todos los comandos</li>
+</ul>
+</details>
+<details>
+<summary>¿Por qué el tipo de la partición raíz no es obligatorio?</summary>
+<p>El manual aclara que marcar la partición 3 como "Linux root (x86-64)" (tipo <code>23</code>) es opcional. El sistema arranca igual si queda como "Linux filesystem" genérico. Ese tipo específico solo es necesario si usas un bootloader que lo requiere para identificar la raíz sin depender de <code>/etc/fstab</code> — por ejemplo <code>systemd-boot</code>. Como en tu instalación usarás <strong>GRUB</strong>, no es indispensable, pero no hace daño marcarlo igual.</p>
+</details>
+<details>
+<summary>Alternativa: parted (no cubierta en el manual, pero existe)</summary>
+<p><code>parted</code> es otra herramienta de particionado disponible en el medio de instalación, capaz de manejar GPT desde sus inicios. El manual prefiere <code>fdisk</code> por ser más estándar y estar disponible en casi cualquier entorno Linux, pero si alguna vez ves guías que usan <code>parted</code>, es simplemente una alternativa con la misma finalidad.</p>
+</details>
+<div class="callout nota">
+<strong>📝 Verificación recomendada (no es parte oficial del capítulo)</strong>
+  Antes de continuar con el siguiente capítulo (crear los sistemas de archivos), es buena práctica confirmar que las tres particiones quedaron como se esperaba:
+  <pre style="margin-top:.5rem;">root # lsblk /dev/sda
+root # blkid</pre>
+<code>lsblk</code> muestra el árbol de particiones y tamaños; <code>blkid</code> muestra los UUID y tipos de sistema de archivos (aunque en este punto todavía no tienen filesystem, solo tipo de partición).
+</div>
+<div class="callout importante">
+<strong>➡️ Qué sigue</strong>
+  Con las particiones creadas pero todavía vacías, el siguiente paso (Capítulo 17 del manual) es formatearlas con <code>mkfs.vfat</code>, <code>mkswap</code> y <code>mkfs.xfs</code> (u otro filesystem elegido) para que realmente puedan almacenar datos.
+</div>
+<footer>
+  Basado en el Gentoo Handbook AMD64 — capítulo "Partitioning the disk with GPT for UEFI". Documento generado para uso personal de estudio.
+</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-14-diseno-particiones.html">← Cap. 14: Capítulo 14 — Diseñando un esquema de particiones</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-16-mbr-bios.html">Cap. 16: Capítulo 16 — Particionando el disco con MBR para BIOS / Legacy Boot →</a>
+</div>
+</body>
+</html>

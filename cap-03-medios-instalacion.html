@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 3 — Medios de instalación de Gentoo</title>
+<style>
+  :root{
+    --bg:#0f1115; --bg2:#161922; --card:#1b1f2a; --border:#2a2f3d;
+    --text:#e6e8ee; --muted:#9aa3b2; --accent:#7dd3fc; --accent2:#a78bfa;
+    --green:#4ade80; --yellow:#facc15; --red:#f87171;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:2rem 1rem; background:var(--bg); color:var(--text);
+    font-family:'Segoe UI',Roboto,system-ui,sans-serif; line-height:1.6;
+  }
+  .container{max-width:820px; margin:0 auto;}
+  h1{font-size:1.8rem; margin-bottom:.2rem;}
+  .subtitle{color:var(--muted); margin-bottom:2rem; font-size:.95rem;}
+  h2{
+    font-size:1.25rem; color:var(--accent); border-bottom:1px solid var(--border);
+    padding-bottom:.4rem; margin-top:2.2rem;
+  }
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:1rem 1.2rem; margin:1rem 0;
+  }
+  .callout{
+    border-left:3px solid var(--accent2); background:var(--bg2);
+    padding:.7rem 1rem; margin:.8rem 0; border-radius:6px; font-size:.92rem;
+  }
+  .callout strong{color:var(--accent2);}
+  .risk{
+    display:inline-block; font-size:.72rem; font-weight:600; letter-spacing:.03em;
+    padding:.15rem .55rem; border-radius:999px; margin-left:.4rem; vertical-align:middle;
+  }
+  .risk.low{background:rgba(74,222,128,.15); color:var(--green); border:1px solid var(--green);}
+  .risk.med{background:rgba(250,204,21,.15); color:var(--yellow); border:1px solid var(--yellow);}
+  .risk.high{background:rgba(248,113,113,.15); color:var(--red); border:1px solid var(--red);}
+  code{
+    background:#0c0e13; color:var(--accent); padding:.15rem .4rem; border-radius:4px;
+    font-family:'Fira Code',Consolas,monospace; font-size:.88rem;
+  }
+  details{
+    background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+    margin:.6rem 0; padding:.4rem .8rem;
+  }
+  summary{cursor:pointer; font-weight:600; padding:.3rem 0; outline:none;}
+  summary:hover{color:var(--accent);}
+  table{width:100%; border-collapse:collapse; margin:1rem 0; font-size:.92rem;}
+  th,td{border:1px solid var(--border); padding:.5rem .7rem; text-align:left;}
+  th{background:var(--bg2); color:var(--accent);}
+  tr:nth-child(even){background:rgba(255,255,255,.02);}
+  .tag{
+    display:inline-block; background:var(--bg2); border:1px solid var(--border);
+    color:var(--muted); font-size:.75rem; padding:.15rem .5rem; border-radius:6px; margin-bottom:.5rem;
+  }
+  footer{margin-top:3rem; color:var(--muted); font-size:.82rem; text-align:center; border-top:1px solid var(--border); padding-top:1rem;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">II. Medio de instalación</span>
+</div>
+<span class="jagg-badge">Cap. 03 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="container">
+<h1>Capítulo 3 — Medios de instalación de Gentoo</h1>
+<p class="subtitle">Elegir con qué imagen vas a arrancar el instalador, y qué es un stage file.</p>
+<div class="callout">
+<strong>Para qué sirve este capítulo:</strong> antes de instalar Gentoo necesitas arrancar una computadora desde algún medio (USB, CD, etc). Aquí eliges qué tipo de imagen usar para eso.
+  </div>
+<h2>3.1 — CD de instalación mínimo (Minimal Installation CD)</h2>
+<div class="card">
+<span class="risk low">SIN RIESGO</span>
+<p>Es una imagen pequeña y autosuficiente. Al arrancar, detecta el hardware automáticamente y carga los drivers necesarios. Todo se hace desde la terminal.</p>
+<table>
+<tr><th>Requisito</th><td>Mínimo 140 MB de RAM</td></tr>
+<tr><th>Interfaz</th><td>Solo terminal (texto)</td></tr>
+<tr><th>Nombre típico</th><td><code>install-amd64-minimal-&lt;fecha&gt;.iso</code></td></tr>
+</table>
+</div>
+<h2>3.2 — Gentoo LiveGUI</h2>
+<div class="card">
+<span class="risk low">SIN RIESGO</span>
+<p>Versión más cómoda: trae un escritorio KDE completo, con navegador gráfico para leer el manual mientras instalas en otra ventana de terminal. También tiene mejor soporte WiFi (con applet de NetworkManager visual).</p>
+<table>
+<tr><th>Requisito</th><td>Mínimo 2 GB de RAM</td></tr>
+<tr><th>Interfaz</th><td>Escritorio gráfico (KDE)</td></tr>
+<tr><th>Ventaja</th><td>Mejor soporte de drivers WiFi</td></tr>
+</table>
+</div>
+<details>
+<summary>¿Cuál elegir?</summary>
+<p>Si tu equipo es limitado en recursos o prefieres trabajar 100% en terminal, usa el <strong>Minimal CD</strong>. Si tienes suficiente RAM y quieres comodidad (navegador para leer el manual mientras instalas), usa el <strong>LiveGUI</strong>. Ambos instalan exactamente el mismo Gentoo — la diferencia es solo el entorno desde el que trabajas.</p>
+</details>
+<h2>3.3 — ¿Qué son los "stage files"?</h2>
+<div class="card">
+<span class="risk low">SIN RIESGO</span>
+<p>Un <strong>stage file</strong> es un archivo comprimido que sirve como "semilla" del sistema: es el sistema base mínimo desde el cual se construye todo Gentoo. Se descarga desde <code>releases/amd64/autobuilds/</code> en los mirrors oficiales.</p>
+</div>
+<div class="callout">
+<strong>Nota histórica:</strong> antes existían stages 1 y 2, pero quedaron obsoletos. Hoy solo se usa <strong>stage3</strong>.
+  </div>
+<h2>Información adicional — ¿Qué combinaciones de stage3 existen?</h2>
+<p class="tag">Contenido relacionado, útil para decidir qué descargar más adelante</p>
+<p>El stage3 se elige combinando dos decisiones independientes:</p>
+<table>
+<tr><th>Categoría</th><th>Opción A</th><th>Opción B</th></tr>
+<tr>
+<td>Sistema de inicio (init)</td>
+<td><strong>OpenRC</strong> — nativo de Gentoo, basado en dependencias</td>
+<td><strong>systemd</strong> — moderno, usado por la mayoría de distros</td>
+</tr>
+<tr>
+<td>Arquitectura de librerías</td>
+<td><strong>Multilib</strong> — 64 bits + compatibilidad 32 bits</td>
+<td><strong>No-multilib</strong> — 64 bits puro</td>
+</tr>
+</table>
+<div class="callout">
+<strong>Recomendación para principiantes:</strong> <code>OpenRC + multilib</code> (o <code>systemd + multilib</code> si prefieres systemd). Evita <strong>no-multilib</strong> al empezar — migrar de ahí a multilib después es muy difícil.
+  </div>
+<details>
+<summary>¿Cuándo se configura el profile?</summary>
+<p>El stage3 ya trae un profile activado por defecto — no hay que hacer nada aquí. Más adelante, ya dentro del sistema (chroot) y con Portage sincronizado, se puede revisar o cambiar con:</p>
+<table>
+<tr><th>Comando</th><th>Para qué sirve</th><th>Riesgo</th></tr>
+<tr><td><code>eselect profile list</code></td><td>Muestra los profiles disponibles</td><td><span class="risk low">bajo</span></td></tr>
+<tr><td><code>eselect profile set N</code></td><td>Cambia al profile número N</td><td><span class="risk med">medio</span></td></tr>
+</table>
+</details>
+<footer>Compendio Gentoo — Capítulo 3 · Generado como material de estudio</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-01-introduccion.html">← Cap. 01: Introducción</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-04-descargando.html">Cap. 04: Capítulo 4 — Descargando →</a>
+</div>
+</body>
+</html>

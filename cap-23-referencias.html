@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 23 — Referencias | Compendio Gentoo</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --bg-card: #171a21;
+    --border: #2a2e38;
+    --text: #e4e6eb;
+    --text-dim: #9aa0ac;
+    --accent: #7dd3fc;
+    --accent-soft: #1e293b;
+    --risk-low: #4ade80;
+    --risk-info: #60a5fa;
+    --code-bg: #0b0d11;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+  h1 {
+    font-size: 1.6rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+    margin-bottom: 6px;
+  }
+  .chapter-tag {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  h2 { font-size: 1.15rem; margin-top: 34px; color: var(--accent); }
+  p { color: var(--text); }
+  .lead {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 16px 18px;
+    border-radius: 8px;
+    margin: 20px 0;
+    color: var(--text-dim);
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .badge-info { background: rgba(96,165,250,0.15); color: var(--risk-info); border: 1px solid rgba(96,165,250,0.3); }
+  .badge-low  { background: rgba(74,222,128,0.15); color: var(--risk-low); border: 1px solid rgba(74,222,128,0.3); }
+
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 16px 0;
+    padding: 14px 18px;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "＋";
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-left: 12px;
+    transition: transform 0.2s;
+  }
+  details[open] summary::after { content: "－"; }
+  details[open] summary { margin-bottom: 10px; }
+
+  .para-que-sirve {
+    background: var(--accent-soft);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    margin: 10px 0;
+    color: var(--text-dim);
+  }
+  .para-que-sirve strong { color: var(--accent); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 0.88em;
+    color: #fbbf6a;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+  }
+  pre code { background: none; padding: 0; color: #d1d5db; }
+
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--accent); text-decoration: none; word-break: break-all; }
+  a:hover { text-decoration: underline; }
+
+  .ref-list li { font-size: 0.9rem; }
+  .footer-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">V. Sistema base (stage3)</span>
+</div>
+<span class="jagg-badge">Cap. 23 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="chapter-tag">Compendio Gentoo · Instalación</div>
+<h1>Capítulo 23 — Referencias <span class="badge badge-info">Informativo</span></h1>
+<div class="lead">
+Es el capítulo más corto del manual. No introduce comandos ni pasos nuevos: son las fuentes técnicas que respaldan lo explicado en el capítulo 22 sobre <code>MAKEOPTS</code>.
+</div>
+<h2>¿Qué hay aquí?</h2>
+<p>Dos enlaces a commits del repositorio de Portage en Gitweb, citados como respaldo de una afirmación puntual del capítulo anterior.</p>
+<ul class="ref-list">
+<li>
+<strong>[1]</strong> Commit que documenta que, a partir de Portage <code>3.0.31</code>, si <code>MAKEOPTS</code> se deja sin definir, Portage detecta automáticamente el número de hilos de la CPU (vía <code>nproc</code>) para el valor de trabajos paralelos (<code>-j</code>).<br/>
+<a href="https://gitweb.gentoo.org/proj/portage.git/commit/?id=5d2af567772bb12b073f1671daea6263055cbdc2" target="_blank">gitweb.gentoo.org — commit 5d2af56...</a>
+</li>
+<li>
+<strong>[2]</strong> Commit que extiende ese comportamiento automático al valor de carga del sistema (<code>-l</code>, load-average) a partir de Portage <code>3.0.53</code>.<br/>
+<a href="https://gitweb.gentoo.org/proj/portage.git/commit/?id=de7be7f45ee54e3f789def46542919550687d15e" target="_blank">gitweb.gentoo.org — commit de7be7f...</a>
+</li>
+</ul>
+<div class="para-que-sirve">
+<strong>¿Para qué sirve este capítulo?</strong> Le da trazabilidad técnica a lo dicho antes: no es una promesa vaga de "Portage es inteligente", sino que hay un commit real en el código fuente que implementa exactamente ese comportamiento.
+</div>
+<details>
+<summary>Recordatorio rápido: ¿qué significa esto en la práctica? <span class="badge badge-low">Repaso</span></summary>
+<p>Si en tu <code>/etc/portage/make.conf</code> no defines <code>MAKEOPTS</code>, Portage no se queda sin instrucciones — usa automáticamente todos los hilos de tu CPU para compilar en paralelo (<code>nproc</code>) y ajusta el límite de carga del sistema en consecuencia.</p>
+<p>El riesgo es que esto no considera tu RAM disponible. Por eso, si tu equipo tiene poca memoria en relación a sus núcleos, conviene fijar manualmente algo como:</p>
+<pre><code>MAKEOPTS="-j4 -l5"</code></pre>
+<p>Regla práctica: usa el <strong>menor</strong> valor entre el número de hilos de tu CPU y (RAM total ÷ 2 GiB). Cada trabajo paralelo (<code>-j</code>) puede consumir hasta ~2 GiB de RAM en compilaciones pesadas (kernel, navegadores, etc.).</p>
+</details>
+<details>
+<summary>Dato adicional (no está en el manual): ¿por qué Gentoo cita commits en vez de documentación formal?</summary>
+<p>Gentoo es un proyecto muy transparente en cuanto a su desarrollo: gran parte de sus decisiones de comportamiento se documentan directamente en los mensajes de commit de Portage, en lugar de en changelogs separados. Es una práctica común en proyectos de código abierto maduros — el código y su historial <em>son</em> la documentación autoritativa, y el wiki simplemente enlaza hacia esa fuente primaria en vez de duplicarla.</p>
+</details>
+<div class="footer-nav">
+<span>← Cap. 22: Configuración de compilación</span>
+<span>Cap. 24: Chrooting →</span>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-22-opciones-compilacion.html">← Cap. 22: Capítulo 22 — Configurando las opciones de compilación</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-24-chroot.html">Cap. 24: Cap. 24 — Chrooting →</a>
+</div>
+</body>
+</html>

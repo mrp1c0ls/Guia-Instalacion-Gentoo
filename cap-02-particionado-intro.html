@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Capítulo 2 — Particionado del disco</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2229; --border:#2a313c;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --accent2:#7ee787;
+    --warn:#f0883e; --danger:#f85149; --code:#c9d1d9;
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg); color:var(--text); font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    max-width:820px; margin:0 auto; padding:32px 20px 80px; line-height:1.6;
+  }
+  h1{font-size:1.8rem; border-bottom:2px solid var(--accent); padding-bottom:10px}
+  h2{font-size:1.25rem; color:var(--accent2); margin-top:2.2rem}
+  p{color:var(--text)}
+  .lead{color:var(--muted); font-size:0.95rem}
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:10px;
+    padding:16px 18px; margin:16px 0;
+  }
+  .concept-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0}
+  @media (max-width:600px){.concept-grid{grid-template-columns:1fr}}
+  .concept{
+    background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:14px 16px;
+  }
+  .concept h3{margin:0 0 6px; font-size:1rem; color:var(--accent)}
+  .concept p{margin:0; font-size:0.92rem; color:var(--muted)}
+  .tag{
+    display:inline-block; font-size:0.7rem; font-weight:600; padding:2px 8px;
+    border-radius:20px; margin-bottom:8px; letter-spacing:.03em;
+  }
+  .tag.modern{background:rgba(126,231,135,.15); color:var(--accent2); border:1px solid rgba(126,231,135,.3)}
+  .tag.legacy{background:rgba(240,136,62,.15); color:var(--warn); border:1px solid rgba(240,136,62,.3)}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:0.9rem}
+  th,td{border:1px solid var(--border); padding:8px 10px; text-align:left}
+  th{background:var(--panel2); color:var(--accent)}
+  code{
+    background:#010409; color:var(--code); padding:2px 6px; border-radius:5px;
+    font-family:"SF Mono",Consolas,monospace; font-size:0.88em;
+  }
+  pre{
+    background:#010409; border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; font-size:0.88rem;
+  }
+  pre code{background:none; padding:0}
+  details{
+    background:var(--panel); border:1px solid var(--border); border-radius:10px;
+    margin:14px 0; padding:0; overflow:hidden;
+  }
+  summary{
+    cursor:pointer; padding:12px 16px; font-weight:600; color:var(--accent);
+    list-style:none; display:flex; align-items:center; gap:8px;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; transition:transform .15s}
+  details[open] summary::before{transform:rotate(90deg)}
+  .details-body{padding:0 16px 16px}
+  .purpose{
+    background:rgba(88,166,255,.08); border-left:3px solid var(--accent);
+    padding:8px 12px; border-radius:0 6px 6px 0; font-size:0.85rem; color:var(--muted); margin-top:8px;
+  }
+  .purpose strong{color:var(--accent)}
+  .diagram{background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px; margin:16px 0}
+  svg text{fill:var(--text); font-family:inherit}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">IV. Preparando el disco</span>
+</div>
+<span class="jagg-badge">Cap. 02 · Compendio Gentoo · JorgeAGG</span>
+</div><div class="jaggnote">📌 <b>Nota de navegación:</b> este fue el primer acercamiento al particionado, de forma general. La versión detallada y definitiva que se siguió realmente en la instalación está en <a href="cap-13-dispositivos-bloque.html">Cap. 13 (dispositivos de bloque)</a>, <a href="cap-14-diseno-particiones.html">Cap. 14 (diseño del esquema)</a> y <a href="cap-15-particionado-gpt-uefi.html">Cap. 15 (fdisk + GPT/UEFI, comandos reales)</a>.</div>
+
+<h1>Capítulo 2: Particionado del disco</h1>
+<p class="lead">Cómo dividir el disco antes de instalar Gentoo, y qué son UEFI, BIOS, GPT y MBR.</p>
+<h2>Conceptos base</h2>
+<div class="concept-grid">
+<div class="concept">
+<span class="tag modern">MODERNO</span>
+<h3>UEFI / EFI</h3>
+<p>El firmware que enciende la máquina antes del sistema operativo. Busca un archivo de arranque dentro de una partición especial (ESP). Es el estándar actual.</p>
+</div>
+<div class="concept">
+<span class="tag legacy">LEGADO</span>
+<h3>BIOS</h3>
+<p>El firmware antiguo. No lee particiones ESP; arranca leyendo directamente el primer sector del disco (MBR). Común en equipos pre-2010.</p>
+</div>
+<div class="concept">
+<span class="tag modern">MODERNO</span>
+<h3>GPT</h3>
+<p>Tabla de particiones moderna. Sin límite práctico de particiones, soporta discos enormes (&gt;2 TiB). Se usa junto con UEFI.</p>
+</div>
+<div class="concept">
+<span class="tag legacy">LEGADO</span>
+<h3>MBR / DOS</h3>
+<p>Tabla de particiones antigua. Máximo 4 particiones primarias, límite de 2 TiB. Se usa junto con BIOS.</p>
+</div>
+</div>
+<div class="purpose">
+<strong>En resumen:</strong> UEFI+GPT es la pareja moderna recomendada. BIOS+MBR es la pareja legada, solo para hardware muy viejo o casos especiales (como algunas nubes tipo AWS).
+</div>
+<h2>Esquema de particiones recomendado (GPT + UEFI)</h2>
+<table>
+<tr><th>Partición</th><th>Punto de montaje</th><th>Sistema de archivos</th><th>Para qué sirve</th></tr>
+<tr><td><code>/dev/sda1</code></td><td><code>/efi</code></td><td>vfat (FAT)</td><td>ESP: aquí el firmware UEFI encuentra el gestor de arranque</td></tr>
+<tr><td><code>/dev/sda2</code></td><td>—</td><td>swap</td><td>Memoria virtual: extiende la RAM usando disco</td></tr>
+<tr><td><code>/dev/sda3</code></td><td><code>/</code></td><td>ext4 / xfs / etc.</td><td>Raíz: contiene todo el sistema Gentoo instalado</td></tr>
+</table>
+<div class="diagram">
+<svg viewbox="0 0 700 110" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#58a6ff" height="50" opacity="0.25" stroke="#58a6ff" width="90" x="10" y="30"></rect>
+<text font-size="12" text-anchor="middle" x="55" y="50">ESP</text>
+<text fill="#8b949e" font-size="10" text-anchor="middle" x="55" y="65">/efi · 1G</text>
+<rect fill="#f0883e" height="50" opacity="0.2" stroke="#f0883e" width="140" x="105" y="30"></rect>
+<text font-size="12" text-anchor="middle" x="175" y="50">swap</text>
+<text fill="#8b949e" font-size="10" text-anchor="middle" x="175" y="65">sin montar · 4G</text>
+<rect fill="#7ee787" height="50" opacity="0.15" stroke="#7ee787" width="440" x="250" y="30"></rect>
+<text font-size="12" text-anchor="middle" x="470" y="50">root</text>
+<text fill="#8b949e" font-size="10" text-anchor="middle" x="470" y="65">/ · resto del disco</text>
+<text fill="#8b949e" font-size="11" x="10" y="20">/dev/sda — disco completo</text>
+</svg>
+</div>
+<h2>Nota sobre BIOS boot partition</h2>
+<p>Solo se necesita si el disco usa GPT pero el equipo arranca en modo BIOS legado con GRUB2. No aplica si se usa UEFI puro (nuestro caso) ni con tabla MBR.</p>
+<h2>Comandos de <code>fdisk</code></h2>
+<p>Se abre la herramienta apuntando al disco:</p>
+<pre><code>fdisk /dev/sda</code></pre>
+<div class="purpose"><strong>Para qué sirve:</strong> entra al modo interactivo de fdisk para ver, crear o borrar particiones del disco indicado.</div>
+<table>
+<tr><th>Tecla</th><th>Acción</th></tr>
+<tr><td><code>p</code></td><td>Ver la tabla de particiones actual</td></tr>
+<tr><td><code>g</code></td><td>Crear tabla nueva tipo GPT (borra lo existente)</td></tr>
+<tr><td><code>o</code></td><td>Crear tabla nueva tipo MBR/DOS (borra lo existente)</td></tr>
+<tr><td><code>n</code></td><td>Crear una partición nueva</td></tr>
+<tr><td><code>d</code></td><td>Borrar una partición</td></tr>
+<tr><td><code>t</code></td><td>Cambiar el tipo de una partición</td></tr>
+<tr><td><code>a</code></td><td>Marcar como booteable (solo en MBR)</td></tr>
+<tr><td><code>w</code></td><td>Guardar los cambios en el disco</td></tr>
+<tr><td><code>q</code></td><td>Salir sin guardar nada</td></tr>
+</table>
+<details>
+<summary>Ver ejemplo completo paso a paso</summary>
+<div class="details-body">
+<pre><code>fdisk /dev/sda
+
+n → 1 → Enter → +1G      # partición 1: ESP (arranque)
+t → 1                    # tipo: EFI System
+
+n → 2 → Enter → +4G      # partición 2: swap
+t → 2 → 19                # tipo: Linux swap
+
+n → 3 → Enter → Enter    # partición 3: root, usa el resto del disco
+t → 3 → 23                # tipo: Linux root (x86-64), opcional
+
+w                          # guardar y salir</code></pre>
+<div class="purpose"><strong>Riesgo:</strong> <span style="color:var(--warn)">medio</span> — hasta presionar <code>w</code> nada se escribe en el disco; se puede salir con <code>q</code> sin dañar nada.</div>
+</div>
+</details>
+<div class="card">
+<strong style="color:var(--accent2)">En una frase:</strong>
+<p style="margin:6px 0 0">Se divide el disco en 3 partes — una pequeña para el arranque (ESP), una para memoria virtual (swap), y una grande para el sistema (root) — usando <code>fdisk</code> con tabla GPT porque el equipo usa UEFI.</p>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-12-red-estatica.html">← Cap. 12: Capítulo 12: Configuración manual de red con IP estática</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-08-preparando-discos.html">Cap. 08: Capítulo 8 · Preparando los discos →</a>
+</div>
+</body>
+</html>

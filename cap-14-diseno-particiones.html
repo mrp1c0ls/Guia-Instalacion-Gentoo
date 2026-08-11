@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 14 — Diseñando un esquema de particiones</title>
+<style>
+  :root {
+    --bg: #12141a;
+    --bg-card: #1a1d26;
+    --bg-code: #0d0f14;
+    --border: #2a2e3a;
+    --text: #e2e4ea;
+    --text-dim: #9a9fae;
+    --accent: #7aa2f7;
+    --accent-2: #bb9af7;
+    --ok: #9ece6a;
+    --warn: #e0af68;
+    --risk: #f7768e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+  h1 {
+    font-size: 1.7em;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+  }
+  h2 {
+    color: var(--accent);
+    margin-top: 2.2em;
+    font-size: 1.25em;
+    border-left: 4px solid var(--accent);
+    padding-left: 10px;
+  }
+  h3 {
+    color: var(--accent-2);
+    font-size: 1.05em;
+    margin-top: 1.6em;
+  }
+  p { color: var(--text); }
+  .subtitle { color: var(--text-dim); margin-top: -8px; }
+  .callout {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: 0.95em;
+  }
+  .callout b { color: var(--accent); }
+  .tag {
+    display: inline-block;
+    font-size: 0.72em;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 999px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.03em;
+  }
+  .tag-low { background: rgba(158,206,106,0.15); color: var(--ok); border: 1px solid var(--ok); }
+  .tag-med { background: rgba(224,175,104,0.15); color: var(--warn); border: 1px solid var(--warn); }
+  .tag-high { background: rgba(247,118,142,0.15); color: var(--risk); border: 1px solid var(--risk); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.92em;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+  }
+  th { background: var(--bg-card); color: var(--accent); }
+  tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+  code {
+    background: var(--bg-code);
+    color: var(--ok);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 12px 0;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent-2);
+  }
+  summary::marker { color: var(--accent); }
+  details[open] summary { margin-bottom: 8px; }
+  ul, ol { padding-left: 1.3em; }
+  li { margin: 4px 0; }
+  .footer {
+    margin-top: 3em;
+    color: var(--text-dim);
+    font-size: 0.85em;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">IV. Preparando el disco</span>
+</div>
+<span class="jagg-badge">Cap. 14 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 14 — Diseñando un esquema de particiones</h1>
+<p class="subtitle">Manual de Gentoo AMD64 · Fase de planeación (sin comandos ejecutables todavía)</p>
+<div class="callout">
+<b>Para qué sirve este capítulo:</b> antes de tocar <code>fdisk</code>, hay que decidir cuántas particiones crear, de qué tamaño, y si el equipo necesita una ESP o una partición de arranque BIOS. Los comandos reales de creación vienen en los capítulos 15 (GPT/UEFI) y 16 (MBR/BIOS).
+</div>
+<h2>1. ¿Cuántas particiones y de qué tamaño?</h2>
+<p>No hay una fórmula fija; depende del uso del equipo:</p>
+<ul>
+<li><b>Muchos usuarios</b> → separar <code>/home</code> (seguridad y backups más simples).</li>
+<li><b>Servidor de correo</b> → separar <code>/var</code> (ahí viven los correos).</li>
+<li><b>Servidor de juegos</b> → separar <code>/opt</code> (ahí suele instalarse ese software).</li>
+</ul>
+<p><code>/usr</code> y <code>/var</code> conviene dejarlos con espacio holgado: <code>/usr</code> guarda casi todas las aplicaciones y las fuentes del kernel; <code>/var</code> guarda el repositorio de ebuilds (~650 MiB) más las cachés de descargas y paquetes binarios, que crecen con el tiempo.</p>
+<table>
+<tr><th>Ventajas de separar en varias particiones</th><th>Desventajas</th></tr>
+<tr><td>Puedes elegir el mejor sistema de archivos para cada una</td><td>Si calculas mal los tamaños, una se llena mientras otra sobra</td></tr>
+<tr><td>Un proceso descontrolado no llena todo el disco</td><td>Separar <code>/usr</code> exige initramfs para montarlo antes del arranque</td></tr>
+<tr><td>Chequeos de disco más rápidos en paralelo</td><td>MBR + SCSI/SATA limita a 15 particiones (GPT no tiene ese límite)</td></tr>
+<tr><td>Puedes montar como solo-lectura, <code>nosuid</code>, <code>noexec</code></td><td>Más piezas que administrar</td></tr>
+</table>
+<div class="callout">
+<b>Recomendación para principiantes:</b> no separes <code>/usr</code> en su propia partición — complica el arranque innecesariamente.
+</div>
+<h2>2. ¿Qué hay del espacio de swap?</h2>
+<p>El swap es espacio en disco que el kernel usa cuando la RAM se satura: mueve ahí páginas de memoria poco usadas (<i>swap out</i>) y las trae de vuelta cuando se necesitan (<i>swap in</i>, más lento que leer RAM directamente).</p>
+<table>
+<tr><th>RAM instalada</th><th>Con suspensión</th><th>Con hibernación</th></tr>
+<tr><td>2 GB o menos</td><td>4 GB</td><td>4 GB</td></tr>
+<tr><td>2 a 8 GB</td><td>= cantidad de RAM</td><td>2 × RAM</td></tr>
+<tr><td>8 a 64 GB</td><td>8 GB mín. – 16 GB máx.</td><td>1.5 × RAM</td></tr>
+<tr><td>64 GB o más</td><td>8 GB mínimo</td><td>No recomendada</td></tr>
+</table>
+<ul>
+<li>Si quieres <b>hibernar</b>, el swap debe ser ≥ que la RAM total (ahí se guarda toda la memoria).</li>
+<li>Con varios discos, un swap por disco permite lectura/escritura en paralelo.</li>
+<li>Entre HDD y SSD, el swap rinde mejor en el SSD.</li>
+<li>Alternativa: un <b>archivo</b> de swap en vez de partición, útil con poco espacio.</li>
+</ul>
+<h2>3. ¿Qué es la ESP (EFI System Partition)?</h2>
+<div class="callout">
+<b>Para qué sirve:</b> es donde el firmware UEFI busca el cargador de arranque (bootloader) y el kernel. Sin ella, el equipo no puede arrancar en modo UEFI.
+</div>
+<p>Obligatoria si el sistema arranca por <b>UEFI</b>. Debe formatearse en <b>FAT</b> (normalmente FAT32) — si no, el firmware no la reconoce y el sistema no arranca. No se necesita si arrancas en modo BIOS/Legacy.</p>
+<h2>4. ¿Qué es la partición de arranque BIOS?</h2>
+<p>Partición diminuta (1–2 MB) donde GRUB2 guarda datos que no caben en el espacio normal asignado. Solo aplica en un caso muy específico:</p>
+<ul>
+<li>Disco con tabla <b>GPT</b>, <b>y</b></li>
+<li>Firmware arrancando en modo <b>BIOS/MBR legacy</b> (no UEFI).</li>
+</ul>
+<p>No se necesita en modo UEFI ni con tabla MBR/Legacy DOS.</p>
+<h2>Extra: zram, un vecino útil del swap</h2>
+<div class="callout">
+<b>Para qué sirve:</b> es una forma de swap que vive comprimido dentro de la RAM en lugar de en disco — mucho más rápido, a cambio de usar algo de CPU.
+</div>
+<h3>Cómo funciona</h3>
+<p>El kernel crea un dispositivo virtual (<code>/dev/zram0</code>) dentro de la propia RAM. Los datos que normalmente irían a disco se comprimen (relación típica 2:1 o 3:1) y se guardan ahí mismo en memoria. Resultado: "escribir a swap" y "leer de swap" son operaciones de RAM, no de disco.</p>
+<h3>El detalle importante para instalaciones que compilan mucho</h3>
+<p>Compilar paquetes grandes puede consumir varios GB de RAM. Si en ese momento el sistema necesita usar zram, la CPU tiene que comprimir datos <i>al mismo tiempo</i> que está compilando — compite por el mismo recurso. Por eso se recomienda:</p>
+<ul>
+<li>Un zram <b>pequeño</b> (≈512 MB) con <b>prioridad alta</b>, para absorber la presión normal de uso.</li>
+<li>Un swap en disco más grande como respaldo, para cuando la compilación realmente necesita más memoria.</li>
+</ul>
+<h3>zram no sirve para hibernar</h3>
+<p>La hibernación necesita guardar toda la RAM en un almacenamiento que sobreviva sin energía. zram vive dentro de la RAM misma, así que se pierde al apagar el equipo. Para hibernar se necesita sí o sí una partición o archivo de swap real en disco.</p>
+<details>
+<summary>Ver cómo se usa en otras distros (fuera de Gentoo)</summary>
+<p>zram es parte del kernel de Linux, no algo exclusivo de Gentoo. Se usa ampliamente en:</p>
+<ul>
+<li><b>Android</b> y <b>Chrome OS</b> — estándar desde hace años en equipos con poca RAM.</li>
+<li><b>Fedora</b> (desde la versión 33) y <b>Ubuntu</b> (desde 22.04) — habilitado por defecto en vez de una partición de swap tradicional.</li>
+</ul>
+<p>En distros con systemd suele configurarse con el paquete <code>zram-generator</code>:</p>
+<pre><code># /etc/systemd/zram-generator.conf
+[zram0]
+zram-size = min(ram / 2, 4096)
+compression-algorithm = zstd</code></pre>
+<p>O de forma manual, sin systemd:</p>
+<pre><code>modprobe zram num_devices=1
+echo zstd &gt; /sys/block/zram0/comp_algorithm
+echo 4G &gt; /sys/block/zram0/disksize
+mkswap /dev/zram0
+swapon -p 100 /dev/zram0</code></pre>
+<p>En una distro binaria (donde no compilas tu propio software) zram casi no tiene contras: solo absorbe la presión de memoria del uso diario. El caso de Gentoo es la excepción, porque tu propia máquina compila el sistema.</p>
+</details>
+<div class="footer">
+Capítulo 14 del Gentoo AMD64 Handbook · Siguiente: Capítulo 15 — Particionando el disco con GPT para UEFI <span class="tag tag-low">RIESGO BAJO — solo lectura, sin comandos ejecutables</span>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-13-dispositivos-bloque.html">← Cap. 13: Capítulo 13 — Introducción a los dispositivos de bloque</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-15-particionado-gpt-uefi.html">Cap. 15: Capítulo 15 · Particionar el disco con GPT para UEFI →</a>
+</div>
+</body>
+</html>

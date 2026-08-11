@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 9 — Configuración Inalámbrica (WiFi)</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
+    --text:#e6e9ef; --muted:#9aa4b2; --accent:#7dd3fc; --accent2:#a78bfa;
+    --ok:#4ade80; --warn:#fbbf24; --danger:#f87171;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6; padding:0 0 60px;
+  }
+  header{
+    padding:36px 24px 28px; text-align:center;
+    background:radial-gradient(circle at 50% 0%, #1c2333 0%, var(--bg) 70%);
+    border-bottom:1px solid var(--border);
+  }
+  header .tag{
+    display:inline-block; font-size:12px; letter-spacing:.12em; color:var(--accent);
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  h1{margin:0 0 8px; font-size:1.8rem}
+  header p{color:var(--muted); margin:0; font-size:.95rem}
+  main{max-width:760px; margin:0 auto; padding:28px 20px}
+
+  .intro{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:18px 20px; margin-bottom:28px; font-size:.95rem; color:#cbd2dd;
+  }
+
+  .compare{
+    display:grid; grid-template-columns:1fr; gap:14px; margin:24px 0 32px;
+  }
+  @media(min-width:640px){ .compare{grid-template-columns:repeat(3,1fr)} }
+  .method-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:16px; position:relative;
+  }
+  .method-card h3{margin:0 0 6px; font-size:1rem; display:flex; align-items:center; gap:8px}
+  .method-card .badge{
+    font-size:.68rem; text-transform:uppercase; letter-spacing:.05em;
+    padding:2px 8px; border-radius:999px; font-weight:600;
+  }
+  .badge.easy{background:rgba(74,222,128,.15); color:var(--ok)}
+  .badge.mid{background:rgba(251,191,36,.15); color:var(--warn)}
+  .badge.hard{background:rgba(167,139,250,.15); color:var(--accent2)}
+  .method-card p{margin:0; font-size:.85rem; color:var(--muted)}
+
+  h2{
+    font-size:1.25rem; margin:38px 0 14px; padding-bottom:8px;
+    border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;
+  }
+  h2 .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px; border-radius:50%; background:var(--accent);
+    color:#0b0d12; font-size:.85rem; font-weight:700; flex:none;
+  }
+
+  .step{
+    background:var(--panel); border:1px solid var(--border); border-radius:10px;
+    padding:14px 16px; margin-bottom:12px;
+  }
+  .step .why{
+    font-size:.82rem; color:var(--accent); margin-top:8px;
+    padding-top:8px; border-top:1px dashed var(--border);
+  }
+  .step .why b{color:var(--accent)}
+
+  pre{
+    background:#0b0d12; border:1px solid var(--border); border-radius:8px;
+    padding:12px 14px; overflow-x:auto; margin:10px 0 0; font-size:.85rem;
+  }
+  code{font-family:"SF Mono",Consolas,Menlo,monospace}
+  .prompt{color:var(--danger); font-weight:600}
+
+  .risk{
+    display:inline-block; font-size:.68rem; text-transform:uppercase; letter-spacing:.05em;
+    padding:2px 8px; border-radius:999px; font-weight:700; margin-bottom:8px;
+  }
+  .risk.low{background:rgba(74,222,128,.15); color:var(--ok)}
+  .risk.none{background:rgba(122,180,255,.12); color:var(--accent)}
+
+  details{
+    background:var(--panel2); border:1px solid var(--border); border-radius:10px;
+    padding:10px 14px; margin:16px 0;
+  }
+  details summary{cursor:pointer; font-weight:600; color:var(--accent2); font-size:.9rem}
+  details[open] summary{margin-bottom:8px}
+  details p, details ul{font-size:.85rem; color:#cbd2dd; margin:6px 0}
+
+  .extra{
+    background:linear-gradient(135deg,#1a1f2b,#171a21); border:1px solid var(--border);
+    border-radius:12px; padding:18px 20px; margin-top:36px;
+  }
+  .extra h2{margin-top:0}
+  .extra ul{margin:0; padding-left:20px; font-size:.9rem; color:#cbd2dd}
+  .extra li{margin-bottom:8px}
+
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:.85rem}
+  th,td{padding:8px 10px; border-bottom:1px solid var(--border); text-align:left}
+  th{color:var(--muted); font-weight:600}
+
+  footer{text-align:center; color:var(--muted); font-size:.8rem; margin-top:40px}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">III. Red durante la instalación (medio live)</span>
+</div>
+<span class="jagg-badge">Cap. 09 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<span class="tag">Compendio Gentoo · Capítulo 9</span>
+<h1>📶 Configuración Inalámbrica (WiFi)</h1>
+<p>Cómo conectar tu equipo a una red WiFi desde el medio de instalación</p>
+</header>
+<main>
+<div class="intro">
+    Si tu máquina se conecta a internet por <b>cable Ethernet</b>, este capítulo no aplica: el DHCP
+    ya resolvió la conexión automáticamente. Este capítulo es solo para cuando dependes de
+    <b>WiFi</b> para instalar Gentoo. Existen tres formas de lograrlo, de la más simple a la más manual.
+  </div>
+<div class="compare">
+<div class="method-card">
+<h3>🖱️ NetworkManager <span class="badge easy">Fácil</span></h3>
+<p>Menú interactivo. Recomendado para casi todos los casos.</p>
+</div>
+<div class="method-card">
+<h3>⚙️ net-setup <span class="badge mid">Alternativa</span></h3>
+<p>Asistente por preguntas. Se usa cuando no hay NetworkManager.</p>
+</div>
+<div class="method-card">
+<h3>🔧 Manual <span class="badge hard">Avanzado</span></h3>
+<p>Control total con wpa_supplicant / iwd. Para redes abiertas o casos especiales.</p>
+</div>
+</div>
+<h2><span class="num">0</span> Antes de empezar: comprobar la tarjeta (opcional)</h2>
+<div class="step">
+<span class="risk none">Sin riesgo</span>
+<p>Verifica que el kernel detecta tu tarjeta inalámbrica antes de configurar nada.</p>
+<pre><span class="prompt">root #</span> iw dev wlp9s0 info</pre>
+<div class="why"><b>Para qué sirve:</b> confirma que el driver del WiFi está cargado. Si el nombre
+    de tu interfaz no es <code>wlp9s0</code> (puede ser <code>wlan0</code> o <code>ra0</code>), revisa
+    el nombre correcto con <code>ip link</code>.</div>
+</div>
+<h2><span class="num">1</span> Opción A — NetworkManager (recomendada)</h2>
+<div class="step">
+<span class="risk none">Sin riesgo</span>
+<p><b>Paso único:</b> ejecuta el asistente de texto y sigue el menú.</p>
+<pre><span class="prompt">root #</span> nmtui</pre>
+<div class="why"><b>Para qué sirve:</b> abre una interfaz de menús donde eliges tu red y escribes
+    la contraseña, sin comandos adicionales. Si usas la LiveGUI (versión con escritorio),
+    basta con hacer clic en el ícono de red de la barra de tareas.</div>
+</div>
+<h2><span class="num">2</span> Opción B — net-setup</h2>
+<p style="color:var(--muted); font-size:.88rem; margin-top:-6px">Úsala solo si NetworkManager no está disponible en tu medio de instalación.</p>
+<div class="step">
+<span class="risk none">Sin riesgo</span>
+<p><b>Paso 1:</b> detener el cliente DHCP activo para evitar conflictos.</p>
+<pre><span class="prompt">root #</span> killall dhcpcd</pre>
+<div class="why"><b>Para qué sirve:</b> libera la interfaz de red para que <code>net-setup</code>
+    pueda configurarla sin interferencias.</div>
+</div>
+<div class="step">
+<span class="risk none">Sin riesgo</span>
+<p><b>Paso 2:</b> lanzar el asistente sobre tu interfaz.</p>
+<pre><span class="prompt">root #</span> net-setup enp1s0</pre>
+<div class="why"><b>Para qué sirve:</b> hace preguntas paso a paso (nombre de red, contraseña) y
+    configura automáticamente <code>wpa_supplicant</code> o una IP fija según tus respuestas.</div>
+</div>
+<h2><span class="num">3</span> Opción C — Configuración manual</h2>
+<p style="color:var(--muted); font-size:.88rem; margin-top:-6px">Para usuarios avanzados o redes abiertas sin contraseña.</p>
+<div class="step">
+<span class="risk none">Sin riesgo</span>
+<p><b>Paso 1:</b> activar la interfaz inalámbrica.</p>
+<pre><span class="prompt">root #</span> ip link set dev wlp9s0 up</pre>
+<div class="why"><b>Para qué sirve:</b> "enciende" la tarjeta a nivel de kernel; sin esto no puede
+    detectar ni asociarse a ninguna red.</div>
+</div>
+<div class="step">
+<span class="risk none">Sin riesgo</span>
+<p><b>Paso 2:</b> para redes con contraseña (la mayoría), usar un daemon como
+    <code>wpa_supplicant</code> o <code>iwd</code> para autenticarte. Para redes abiertas,
+    con activar la interfaz suele bastar para asociarte al ESSID.</p>
+<div class="why"><b>Para qué sirve:</b> estos programas manejan el protocolo de seguridad WiFi
+    (WPA2/WPA3). El handbook los explica a fondo en el capítulo de "Redes inalámbricas" aparte.</div>
+</div>
+<details>
+<summary>💡 Comparación rápida de los tres métodos</summary>
+<table>
+<tr><th>Método</th><th>Cuándo usarlo</th><th>Requiere contraseña manual</th></tr>
+<tr><td>NetworkManager (<code>nmtui</code>)</td><td>Caso general, primera opción</td><td>La pide el menú</td></tr>
+<tr><td>net-setup</td><td>Si no hay NetworkManager (ej. HPPA)</td><td>La pide el asistente</td></tr>
+<tr><td>Manual (wpa_supplicant/iwd)</td><td>Redes abiertas o control total</td><td>Configuración directa</td></tr>
+</table>
+</details>
+<div class="extra">
+<h2 style="border:none; padding:0">✨ Para enriquecer: cosas útiles que no siempre se mencionan</h2>
+<ul>
+<li><b>Verifica siempre después de conectar.</b> Haz <code>ping gentoo.org</code> (o cualquier
+      dominio) para confirmar que hay internet real, no solo asociación WiFi.</li>
+<li><b>El nombre de la interfaz cambia entre equipos.</b> Gracias al esquema de nombres
+      predecibles de systemd, puede ser <code>wlp2s0</code>, <code>wlp3s0</code>, etc. — nunca asumas
+      que será igual al de otra máquina.</li>
+<li><b>Esta configuración es temporal.</b> Todo lo hecho aquí es solo para el medio de
+      instalación (LiveCD/USB). Una vez dentro del sistema instalado, deberás configurar la red
+      de nuevo con <b>netifrc</b> u otra herramienta permanente (ya cubierto en tu instalación).</li>
+<li><b>Si algo falla</b>, el propio handbook recomienda volver a la configuración manual de red
+      como respaldo — es la opción con más control cuando los asistentes no detectan bien el hardware.</li>
+</ul>
+</div>
+<footer>Compendio Gentoo · Capítulo 9 — Configuración Inalámbrica</footer>
+</main>
+
+<div id="jagg-bottombar">
+<a href="cap-07-red-automatica.html">← Cap. 07: Capítulo 7 — Configuración automática de la red</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-10-config-especifica.html">Cap. 10: Capítulo 10 — Configuración específica de aplicaciones →</a>
+</div>
+</body>
+</html>

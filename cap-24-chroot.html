@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 24: Chrooting — Compendio Gentoo</title>
+<style>
+  :root {
+    --bg: #12141a;
+    --bg-card: #1a1d26;
+    --bg-code: #0d0f14;
+    --border: #2a2e3a;
+    --text: #d8dce5;
+    --text-dim: #8b91a3;
+    --accent: #7aa2f7;
+    --accent-soft: #3d4a6b;
+    --risk-low: #3fb950;
+    --risk-med: #d29922;
+    --risk-high: #f85149;
+    --tip: #56b6c2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+    line-height: 1.6;
+  }
+  h1 {
+    font-size: 1.7rem;
+    border-bottom: 2px solid var(--accent-soft);
+    padding-bottom: 0.6rem;
+  }
+  h1 .cap-num { color: var(--accent); }
+  h2 {
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin-top: 2.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  h3 { font-size: 1.02rem; color: var(--text); margin-top: 1.4rem; }
+  p { margin: 0.6rem 0; }
+  .intro {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0 1.6rem;
+    color: var(--text-dim);
+  }
+  code, pre {
+    font-family: "SF Mono", Consolas, Menlo, monospace;
+    font-size: 0.88rem;
+  }
+  .cmd {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin: 0.6rem 0 0.3rem;
+    overflow-x: auto;
+    white-space: pre;
+    color: #a9d18e;
+  }
+  .cmd .prompt { color: #f85149; opacity: 0.8; }
+  .para-que-sirve {
+    font-size: 0.85rem;
+    color: var(--tip);
+    background: rgba(86, 182, 194, 0.08);
+    border-left: 3px solid var(--tip);
+    padding: 0.5rem 0.8rem;
+    margin: 0 0 1rem;
+    border-radius: 0 6px 6px 0;
+  }
+  .para-que-sirve b { color: var(--tip); }
+  .risk {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+  .risk-low { background: rgba(63,185,80,0.15); color: var(--risk-low); border: 1px solid var(--risk-low); }
+  .risk-med { background: rgba(210,153,34,0.15); color: var(--risk-med); border: 1px solid var(--risk-med); }
+  .risk-high { background: rgba(248,81,73,0.15); color: var(--risk-high); border: 1px solid var(--risk-high); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.8rem 0 1.2rem;
+    font-size: 0.9rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--bg-card); color: var(--accent); }
+  td code { color: #a9d18e; }
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 0.8rem 0;
+    padding: 0.7rem 1rem;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  summary::-webkit-details-marker { color: var(--accent); }
+  details[open] summary { margin-bottom: 0.6rem; }
+  .warn {
+    background: rgba(248,81,73,0.08);
+    border-left: 4px solid var(--risk-high);
+    border-radius: 0 8px 8px 0;
+    padding: 0.7rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.92rem;
+  }
+  .warn b { color: var(--risk-high); }
+  .note {
+    background: rgba(122,162,247,0.08);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 0.7rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.92rem;
+  }
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps li {
+    counter-increment: step;
+    margin: 0.5rem 0;
+    padding-left: 2.1rem;
+    position: relative;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: -1px;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 50%;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    text-align: center;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">VI. Chroot y Portage</span>
+</div>
+<span class="jagg-badge">Cap. 24 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1><span class="cap-num">Cap. 24</span> — Chrooting</h1>
+<div class="intro">
+Hasta ahora todo lo hiciste "desde afuera": particionaste discos y extrajiste los archivos del sistema base (stage3) mientras seguías parado en el medio de instalación (USB/CD en vivo). En este capítulo <b>entras</b> a ese sistema nuevo para trabajar directamente dentro de él, como si ya estuviera instalado. A esto se le llama <b>chroot</b> (<i>change root</i> — "cambiar la raíz").
+</div>
+<h2>🌐 24.1 — Copiar la información de DNS</h2>
+<p>Antes de entrar, copia el archivo que le dice a tu sistema qué servidores DNS usar. Sin esto, el nuevo entorno no tendría internet aunque el cable/wifi funcione.</p>
+<div class="cmd"><span class="prompt">root #</span> cp --dereference /etc/resolv.conf /mnt/gentoo/etc/</div>
+<div class="para-que-sirve"><b>Para qué sirve:</b> asegura que el sistema nuevo pueda resolver nombres de dominio (como <code>gentoo.org</code>) a direcciones IP. <code>--dereference</code> copia el archivo real (no un enlace simbólico roto) por si <code>/etc/resolv.conf</code> apunta a otro lugar.</div>
+<h2>📁 24.2 — Montar los sistemas de archivos necesarios</h2>
+<p>El nuevo sistema necesita "ver" ciertas carpetas especiales del kernel para funcionar. Estas no se copian, se <b>enlazan</b> — son literalmente las mismas que las del sistema exterior.</p>
+<table>
+<tr><th>Carpeta</th><th>Qué es</th><th>Por qué se necesita</th></tr>
+<tr>
+<td><code>/proc</code></td>
+<td>Sistema de archivos virtual generado al vuelo por el kernel</td>
+<td>Da información en tiempo real de procesos en ejecución (PID, memoria, CPU). Muchos programas la consultan para funcionar.</td>
+</tr>
+<tr>
+<td><code>/sys</code></td>
+<td>Similar a <code>/proc</code>, pero más estructurado</td>
+<td>Expone información de hardware y dispositivos detectados por el kernel (discos, USB, red, etc.)</td>
+</tr>
+<tr>
+<td><code>/dev</code></td>
+<td>Archivos que representan dispositivos físicos</td>
+<td>Sin esto no podrías acceder a discos (<code>/dev/sda1</code>), terminales, ni dispositivos aleatorios (<code>/dev/random</code>)</td>
+</tr>
+<tr>
+<td><code>/run</code></td>
+<td>Almacenamiento temporal en RAM</td>
+<td>Guarda archivos de estado que solo importan mientras el sistema está encendido (PIDs de servicios, bloqueos, sockets)</td>
+</tr>
+</table>
+<div class="cmd"><span class="prompt">root #</span> mount --types proc /proc /mnt/gentoo/proc
+<span class="prompt">root #</span> mount --rbind /sys /mnt/gentoo/sys
+<span class="prompt">root #</span> mount --make-rslave /mnt/gentoo/sys
+<span class="prompt">root #</span> mount --rbind /dev /mnt/gentoo/dev
+<span class="prompt">root #</span> mount --make-rslave /mnt/gentoo/dev
+<span class="prompt">root #</span> mount --bind /run /mnt/gentoo/run
+<span class="prompt">root #</span> mount --make-slave /mnt/gentoo/run</div>
+<details>
+<summary>¿Qué hacen <code>--rbind</code> y <code>--make-rslave</code>?</summary>
+<p><b><code>--rbind</code></b> (bind recursivo): en vez de solo "asomarse" a una carpeta, replica también todos los sub-montajes que tiene adentro (por ejemplo, <code>/sys/fs/cgroup</code> suele ser su propio montaje separado). Sin la "r", esos sub-montajes quedarían invisibles dentro del chroot.</p>
+<p><b><code>--make-rslave</code></b>: por defecto, un bind mount queda conectado en <i>ambas direcciones</i> — lo que pase adentro del chroot también afectaría al sistema exterior. Esta opción lo vuelve de <b>un solo sentido</b>: los cambios de afuera se ven adentro (por ejemplo, un USB nuevo), pero lo que hagas adentro del chroot no puede romper el sistema exterior por accidente.</p>
+<p><code>/run</code> usa la versión sin "r" (<code>--bind</code> / <code>--make-slave</code>) porque normalmente no tiene sub-montajes complejos anidados.</p>
+</details>
+<div class="note">
+Si usas el medio oficial de instalación de Gentoo, todo este bloque de montajes (y el paso de copiar DNS) se puede reemplazar con un solo comando:
+<div class="cmd" style="margin-top:0.5rem"><span class="prompt">root #</span> arch-chroot /mnt/gentoo</div>
+</div>
+<div style="background:#0d1117;border:1px solid #2a3140;border-radius:10px;padding:1rem 1rem .5rem;margin:1.2rem auto;max-width:760px;">
+<svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <text x="360" y="24" text-anchor="middle" font-size="13" fill="#7dd3fc" font-family="monospace">Sistema live (medio de instalación)</text>
+  <rect x="20" y="36" width="300" height="150" rx="8" fill="none" stroke="#3a4150"/>
+  <text x="170" y="58" text-anchor="middle" font-size="12" fill="#dbe1ea" font-family="monospace">/ (raíz del live)</text>
+  <g font-family="monospace" font-size="11" fill="#9ece6a">
+    <rect x="36" y="70" width="120" height="26" rx="4" fill="#132116" stroke="#2d4a2d"/>
+    <text x="96" y="87" text-anchor="middle">/proc</text>
+    <rect x="164" y="70" width="120" height="26" rx="4" fill="#132116" stroke="#2d4a2d"/>
+    <text x="224" y="87" text-anchor="middle">/sys</text>
+    <rect x="36" y="104" width="120" height="26" rx="4" fill="#132116" stroke="#2d4a2d"/>
+    <text x="96" y="121" text-anchor="middle">/dev</text>
+    <rect x="164" y="104" width="120" height="26" rx="4" fill="#132116" stroke="#2d4a2d"/>
+    <text x="224" y="121" text-anchor="middle">/run</text>
+  </g>
+  <text x="170" y="160" text-anchor="middle" font-size="10" fill="#6b7280" font-family="monospace">--rbind / --make-rslave</text>
+
+  <g stroke="#7aa2f7" stroke-width="1.6" fill="none" marker-end="url(#arrow)">
+    <path d="M 96 96 C 200 200, 400 200, 500 96"/>
+    <path d="M 224 96 C 300 180, 420 180, 500 130"/>
+    <path d="M 96 130 C 220 220, 420 220, 500 160"/>
+    <path d="M 224 130 C 320 195, 440 195, 500 190"/>
+  </g>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#7aa2f7"/>
+    </marker>
+  </defs>
+
+  <rect x="400" y="36" width="300" height="150" rx="8" fill="none" stroke="#7aa2f7"/>
+  <text x="550" y="58" text-anchor="middle" font-size="12" fill="#dbe1ea" font-family="monospace">/mnt/gentoo → luego chroot</text>
+  <g font-family="monospace" font-size="11" fill="#7dd3fc">
+    <rect x="416" y="70" width="120" height="26" rx="4" fill="#0f1e33" stroke="#2a4568"/>
+    <text x="476" y="87" text-anchor="middle">/proc</text>
+    <rect x="544" y="70" width="120" height="26" rx="4" fill="#0f1e33" stroke="#2a4568"/>
+    <text x="604" y="87" text-anchor="middle">/sys</text>
+    <rect x="416" y="104" width="120" height="26" rx="4" fill="#0f1e33" stroke="#2a4568"/>
+    <text x="476" y="121" text-anchor="middle">/dev</text>
+    <rect x="544" y="104" width="120" height="26" rx="4" fill="#0f1e33" stroke="#2a4568"/>
+    <text x="604" y="121" text-anchor="middle">/run</text>
+  </g>
+  <text x="550" y="160" text-anchor="middle" font-size="10" fill="#6b7280" font-family="monospace">un solo sentido: afuera→adentro</text>
+
+  <text x="360" y="215" text-anchor="middle" font-size="11" fill="#facc15" font-family="monospace">chroot /mnt/gentoo /bin/bash → a partir de aquí, "/" = /mnt/gentoo</text>
+</svg>
+<p style="text-align:center;color:#8b93a3;font-size:.78rem;margin:.4rem 0 0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">Los mounts especiales se enlazan (no se copian): son literalmente los mismos que los del sistema exterior.</p></div><h2>🚪 24.3 — Entrar al nuevo entorno</h2>
+<p>Aquí ocurre el chroot real, en tres pasos:</p>
+<ol class="steps">
+<li>Cambiar la raíz del sistema de <code>/</code> (medio de instalación) a <code>/mnt/gentoo</code> (tu sistema nuevo)</li>
+<li>Recargar las variables de entorno del sistema nuevo</li>
+<li>Cambiar el prompt para no perder de vista que estás "adentro"</li>
+</ol>
+<div class="cmd"><span class="prompt">root #</span> chroot /mnt/gentoo /bin/bash
+<span class="prompt">root #</span> source /etc/profile
+<span class="prompt">root #</span> export PS1="(chroot) ${'$'}{PS1}"</div>
+<div class="para-que-sirve"><b>Para qué sirve:</b> a partir de este punto, cada comando que ejecutes actúa directamente sobre el sistema nuevo, no sobre el medio de instalación. Es importante ver <code>(chroot)</code> en tu prompt para no confundir en qué sistema estás parado.</div>
+<div class="note">
+⚠️ <b>Importante — rutas dentro del chroot:</b> una vez adentro, <code>/mnt/gentoo</code> deja de existir como tal. Lo que antes era <code>/mnt/gentoo/efi</code> ahora es simplemente <code>/efi</code>. Escribir la ruta larga desde dentro del chroot dará error de "carpeta no encontrada".
+</div>
+<div class="note">
+Si la instalación se interrumpe después de este punto, puedes retomarla sin volver a particionar: monta la partición raíz, copia el DNS, repite los montajes, y vuelve a entrar al chroot. Muy útil también si necesitas arreglar el bootloader más adelante.
+</div>
+<h2>⚙️ 24.4 — Preparando el bootloader</h2>
+<p>Ya adentro del chroot, hay que montar la partición donde vivirá el bootloader. El comando depende del tipo de firmware de tu equipo:</p>
+<table>
+<tr><th>Tipo de sistema</th><th>Partición</th><th>Se monta en</th><th>Bootloader típico</th></tr>
+<tr><td><b>UEFI</b> (moderno)</td><td>ESP, formateada en FAT32</td><td><code>/efi</code></td><td>GRUB (modo UEFI), systemd-boot</td></tr>
+<tr><td><b>BIOS Legacy / MBR</b></td><td>Partición de arranque</td><td><code>/boot</code></td><td>GRUB (modo Legacy)</td></tr>
+</table>
+<h3>Sistemas UEFI (GPT)</h3>
+<div class="cmd"><span class="prompt">root #</span> mkdir --parents /efi
+<span class="prompt">root #</span> mount /dev/sda1 /efi</div>
+<div class="para-que-sirve"><b>Para qué sirve:</b> monta la ESP (EFI System Partition) donde el firmware UEFI buscará el bootloader al encender la máquina. El <code>mkdir</code> es necesario porque el stage3 no siempre trae la carpeta <code>/efi</code> creada.</div>
+<h3>Sistemas BIOS Legacy (MBR)</h3>
+<div class="cmd"><span class="prompt">root #</span> mount /dev/sda1 /boot</div>
+<div class="para-que-sirve"><b>Para qué sirve:</b> en un equipo con BIOS heredado (sin UEFI), no existe ESP — el bootloader (GRUB en modo Legacy) se instala directamente en el MBR del disco y sus archivos de arranque viven en <code>/boot</code>.</div>
+<div class="warn">
+<b>Verificación recomendada</b> tras montar, confirma que quedó correcto antes de seguir:
+<div class="cmd" style="margin-top:0.5rem"><span class="prompt">root #</span> mount | grep -E "efi|boot"</div>
+</div>
+<details>
+<summary>Comparación rápida: GPT+UEFI vs MBR+BIOS <span class="risk risk-low">referencia</span></summary>
+<table style="margin-top:0.5rem">
+<tr><th></th><th>GPT + UEFI</th><th>MBR + BIOS Legacy</th></tr>
+<tr><td>Esquema de partición</td><td>GPT</td><td>MBR</td></tr>
+<tr><td>Partición especial</td><td>ESP (FAT32)</td><td>No requiere partición dedicada (o partición boot legacy pequeña)</td></tr>
+<tr><td>Punto de montaje</td><td><code>/efi</code></td><td><code>/boot</code></td></tr>
+<tr><td>Límite de particiones</td><td>Prácticamente ilimitado</td><td>4 primarias (o 3 + extendida)</td></tr>
+<tr><td>Discos &gt; 2TB</td><td>Soportado</td><td>No soportado</td></tr>
+</table>
+<p style="margin-top:0.6rem">Este compendio usa <b>GPT + UEFI</b>, que es el estándar recomendado para equipos modernos.</p>
+</details>
+<footer>Compendio de instalación de Gentoo Linux — Capítulo 24: Chrooting</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-23-referencias.html">← Cap. 23: Capítulo 23 — Referencias Informativo</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-25-configurando-portage.html">Cap. 25: Capítulo 25 — Configurando Portage →</a>
+</div>
+</body>
+</html>

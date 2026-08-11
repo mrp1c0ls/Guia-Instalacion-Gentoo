@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 20 — Descargando el archivo stage | Compendio Gentoo</title>
+<style>
+  :root {
+    --bg: #12141a;
+    --bg-card: #1b1e27;
+    --bg-code: #0d0f14;
+    --border: #2c2f3a;
+    --text: #dcdfe6;
+    --text-dim: #9a9fae;
+    --accent: #7aa2f7;
+    --accent-2: #9ece6a;
+    --warn: #e0af68;
+    --danger: #f7768e;
+    --info: #7dcfff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 1rem 4rem;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  header {
+    padding: 2.5rem 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+  .kicker {
+    color: var(--accent);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+  h1 { margin: 0 0 0.4rem; font-size: 1.7rem; }
+  .subtitle { color: var(--text-dim); font-size: 0.95rem; }
+  h2 {
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin-top: 2.2rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 1rem; color: var(--text); margin-top: 1.4rem; }
+  p { margin: 0.6rem 0; }
+  code {
+    background: var(--bg-code);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    color: var(--accent-2);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+  }
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    margin: 0.7rem 0;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: #c8d3f5;
+    font-size: 0.85rem;
+  }
+  .callout {
+    background: var(--bg-card);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    margin: 0.8rem 0;
+    font-size: 0.92rem;
+  }
+  .callout.tip { border-left-color: var(--info); }
+  .callout.warn { border-left-color: var(--warn); }
+  .callout-label {
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .callout .callout-label { color: var(--accent); }
+  .callout.tip .callout-label { color: var(--info); }
+  .callout.warn .callout-label { color: var(--warn); }
+  .risk {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+  .risk.low { background: rgba(158,206,106,0.15); color: var(--accent-2); }
+  .risk.med { background: rgba(224,175,104,0.15); color: var(--warn); }
+  .risk.high { background: rgba(247,118,142,0.15); color: var(--danger); }
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 0.9rem 0;
+    padding: 0.2rem 1rem;
+  }
+  summary {
+    cursor: pointer;
+    padding: 0.7rem 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  summary::marker { color: var(--accent); }
+  details[open] summary { border-bottom: 1px solid var(--border); }
+  details .content { padding: 0.8rem 0 0.9rem; }
+  .step-title { display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.8rem 0;
+    font-size: 0.88rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.55rem 0.7rem;
+    border-bottom: 1px solid var(--border);
+  }
+  th { color: var(--accent); font-weight: 600; }
+  .footer-nav {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+  }
+  .badge-row { margin-top: 0.6rem; }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">V. Sistema base (stage3)</span>
+</div>
+<span class="jagg-badge">Cap. 20 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header>
+<div class="kicker">Handbook de Gentoo · Instalación</div>
+<h1>Capítulo 20 — Descargando el archivo stage</h1>
+<p class="subtitle">Ajustar el reloj del sistema, obtener el stage file y verificar que llegó íntegro y sin alteraciones.</p>
+</header>
+<div class="callout">
+<span class="callout-label">Para qué sirve este capítulo</span>
+  Antes de instalar el sistema base necesitas dos cosas: que el reloj del equipo esté sincronizado (o las descargas por HTTPS pueden fallar) y descargar el archivo <code>stage3</code> correcto — la "semilla" de tu futuro sistema Gentoo. Este capítulo cubre ambos pasos, más la verificación de que el archivo no viene corrupto ni manipulado.
+</div>
+<h2>1. Ajustar la fecha y hora</h2>
+<p>Las descargas usan HTTPS, que depende de certificados con fecha de validez. Si el reloj del live environment está muy desfasado, la descarga puede fallar de forma confusa.</p>
+<details open="">
+<summary>
+<span class="step-title">Revisar la hora actual <span class="risk low">Bajo riesgo</span></span>
+</summary>
+<div class="content">
+<pre><code>root # date</code></pre>
+<p>Si el resultado está a más de unos minutos de diferencia con la hora real, corrígelo.</p>
+</div>
+</details>
+<details>
+<summary><span class="step-title">Opción automática — chrony <span class="risk low">Recomendada</span></span></summary>
+<div class="content">
+<p>Sincroniza el reloj vía NTP contra servidores de internet. Es la forma más confiable:</p>
+<pre><code>root # chronyd -q</code></pre>
+<div class="callout warn">
+<span class="callout-label">Nota</span>
+      El tráfico NTP estándar no está autenticado — es información pública, no un canal seguro, pero suficiente para este propósito.
+    </div>
+</div>
+</details>
+<details>
+<summary><span class="step-title">Opción manual — sin acceso a NTP <span class="risk low">Bajo riesgo</span></span></summary>
+<div class="content">
+<p>Formato: <code>MMDDhhmmYYYY</code> (mes, día, hora, minuto, año). Ejemplo, 3 de octubre 13:16 del 2021:</p>
+<pre><code>root # date 100313162021</code></pre>
+<p>Se recomienda usar hora <strong>UTC</strong>; la zona horaria real se configura después (Capítulo 27).</p>
+</div>
+</details>
+<h2>2. Descargar el stage file</h2>
+<p>Ya elegiste el tipo de stage (multilib + OpenRC, en tu caso) en el capítulo anterior. Ahora solo falta bajarlo.</p>
+<details open="">
+<summary><span class="step-title">Con navegador gráfico <span class="risk low">Más simple</span></span></summary>
+<div class="content">
+<p>Copias el enlace desde la <a href="https://www.gentoo.org/downloads/#other-arches" style="color:var(--info)">página de descargas de Gentoo</a> y lo pegas en <code>wget</code>:</p>
+<pre><code>root # wget &lt;URL_DEL_STAGE_FILE&gt;</code></pre>
+</div>
+</details>
+<details>
+<summary><span class="step-title">Con navegador de texto (sin entorno gráfico)</span></summary>
+<div class="content">
+<p>Puedes navegar los mirrors directamente desde la terminal con <code>links</code> o <code>lynx</code>:</p>
+<pre><code>root # links https://www.gentoo.org/downloads/mirrors/</code></pre>
+<p>Navegas a <code>releases/amd64/autobuilds/</code>, eliges el stage correcto y presionas <code>d</code> para descargar.</p>
+<p>Si necesitas proxy:</p>
+<pre><code>root # export http_proxy="http://proxy.server.com:port"</code></pre>
+</div>
+</details>
+<h2>3. Verificar y validar el archivo <span class="risk med">Importante</span></h2>
+<div class="callout">
+<span class="callout-label">Para qué sirve</span>
+  Confirma que el archivo descargado no está corrupto y que realmente lo publicó el equipo de Gentoo, no un tercero que lo alteró en el camino.
+</div>
+<table>
+<tr><th>Archivo</th><th>Qué contiene</th></tr>
+<tr><td><code>.CONTENTS.gz</code></td><td>Lista de todos los archivos dentro del stage.</td></tr>
+<tr><td><code>.DIGESTS</code></td><td>Checksums del archivo en varios algoritmos (SHA256, SHA512, BLAKE2B).</td></tr>
+<tr><td><code>.sha256</code></td><td>Checksum SHA256 firmado con PGP (no siempre disponible).</td></tr>
+</table>
+<details>
+<summary><span class="step-title">Verificar la firma criptográfica (GPG)</span></summary>
+<div class="content">
+<p>Primero importa la llave pública de Gentoo (si no lo hiciste ya en el Capítulo 4):</p>
+<pre><code>root # gpg --import /usr/share/openpgp-keys/gentoo-release.asc</code></pre>
+<p>Luego verifica la firma:</p>
+<pre><code>root # gpg --verify stage3-amd64-&lt;release&gt;-&lt;init&gt;.tar.xz.asc stage3-amd64-&lt;release&gt;-&lt;init&gt;.tar.xz</code></pre>
+<p>Si todo está bien, el resultado incluirá la línea <code>Good signature from</code>.</p>
+</div>
+</details>
+<details>
+<summary><span class="step-title">Verificar el checksum (alternativa/complemento)</span></summary>
+<div class="content">
+<pre><code>root # sha256sum --check stage3-amd64-&lt;release&gt;-&lt;init&gt;.tar.xz.sha256.verified</code></pre>
+<p>Debe imprimir <code>OK</code>. Si dice <code>FAILED</code>, el archivo está corrupto o alterado — descártalo y vuelve a descargar.</p>
+</div>
+</details>
+<div class="callout warn">
+<span class="callout-label">Si algo falla</span>
+  Nunca continúes la instalación con un stage file que no pasó la verificación. Un archivo corrupto puede causar errores difíciles de diagnosticar mucho más adelante en el proceso.
+</div>
+<h2>Contexto extra: ¿por qué existe este paso?</h2>
+<p>Un <strong>stage file</strong> es un archivo comprimido (<code>.tar.xz</code>) que contiene un sistema Gentoo casi completo — la base sobre la que se construye todo lo demás. Se genera con una herramienta interna de Gentoo llamada <em>Catalyst</em> y se actualiza con frecuencia, por eso no viene incluido en el medio de instalación y hay que descargarlo aparte.</p>
+<p>La verificación con GPG y checksums no es paranoia innecesaria: es el mismo principio que usaste al verificar el ISO de instalación en el Capítulo 4. Es la única garantía de que lo que vas a extraer en <code>/mnt/gentoo</code> es exactamente lo que Gentoo publicó.</p>
+<div class="callout tip">
+<span class="callout-label">Siguiente paso</span>
+  Con el stage file descargado y verificado, el Capítulo 21 lo extrae dentro de <code>/mnt/gentoo</code> con <code>tar</code>, y el Capítulo 22 configura las opciones de compilación (<code>make.conf</code>) antes de entrar al chroot.
+</div>
+<div class="footer-nav">
+<span>← Cap. 19: Eligiendo un stage file</span>
+<span>Cap. 21: Instalando el stage file →</span>
+</div>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-19-stage-file.html">← Cap. 19: Capítulo 19 — Eligiendo el Stage File</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-21-instalando-stage.html">Cap. 21: Capítulo 21 — Instalando el archivo stage →</a>
+</div>
+</body>
+</html>

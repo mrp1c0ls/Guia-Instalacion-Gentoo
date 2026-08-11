@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Capítulo 53 — Reflexiones finales y mantenimiento de Portage</title>
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#161b22; --border:#30363d; --text:#c9d1d9;
+    --muted:#8b949e; --accent:#58a6ff; --green:#3fb950; --yellow:#d29922; --red:#f85149;
+  }
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI",Roboto,Arial,sans-serif;
+    max-width:880px; margin:0 auto; padding:32px 20px 80px; line-height:1.6;
+  }
+  h1{color:var(--accent); font-size:1.7em; border-bottom:2px solid var(--border); padding-bottom:10px;}
+  h2{color:var(--accent); font-size:1.25em; margin-top:2.2em; border-left:4px solid var(--accent); padding-left:10px;}
+  h3{color:#a5d6ff; font-size:1.05em; margin-top:1.5em;}
+  p{margin:0.7em 0;}
+  code, pre{
+    font-family:"JetBrains Mono","Fira Code",Consolas,monospace; font-size:0.92em;
+  }
+  code{background:#21262d; padding:2px 6px; border-radius:4px; color:#79c0ff;}
+  pre{
+    background:#010409; border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; margin:0.8em 0;
+  }
+  pre code{background:none; padding:0; color:#e6edf3;}
+  .comment{color:#8b949e;}
+  .prompt{color:#3fb950;}
+  .callout{
+    background:var(--bg2); border:1px solid var(--border); border-left:4px solid var(--accent);
+    border-radius:6px; padding:12px 16px; margin:1em 0;
+  }
+  .callout.tip{border-left-color:var(--green);}
+  .callout.warn{border-left-color:var(--yellow);}
+  .callout strong{display:block; margin-bottom:4px; color:var(--accent);}
+  .callout.tip strong{color:var(--green);}
+  .callout.warn strong{color:var(--yellow);}
+  .badge{
+    display:inline-block; font-size:0.72em; font-weight:600; padding:2px 9px;
+    border-radius:12px; text-transform:uppercase; letter-spacing:0.03em; margin-left:8px;
+  }
+  .badge.safe{background:rgba(63,185,80,0.15); color:var(--green); border:1px solid var(--green);}
+  .badge.info{background:rgba(88,166,255,0.15); color:var(--accent); border:1px solid var(--accent);}
+  .badge.caution{background:rgba(210,153,34,0.15); color:var(--yellow); border:1px solid var(--yellow);}
+  details{
+    background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+    padding:10px 16px; margin:0.9em 0;
+  }
+  summary{cursor:pointer; font-weight:600; color:var(--accent);}
+  summary:hover{color:#a5d6ff;}
+  table{width:100%; border-collapse:collapse; margin:1em 0; font-size:0.92em;}
+  th, td{border:1px solid var(--border); padding:8px 12px; text-align:left;}
+  th{background:var(--bg2); color:var(--accent);}
+  tr:nth-child(even){background:rgba(255,255,255,0.02);}
+  .step-list li{margin:0.5em 0;}
+  .intro{color:var(--muted); font-style:italic;}
+  footer{margin-top:3em; padding-top:1em; border-top:1px solid var(--border); color:var(--muted); font-size:0.85em;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">XII. Finalizando la instalación</span>
+</div>
+<span class="jagg-badge">Cap. 53 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 53 — Reflexiones finales <span class="badge info">Informativo</span></h1>
+<p class="intro">Cierre oficial del Handbook. No contiene comandos ni configuración — es la despedida del proceso de instalación. Se enriquece este documento con el <strong>mantenimiento de Portage</strong> (Cap. 49), el paso técnico real que da seguimiento natural a esta etapa.</p>
+<h2>¿Qué es este capítulo?</h2>
+<div class="callout">
+<strong>Para qué sirve</strong>
+Es el epílogo del Handbook completo. No enseña nada técnico: agradece al usuario, invita a dar feedback sobre la documentación y despide el proceso de instalación. Si llegaste hasta aquí siguiendo la secuencia, significa que tu sistema Gentoo ya está instalado, arrancado (reboot) y con usuario creado.
+</div>
+<p>El único contenido "accionable" es: si encuentras errores en el Handbook, reportarlos siguiendo las pautas de la sección <em>"How do I improve the Handbook?"</em> al inicio del documento. No hay archivos que tocar ni paquetes que instalar en este capítulo.</p>
+<hr style="border-color:var(--border); margin:2em 0;"/>
+<h2>Sobre el mantenimiento de Portage</h2>
+<div class="callout tip">
+<strong>Puente hacia el resto del compendio</strong>
+El paso técnico que sigue naturalmente al reboot -- limpiar la caché de Portage (<code>eclean-dist</code>,
+<code>eclean-pkg</code>) -- se cubre a fondo en el <a href="cap-49-portage-maintenance.html" style="color:var(--accent)">Capítulo 49</a>.
+Para el uso diario de <code>emerge</code> ya con el sistema arrancado (instalar, actualizar <code>@world</code>,
+resolver conflictos con <code>--autounmask</code>, <code>package.use/</code>, etc.), ver el
+<a href="apendice-portage-post-instalacion.html" style="color:var(--accent)">Apéndice: Gestión de paquetes post-instalación</a>.
+</div>
+<h2>¿Aplica systemd aquí?</h2>
+<p>No. Tanto <code>eclean</code> como <code>emerge --depclean</code> son herramientas de <strong>Portage</strong>, el gestor de paquetes de Gentoo — funcionan igual sin importar si el sistema usa OpenRC o systemd como init. En tu caso, con <strong>OpenRC</strong> confirmado, no hay pasos alternativos que considerar en este punto.</p>
+<h2>Resumen: dónde se configura / dónde se ejecuta</h2>
+<table>
+<tr><th>Elemento</th><th>Ubicación / Comando</th><th>Notas</th></tr>
+<tr><td>Caché de código fuente</td><td><code>/var/cache/distfiles</code></td><td>Limpiar con <code>eclean-dist</code></td></tr>
+<tr><td>Caché de binarios</td><td><code>/var/cache/binhost/gentoo</code></td><td>Limpiar con <code>eclean-pkg</code></td></tr>
+<tr><td>Instalar gentoolkit</td><td><code>emerge --ask app-portage/gentoolkit</code></td><td>Trae eclean, equery, revdep-rebuild</td></tr>
+<tr><td>Quitar paquetes huérfanos</td><td><code>emerge --ask --depclean</code></td><td>Siempre probar antes con <code>--pretend</code></td></tr>
+<tr><td>Feedback al Handbook</td><td>Sección inicial del Handbook / bugs.gentoo.org</td><td>Solo aplica al capítulo 53 en sí</td></tr>
+</table>
+<footer>
+Compendio personal — Instalación Gentoo AMD64 · OpenRC · GRUB · dracut · es_MX.UTF-8<br/>
+Capítulo 53 (Closing thoughts) enriquecido con Capítulo 49 (Portage maintenance) del Handbook oficial.
+</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-52-donde-ir-desde-aqui.html">← Cap. 52: Capítulo 52 — ¿A dónde ir desde aquí?</a>
+<a href="index.html">Índice del compendio</a>
+<a href="apendice-portage-post-instalacion.html">Cap. A: Gestión de paquetes post-instalación →</a>
+</div>
+</body>
+</html>

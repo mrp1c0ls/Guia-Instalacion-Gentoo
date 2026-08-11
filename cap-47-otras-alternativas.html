@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Capítulo 47 — Otras alternativas de bootloader</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg-card: #171a23;
+    --border: #2a2e3a;
+    --text: #e2e4ea;
+    --text-dim: #9aa0ae;
+    --accent: #7db8ff;
+    --green: #4caf7d;
+    --yellow: #d9a441;
+    --red: #d9534f;
+    --purple: #b28ade;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.2rem 4rem;
+    line-height: 1.6;
+  }
+  h1 { font-size: 1.6rem; border-bottom: 2px solid var(--accent); padding-bottom: .5rem; }
+  h2 { font-size: 1.2rem; color: var(--accent); margin-top: 2.2rem; }
+  h3 { font-size: 1.02rem; color: var(--text); margin-top: 1.4rem; }
+  p { color: var(--text); }
+  code, pre {
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+    background: #0b0d12;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: #9fe6a0;
+  }
+  code { padding: .1rem .35rem; font-size: .85em; }
+  pre { padding: .8rem 1rem; overflow-x: auto; margin: .6rem 0; }
+  pre code { border: none; padding: 0; background: none; }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+  }
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: #131722;
+    padding: .8rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin: .8rem 0;
+  }
+  .callout strong { color: var(--accent); }
+
+  .badge {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 600;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    margin-left: .4rem;
+    vertical-align: middle;
+  }
+  .badge.low { background: rgba(76,175,125,.15); color: var(--green); border: 1px solid var(--green); }
+  .badge.info { background: rgba(125,184,255,.15); color: var(--accent); border: 1px solid var(--accent); }
+  .badge.na { background: rgba(154,160,174,.15); color: var(--text-dim); border: 1px solid var(--text-dim); }
+
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .6rem 1rem;
+    margin: .8rem 0;
+  }
+  summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+  summary:hover { color: #a5cdff; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: .9rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: .55rem .7rem;
+    text-align: left;
+  }
+  th { background: #1c2029; color: var(--accent); }
+  tr:nth-child(even) { background: #14171f; }
+
+  .tag {
+    display: inline-block;
+    background: #1c2029;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: .1rem .5rem;
+    font-size: .75rem;
+    color: var(--text-dim);
+    margin-right: .3rem;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">XI. Bootloader</span>
+</div>
+<span class="jagg-badge">Cap. 47 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 47 — Otras alternativas de bootloader <span class="badge na">No aplica a tu instalación</span></h1>
+<p class="tag">GRUB ya seleccionado</p><p class="tag">Solo referencia</p>
+<div class="callout">
+<strong>Para qué sirve este capítulo:</strong> No instala nada. Es una nota del Handbook que reconoce que GRUB, systemd-boot y EFI Stub no son las únicas opciones de arranque para Linux — solo son las tres que Gentoo documenta en detalle. Si ninguna te sirviera, aquí te dirigen a la <a href="https://wiki.gentoo.org/wiki/Bootloader" style="color:var(--accent)">lista completa de bootloaders</a> en la wiki.
+</div>
+<h2>¿Por qué existen varios bootloaders?</h2>
+<p>
+Un bootloader tiene un solo trabajo real: decirle al hardware dónde está el kernel de Linux y cómo arrancarlo. Pero hay distintas formas de resolver ese problema, dependiendo de cuánto control quieras tener en el momento de arrancar (editar parámetros, elegir entre varios kernels, dual-boot con otro sistema operativo, etc.) contra qué tan simple quieres que sea el proceso.
+</p>
+<p>
+Las tres opciones que cubre el Handbook representan tres niveles distintos de esa balanza: <strong>control total</strong> (GRUB), <strong>simplicidad con menú</strong> (systemd-boot), y <strong>mínima intervención</strong> (EFI Stub, sin bootloader intermedio).
+</p>
+<h2>Comparativa de las tres opciones</h2>
+<h3>1. GRUB <span class="badge low">Tu elección</span></h3>
+<div class="card">
+<p><strong>Para qué sirve:</strong> Es el bootloader "todoterreno". Presenta un menú de arranque real donde puedes elegir entre múltiples kernels instalados, editar parámetros de arranque al vuelo sin reiniciar de nuevo, y detectar otros sistemas operativos instalados (Windows, otras distros) para dual-boot.</p>
+<p><strong>Cómo se usa:</strong> Se instala una sola vez con <code>grub-install</code> (escribe los archivos ejecutables EFI en la partición EFI) y se configura con <code>grub-mkconfig</code>, que genera <code>grub.cfg</code> escaneando automáticamente qué kernels e initramfs existen en <code>/boot</code>.</p>
+<pre><code># Instalar en el sistema (una vez)
+grub-install --target=x86_64-efi --efi-directory=/efi
+
+# Generar/actualizar configuración (cada vez que cambia el kernel)
+grub-mkconfig -o /boot/grub/grub.cfg</code></pre>
+<p><strong>Opción útil:</strong> <code>app-portage/mirrorselect</code> no aplica aquí, pero sí <code>sys-boot/os-prober</code> — si algún día agregas dual-boot, este paquete detecta otros SO y los agrega al menú automáticamente al volver a correr <code>grub-mkconfig</code>.</p>
+<p><strong>systemd vs OpenRC:</strong> No hay diferencia — GRUB no depende del init system, funciona igual en ambos.</p>
+</div>
+<h3>2. systemd-boot <span class="badge info">Alternativa simple</span></h3>
+<div class="card">
+<p><strong>Para qué sirve:</strong> Es un "chainloader delgado" — en vez de generar lógica compleja como GRUB, simplemente lee archivos de configuración individuales (uno de texto plano por cada entrada de arranque) y los muestra como opciones. No tiene scripting ni detección automática de otros sistemas operativos.</p>
+<p><strong>Cómo se usa:</strong> Se instala con <code>bootctl install</code> (no con grub-install) y cada entrada de arranque es un archivo <code>.conf</code> separado dentro de <code>/efi/loader/entries/</code>, en vez de un único archivo generado como <code>grub.cfg</code>.</p>
+<div class="callout">
+<strong>Aclaración importante:</strong> A pesar del nombre, <strong>no requiere systemd como init</strong>. Funciona igual en máquinas con OpenRC — el nombre viene de que el proyecto systemd lo desarrolla, no de una dependencia técnica.
+</div>
+<p><strong>Cuándo elegirlo en vez de GRUB:</strong> Si quieres algo minimalista, con Secure Boot fácil de configurar, y no necesitas edición dinámica de parámetros de arranque ni detección de otros sistemas operativos.</p>
+</div>
+<h3>3. EFI Stub <span class="badge info">Alternativa mínima</span></h3>
+<div class="card">
+<p><strong>Para qué sirve:</strong> Elimina el bootloader secundario por completo. El firmware UEFI moderno puede arrancar el kernel de Linux <em>directamente</em>, porque el propio kernel se compila para comportarse como una aplicación EFI ("stub" = capa mínima de arranque incrustada en el kernel).</p>
+<p><strong>Cómo se usa:</strong> No hay un paquete bootloader que instalar. En vez de eso, se activa la USE flag <code>efistub</code> en <code>sys-kernel/installkernel</code>, se copia el kernel compilado a la partición EFI, y se registra una entrada de arranque en el firmware usando <code>efibootmgr</code> (el mismo paquete que usarías para gestionar entradas de GRUB, pero aquí es el único mecanismo de gestión).</p>
+<pre><code># Habilitar la USE flag (requiere aceptar keywords de testing)
+# /etc/portage/package.use/installkernel
+sys-kernel/installkernel efistub
+
+# Registrar la entrada de arranque directamente en el firmware
+efibootmgr --create --disk /dev/sda --part 1 \
+  --label "gentoo" --loader "\EFI\Gentoo\bzImage.efi"</code></pre>
+<p><strong>Trade-off clave:</strong> Ganas simplicidad (menos piezas que pueden fallar) pero pierdes flexibilidad — cambiar parámetros del kernel implica reconfigurar/recompilar en vez de editar un archivo de texto como en GRUB.</p>
+</div>
+<h2>¿Y las que ni siquiera están en el Handbook?</h2>
+<p>
+El capítulo 47 apunta a la <a href="https://wiki.gentoo.org/wiki/Bootloader" style="color:var(--accent)">lista completa de bootloaders soportados por Gentoo</a>, que incluye opciones como <strong>rEFInd</strong> (menú gráfico con detección automática de sistemas, popular en equipos con múltiples SO o Hackintosh), <strong>Limine</strong> (rápido y minimalista, gana popularidad reciente), o <strong>syslinux/extlinux</strong> (más orientado a sistemas Legacy BIOS o embebidos). Ninguno se documenta paso a paso en el Handbook porque no son la ruta "por defecto" ni la más común entre usuarios de Gentoo.
+</p>
+<details>
+<summary>¿Vale la pena cambiar de GRUB a otra opción?</summary>
+<p>
+Para tu caso: no. Ya invertiste en configurar GRUB con dracut y OpenRC, que es la combinación más probada y documentada. Cambiar de bootloader solo tiene sentido si te topas con un problema específico que GRUB no resuelve bien (por ejemplo, quieres Secure Boot muy simple → systemd-boot, o quieres cero capas intermedias → EFI Stub). Fuera de eso, GRUB es la opción más flexible y con mejor soporte de la comunidad.
+</p>
+</details>
+<h2>Dónde se configura — resumen</h2>
+<table>
+<tr><th>Elemento</th><th>Ubicación</th><th>Bootloader</th></tr>
+<tr><td>Config. de compilación de GRUB</td><td><code>/etc/portage/make.conf</code> (<code>GRUB_PLATFORMS</code>)</td><td>GRUB</td></tr>
+<tr><td>Parámetros de arranque (cmdline)</td><td><code>/etc/default/grub</code></td><td>GRUB</td></tr>
+<tr><td>Config. generada final</td><td><code>/boot/grub/grub.cfg</code></td><td>GRUB</td></tr>
+<tr><td>Entradas de arranque individuales</td><td><code>/efi/loader/entries/*.conf</code></td><td>systemd-boot</td></tr>
+<tr><td>USE flag para arranque directo</td><td><code>/etc/portage/package.use/installkernel</code></td><td>EFI Stub</td></tr>
+<tr><td>Entradas registradas en firmware</td><td>Gestionadas vía <code>efibootmgr</code> (no en disco)</td><td>EFI Stub / cualquiera</td></tr>
+</table>
+<p style="color:var(--text-dim); font-size:.85rem; margin-top:2rem;">Compendio Gentoo — Capítulo 47. Siguiente: Capítulo 48, Rebooting the system.</p>
+
+<div id="jagg-bottombar">
+<a href="cap-45-46-bootloaders-alternativos.html">← Cap. 45-46: Cap. 45–46 · Bootloaders alternativos</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-48-reboot.html">Cap. 48: Capítulo 48 — Reiniciar el sistema →</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compendio Gentoo AMD64 — Índice | JorgeAGG</title>
+<style>
+  :root{
+    --bg:#0d0f14; --bg-panel:#151922; --bg-panel2:#1b202b; --border:#2a3140;
+    --text:#dbe1ea; --text-dim:#8b93a3; --accent:#7dd3fc; --accent2:#a78bfa;
+    --green:#9ece6a; --yellow:#facc15;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+  }
+  header{
+    background:radial-gradient(ellipse at top, #1b2436 0%, #0d0f14 60%);
+    border-bottom:1px solid var(--border);
+    padding:3.2rem 1.5rem 2.4rem; text-align:center;
+  }
+  header .kicker{
+    color:var(--accent2); letter-spacing:.18em; text-transform:uppercase;
+    font-size:.78rem; font-weight:700; margin-bottom:.6rem;
+  }
+  header h1{margin:.2rem 0 .5rem; font-size:2.1rem; color:#fff;}
+  header p.sub{color:var(--text-dim); max-width:640px; margin:0 auto; font-size:1rem;}
+  .config-pills{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:.5rem; margin-top:1.4rem;
+  }
+  .config-pills span{
+    background:var(--bg-panel2); border:1px solid var(--border); color:var(--accent);
+    padding:.3rem .8rem; border-radius:999px; font-size:.8rem; font-family:monospace;
+  }
+  .cta-row{margin-top:1.8rem; display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap;}
+  .cta{
+    display:inline-block; padding:.65rem 1.3rem; border-radius:8px; font-weight:600;
+    font-size:.92rem; text-decoration:none; border:1px solid var(--border);
+  }
+  .cta.primary{background:var(--accent); color:#0d0f14; border-color:var(--accent);}
+  .cta.secondary{color:var(--accent); background:transparent;}
+
+  main{max-width:980px; margin:0 auto; padding:2.5rem 1.5rem 5rem;}
+
+  .secblock{margin-bottom:2.6rem;}
+  .secblock h2{
+    font-size:1.15rem; color:#fff; border-bottom:1px solid var(--border);
+    padding-bottom:.6rem; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem;
+  }
+  .secicon{font-size:1.1rem;}
+  .chgrid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:.7rem;
+  }
+  .chcard{
+    display:flex; align-items:flex-start; gap:.7rem;
+    background:var(--bg-panel); border:1px solid var(--border); border-radius:10px;
+    padding:.75rem .9rem; text-decoration:none; color:var(--text);
+    transition:border-color .15s, transform .1s;
+  }
+  .chcard:hover{border-color:var(--accent); transform:translateY(-1px);}
+  .chnum{
+    flex-shrink:0; background:var(--bg-panel2); color:var(--accent); font-family:monospace;
+    font-size:.78rem; font-weight:700; border-radius:6px; padding:.2rem .5rem; min-width:2.2rem;
+    text-align:center;
+  }
+  .chtitle{font-size:.88rem; color:var(--text);}
+
+  .noteblock{
+    background:var(--bg-panel); border:1px solid var(--border); border-left:4px solid var(--accent2);
+    border-radius:8px; padding:1rem 1.3rem; margin:0 0 2.5rem; font-size:.92rem; color:var(--text-dim);
+  }
+  .noteblock b{color:var(--accent2);}
+
+  footer{
+    text-align:center; color:var(--text-dim); font-size:.82rem;
+    border-top:1px solid var(--border); padding:2rem 1rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">Compendio personal · Gentoo AMD64 Handbook</div>
+  <h1>Compendio de instalación Gentoo</h1>
+  <p class="sub">53 capítulos en español, con diagramas, badges de riesgo y bloques "para qué sirve",
+  construidos capítulo a capítulo junto con una instalación real.</p>
+  <div class="config-pills">
+    <span>AMD64 multilib</span>
+    <span>OpenRC</span>
+    <span>GPT + UEFI</span>
+    <span>GRUB</span>
+    <span>dracut</span>
+    <span>es_MX.UTF-8</span>
+  </div>
+  <div class="cta-row">
+    <a class="cta primary" href="compendio-gentoo-jorgeagg.pdf">⬇ Descargar compendio completo en PDF</a>
+    <a class="cta secondary" href="cap-01-introduccion.html">Empezar por el Capítulo 1 →</a>
+  </div>
+</header>
+
+<main>
+
+<div class="noteblock">
+  <b>Cómo está organizado:</b> los capítulos siguen la numeración del Gentoo Handbook oficial.
+  Donde dos capítulos cubren un tema muy parecido (por ejemplo, el particionado en el Cap. 2 vs. el Cap. 15,
+  o el mantenimiento de Portage en el Cap. 49 vs. el apéndice de uso diario), cada página incluye una nota
+  de navegación señalando cuál es la versión más detallada o definitiva para no repetir el mismo contenido dos veces.
+</div>
+
+
+        <section class="secblock">
+          <h2><span class="secicon">🌱</span> I. Fundamentos</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-01-introduccion.html">
+              <span class="chnum">01</span>
+              <span class="chtitle">Introducción</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">💿</span> II. Medio de instalación</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-03-medios-instalacion.html">
+              <span class="chnum">03</span>
+              <span class="chtitle">Medios de instalación de Gentoo</span>
+            </a>
+            <a class="chcard" href="cap-04-descargando.html">
+              <span class="chnum">04</span>
+              <span class="chtitle">Descargando</span>
+            </a>
+            <a class="chcard" href="cap-05-grabar-medio.html">
+              <span class="chnum">05</span>
+              <span class="chtitle">Grabar el medio de arranque</span>
+            </a>
+            <a class="chcard" href="cap-06-arranque.html">
+              <span class="chnum">06</span>
+              <span class="chtitle">Arranque del medio de instalación</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">📡</span> III. Red durante la instalación (medio live)</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-07-red-automatica.html">
+              <span class="chnum">07</span>
+              <span class="chtitle">Configuración automática de la red</span>
+            </a>
+            <a class="chcard" href="cap-09-wifi.html">
+              <span class="chnum">09</span>
+              <span class="chtitle">Configuración Inalámbrica (WiFi)</span>
+            </a>
+            <a class="chcard" href="cap-10-config-especifica.html">
+              <span class="chnum">10</span>
+              <span class="chtitle">Configuración específica de aplicaciones</span>
+            </a>
+            <a class="chcard" href="cap-11-internet-ip-basics.html">
+              <span class="chnum">11</span>
+              <span class="chtitle">Conceptos básicos de Internet e IP</span>
+            </a>
+            <a class="chcard" href="cap-12-red-estatica.html">
+              <span class="chnum">12</span>
+              <span class="chtitle">Configuración manual de red con IP estática</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">🗂️</span> IV. Preparando el disco</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-02-particionado-intro.html">
+              <span class="chnum">02</span>
+              <span class="chtitle">Particionado del disco</span>
+            </a>
+            <a class="chcard" href="cap-08-preparando-discos.html">
+              <span class="chnum">08</span>
+              <span class="chtitle">Preparando los discos</span>
+            </a>
+            <a class="chcard" href="cap-13-dispositivos-bloque.html">
+              <span class="chnum">13</span>
+              <span class="chtitle">Introducción a los dispositivos de bloque</span>
+            </a>
+            <a class="chcard" href="cap-14-diseno-particiones.html">
+              <span class="chnum">14</span>
+              <span class="chtitle">Diseñando un esquema de particiones</span>
+            </a>
+            <a class="chcard" href="cap-15-particionado-gpt-uefi.html">
+              <span class="chnum">15</span>
+              <span class="chtitle">Particionar el disco con GPT para UEFI</span>
+            </a>
+            <a class="chcard" href="cap-16-mbr-bios.html">
+              <span class="chnum">16</span>
+              <span class="chtitle">Particionando el disco con MBR para BIOS / Legacy Boot</span>
+            </a>
+            <a class="chcard" href="cap-17-sistemas-archivos.html">
+              <span class="chnum">17</span>
+              <span class="chtitle">Creación de sistemas de archivos</span>
+            </a>
+            <a class="chcard" href="cap-18-montar-raiz.html">
+              <span class="chnum">18</span>
+              <span class="chtitle">Montar la partición raíz</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">📦</span> V. Sistema base (stage3)</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-19-stage-file.html">
+              <span class="chnum">19</span>
+              <span class="chtitle">Eligiendo el Stage File</span>
+            </a>
+            <a class="chcard" href="cap-20-descargando-stage.html">
+              <span class="chnum">20</span>
+              <span class="chtitle">Descargando el archivo stage</span>
+            </a>
+            <a class="chcard" href="cap-21-instalando-stage.html">
+              <span class="chnum">21</span>
+              <span class="chtitle">Instalando el archivo stage</span>
+            </a>
+            <a class="chcard" href="cap-22-opciones-compilacion.html">
+              <span class="chnum">22</span>
+              <span class="chtitle">Configurando las opciones de compilación</span>
+            </a>
+            <a class="chcard" href="cap-23-referencias.html">
+              <span class="chnum">23</span>
+              <span class="chtitle">Referencias Informativo</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">🚪</span> VI. Chroot y Portage</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-24-chroot.html">
+              <span class="chnum">24</span>
+              <span class="chtitle">Chrooting</span>
+            </a>
+            <a class="chcard" href="cap-25-configurando-portage.html">
+              <span class="chnum">25</span>
+              <span class="chtitle">Configurando Portage</span>
+            </a>
+            <a class="chcard" href="cap-26-openrc-vs-systemd.html">
+              <span class="chnum">26</span>
+              <span class="chtitle">Opcional: Usar systemd como sistema y gestor de servicios</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">🌎</span> VII. Configuración regional y hardware</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-27-timezone.html">
+              <span class="chnum">27</span>
+              <span class="chtitle">Zona horaria (Timezone)</span>
+            </a>
+            <a class="chcard" href="cap-28-locales.html">
+              <span class="chnum">28</span>
+              <span class="chtitle">Configurar los locales</span>
+            </a>
+            <a class="chcard" href="cap-29-referencias.html">
+              <span class="chnum">29</span>
+              <span class="chtitle">Referencias Sin comandos</span>
+            </a>
+            <a class="chcard" href="cap-30-firmware-microcodigo.html">
+              <span class="chnum">30</span>
+              <span class="chtitle">30. Instalando Firmware y Microcódigo</span>
+            </a>
+            <a class="chcard" href="cap-31-installkernel.html">
+              <span class="chnum">31</span>
+              <span class="chtitle">sys-kernel/installkernel</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">🧠</span> VIII. El kernel</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-32-seleccion-kernel.html">
+              <span class="chnum">32</span>
+              <span class="chtitle">Selección del Kernel</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">🔗</span> IX. fstab y red permanente</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-33-fstab.html">
+              <span class="chnum">33</span>
+              <span class="chtitle">Información del sistema de archivos</span>
+            </a>
+            <a class="chcard" href="cap-34-networking.html">
+              <span class="chnum">34</span>
+              <span class="chtitle">Información de red</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">🛠️</span> X. Configuración inicial del sistema y servicios</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-35-system-information.html">
+              <span class="chnum">35</span>
+              <span class="chtitle">System Information</span>
+            </a>
+            <a class="chcard" href="cap-36-system-logger.html">
+              <span class="chnum">36</span>
+              <span class="chtitle">System Logger</span>
+            </a>
+            <a class="chcard" href="cap-37-cron-daemon.html">
+              <span class="chnum">37</span>
+              <span class="chtitle">Cron Daemon</span>
+            </a>
+            <a class="chcard" href="cap-38-file-indexing.html">
+              <span class="chnum">38</span>
+              <span class="chtitle">Indexado de archivos</span>
+            </a>
+            <a class="chcard" href="cap-39-ssh.html">
+              <span class="chnum">39</span>
+              <span class="chtitle">Acceso remoto por shell (SSH)</span>
+            </a>
+            <a class="chcard" href="cap-40-shell-completion.html">
+              <span class="chnum">40</span>
+              <span class="chtitle">Shell Completion (Bash)</span>
+            </a>
+            <a class="chcard" href="cap-41-sincronizacion-tiempo.html">
+              <span class="chnum">41</span>
+              <span class="chtitle">Sincronización de tiempo</span>
+            </a>
+            <a class="chcard" href="cap-42-filesystem-tools.html">
+              <span class="chnum">42</span>
+              <span class="chtitle">Herramientas de Sistemas de Archivos</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">⚡</span> XI. Bootloader</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-43-seleccion-bootloader.html">
+              <span class="chnum">43</span>
+              <span class="chtitle">Seleccionar e instalar el Bootloader</span>
+            </a>
+            <a class="chcard" href="cap-44-grub.html">
+              <span class="chnum">44</span>
+              <span class="chtitle">Bootloader — GRUB y alternativas</span>
+            </a>
+            <a class="chcard" href="cap-45-46-bootloaders-alternativos.html">
+              <span class="chnum">45-46</span>
+              <span class="chtitle">Bootloaders alternativos</span>
+            </a>
+            <a class="chcard" href="cap-47-otras-alternativas.html">
+              <span class="chnum">47</span>
+              <span class="chtitle">Otras alternativas de bootloader No aplica a tu instalación</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">🏁</span> XII. Finalizando la instalación</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="cap-48-reboot.html">
+              <span class="chnum">48</span>
+              <span class="chtitle">Reiniciar el sistema</span>
+            </a>
+            <a class="chcard" href="cap-49-portage-maintenance.html">
+              <span class="chnum">49</span>
+              <span class="chtitle">Mantenimiento de Portage</span>
+            </a>
+            <a class="chcard" href="cap-50-administracion-usuarios.html">
+              <span class="chnum">50</span>
+              <span class="chtitle">Administración de usuarios</span>
+            </a>
+            <a class="chcard" href="cap-51-limpieza-disco.html">
+              <span class="chnum">51</span>
+              <span class="chtitle">Limpieza de disco</span>
+            </a>
+            <a class="chcard" href="cap-52-donde-ir-desde-aqui.html">
+              <span class="chnum">52</span>
+              <span class="chtitle">¿A dónde ir desde aquí?</span>
+            </a>
+            <a class="chcard" href="cap-53-closing-thoughts.html">
+              <span class="chnum">53</span>
+              <span class="chtitle">Reflexiones finales Informativo</span>
+            </a>
+          </div>
+        </section>
+        <section class="secblock">
+          <h2><span class="secicon">📎</span> Apéndice</h2>
+          <div class="chgrid">
+            
+            <a class="chcard" href="apendice-portage-post-instalacion.html">
+              <span class="chnum">A</span>
+              <span class="chtitle">Gestión de paquetes post-instalación</span>
+            </a>
+          </div>
+        </section>
+
+</main>
+
+<footer>
+  Compendio Gentoo AMD64 · JorgeAGG · Basado en el Gentoo Handbook oficial · Generado como material de estudio personal
+</footer>
+
+</body>
+</html>

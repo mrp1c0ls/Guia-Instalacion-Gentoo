@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html lang="es-MX">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 32 — Selección del Kernel | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --bg-card:#171a21;
+    --bg-code:#0b0d11;
+    --border:#2a2f3a;
+    --text:#dbe1ea;
+    --text-dim:#8b93a3;
+    --accent:#7dd3fc;
+    --accent2:#a78bfa;
+    --green:#4ade80;
+    --yellow:#facc15;
+    --red:#f87171;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65;
+    padding:0 0 60px;
+  }
+  header{
+    padding:40px 20px 30px;
+    text-align:center;
+    background:linear-gradient(180deg,#1a1e28,#0f1115);
+    border-bottom:1px solid var(--border);
+  }
+  header .eyebrow{
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:2px;
+    font-size:0.75rem;
+    font-weight:600;
+  }
+  header h1{
+    margin:10px 0 6px;
+    font-size:1.9rem;
+  }
+  header p{
+    color:var(--text-dim);
+    margin:0;
+    font-size:0.95rem;
+  }
+  main{
+    max-width:820px;
+    margin:0 auto;
+    padding:30px 20px;
+  }
+  h2{
+    font-size:1.35rem;
+    margin-top:42px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2 .num{
+    color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+  h3{
+    font-size:1.05rem;
+    color:var(--accent2);
+    margin-top:28px;
+  }
+  p{color:var(--text);}
+  .lead{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    color:var(--text-dim);
+    font-size:0.95rem;
+  }
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin:16px 0;
+  }
+  .tag{
+    display:inline-block;
+    font-size:0.7rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    padding:3px 9px;
+    border-radius:20px;
+    margin-bottom:10px;
+  }
+  .tag.bajo{background:rgba(74,222,128,0.15);color:var(--green);}
+  .tag.medio{background:rgba(250,204,21,0.15);color:var(--yellow);}
+  .tag.alto{background:rgba(248,113,113,0.15);color:var(--red);}
+  .tag.info{background:rgba(125,211,252,0.15);color:var(--accent);}
+  .para-que-sirve{
+    margin-top:10px;
+    padding:10px 14px;
+    background:rgba(125,211,252,0.06);
+    border-left:3px solid var(--accent);
+    border-radius:4px;
+    font-size:0.9rem;
+    color:var(--text-dim);
+  }
+  .para-que-sirve strong{color:var(--accent);}
+  pre{
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    font-size:0.87rem;
+    margin:10px 0;
+  }
+  code{
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+  p code, li code, td code{
+    background:rgba(125,211,252,0.1);
+    color:var(--accent);
+    padding:1px 6px;
+    border-radius:4px;
+    font-size:0.88em;
+  }
+  .file-label{
+    font-size:0.72rem;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    margin-bottom:4px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0;
+    font-size:0.9rem;
+  }
+  th,td{
+    text-align:left;
+    padding:9px 12px;
+    border-bottom:1px solid var(--border);
+  }
+  th{
+    color:var(--accent);
+    font-weight:600;
+    background:rgba(125,211,252,0.05);
+  }
+  tr:last-child td{border-bottom:none;}
+  details{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    margin:14px 0;
+    padding:0;
+    overflow:hidden;
+  }
+  summary{
+    cursor:pointer;
+    padding:14px 18px;
+    font-weight:600;
+    color:var(--accent2);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    user-select:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{
+    content:"▸";
+    color:var(--accent);
+    transition:transform 0.15s;
+  }
+  details[open] summary::before{
+    transform:rotate(90deg);
+  }
+  details .content{
+    padding:0 18px 18px;
+    color:var(--text-dim);
+  }
+  .decision{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin:16px 0;
+  }
+  @media(max-width:600px){.decision{grid-template-columns:1fr;}}
+  .decision .opt{
+    background:var(--bg-code);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+  }
+  .decision .opt h4{
+    margin:0 0 8px;
+    color:var(--accent);
+    font-size:0.95rem;
+  }
+  .decision .opt ul{
+    margin:0;
+    padding-left:18px;
+    font-size:0.85rem;
+    color:var(--text-dim);
+  }
+  .where{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:0.82rem;
+    color:var(--yellow);
+    background:rgba(250,204,21,0.08);
+    padding:4px 10px;
+    border-radius:6px;
+    margin:6px 0;
+  }
+  .nix-note{
+    margin-top:16px;
+    padding:12px 14px;
+    border:1px dashed var(--accent2);
+    border-radius:8px;
+    background:rgba(167,139,250,0.05);
+    font-size:0.88rem;
+    color:var(--text-dim);
+  }
+  .nix-note strong{color:var(--accent2);}
+  footer{
+    text-align:center;
+    padding:30px 20px 10px;
+    color:var(--text-dim);
+    font-size:0.8rem;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">VIII. El kernel</span>
+</div>
+<span class="jagg-badge">Cap. 32 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<div class="eyebrow">Compendio Gentoo · es_MX</div>
+<h1>Capítulo 32 — Selección del Kernel</h1>
+<p>Distribution Kernel · gentoo-sources · USE flags · modprobed-db</p>
+</header>
+<main>
+<p class="lead">El kernel es la capa entre el hardware y todos los programas del sistema. Este capítulo decide <strong>cómo</strong> se va a construir y mantener a lo largo del tiempo — es una de las decisiones con más impacto a futuro en tu instalación.</p>
+<h2><span class="num">32.0</span> El dilema central</h2>
+<p>Hay dos caminos. Ambos son válidos y reversibles (se puede cambiar de uno a otro después), pero implican filosofías distintas de mantenimiento:</p>
+<div class="decision">
+<div class="opt">
+<h4>Distribution Kernel</h4>
+<ul>
+<li>Portage configura, compila e instala todo</li>
+<li>Se actualiza junto con <code>@world</code></li>
+<li>Recomendado para empezar</li>
+<li>Mínima intervención manual</li>
+</ul>
+</div>
+<div class="opt">
+<h4>Configuración manual</h4>
+<ul>
+<li>Vos elegís cada opción del kernel</li>
+<li>Usa <code>sys-kernel/gentoo-sources</code></li>
+<li>Control total, más trabajo</li>
+<li>Hay que repetir el proceso en cada actualización</li>
+</ul>
+</div>
+</div>
+<div class="para-que-sirve"><strong>Dato importante:</strong> un kernel compilado a mano <em>no</em> usa menos RAM que uno de distribución. El kernel de Linux es modular — en ambos casos solo se carga lo que el hardware realmente necesita. La diferencia real está en cuánto control querés tener, no en el rendimiento.</div>
+<h2><span class="num">32.1</span> Distribution Kernel</h2>
+<p>Es el camino recomendado para la mayoría de las instalaciones. Portage trata al kernel como un paquete más: lo configura con una selección genérica de opciones que cubre casi todo el hardware existente, lo compila (o lo descarga ya compilado) y lo instala.</p>
+<h3>Opción A — Compilar desde fuente</h3>
+<div class="card">
+<span class="tag medio">Compila localmente · tarda más</span>
+<div class="file-label">Comando</div>
+<pre><code>root # emerge --ask sys-kernel/gentoo-kernel</code></pre>
+<p>Descarga el <strong>código fuente</strong> del kernel (con los parches propios de Gentoo aplicados) y lo compila en tu propia máquina, usando las <code>USE flags</code> y opciones de <code>make.conf</code> que ya definiste. El resultado es un kernel "a tu medida" dentro del margen que permite la configuración genérica de distribución.</p>
+<div class="para-que-sirve"><strong>Para qué sirve:</strong> si tu CPU o hardware es poco común, o si querés que tus USE flags globales (como flags de arquitectura, firmware específico, etc.) influyan en el resultado, esta es la opción. El costo es tiempo: compilar un kernel completo puede tardar bastante según el hardware.</div>
+</div>
+<h3>Opción B — Binario precompilado</h3>
+<div class="card">
+<span class="tag bajo">Solo descarga · instalación rápida</span>
+<div class="file-label">Comando</div>
+<pre><code>root # emerge --ask sys-kernel/gentoo-kernel-bin</code></pre>
+<p>En vez de compilar, Portage <strong>descarga un kernel ya compilado</strong> por el proyecto Gentoo, con una configuración genérica pensada para funcionar en la mayoría del hardware "de fábrica". No consume tiempo de CPU en compilación — es prácticamente instantáneo comparado con la opción A.</p>
+<div class="para-que-sirve"><strong>Para qué sirve:</strong> ideal si priorizás rapidez de instalación, estás en una máquina virtual, un laptop con hardware común, o simplemente no querés esperar una compilación. La contrapartida es menos margen de personalización, porque no pasa por tu <code>make.conf</code> de la misma forma.</div>
+</div>
+<p><strong>Ambas opciones son intercambiables</strong> en cuanto a mantenimiento: las dos se actualizan igual, vía <code>emerge -avuDN @world</code>, y ambas requieren que <code>installkernel</code> esté configurado con un generador de initramfs (por ejemplo, Dracut) antes de instalarlas.</p>
+<h2><span class="num">32.1.a</span> El USE flag <code>dist-kernel</code></h2>
+<div class="card">
+<span class="tag info">USE flag</span>
+<div class="where">📍 Se configura en <code>/etc/portage/make.conf</code></div>
+<div class="file-label">/etc/portage/make.conf</div>
+<pre><code>USE="dist-kernel"</code></pre>
+<p>Es un interruptor global que le dice a Portage: <em>"cuando actualices el kernel, hacé también el trabajo de limpieza asociado, sin que yo tenga que acordarme."</em></p>
+<p>Sin este flag, después de cada actualización del kernel tendrías que correr manualmente:</p>
+<pre><code>root # emerge --ask @module-rebuild</code></pre>
+<p>para reconstruir módulos externos (como drivers de NVIDIA o ZFS, que dependen de la versión exacta del kernel) y regenerar el initramfs. Con <code>dist-kernel</code> activo, todo eso pasa automáticamente cuando el kernel sube de versión.</p>
+<div class="nix-note"><strong>Analogía NixOS:</strong> es similar a lo que hace <code>nixos-rebuild switch</code> al regenerar el <code>initrd</code> y actualizar el bootloader en cada nueva generación — automático, sin pasos manuales sueltos. <code>dist-kernel</code> le da ese mismo comportamiento a Gentoo, que por defecto es más manual.</div>
+</div>
+<h2><span class="num">32.1.b</span> Mantenimiento y limpieza</h2>
+<div class="card">
+<div class="file-label">Actualizar todo el sistema (incluido el kernel si hay versión nueva)</div>
+<pre><code>root # emerge --sync
+root # emerge -avuDN @world</code></pre>
+<div class="para-que-sirve"><strong>Para qué sirve:</strong> <code>--sync</code> baja la lista más reciente de paquetes disponibles (no instala nada todavía). <code>-avuDN @world</code> sí actualiza lo instalado. El flag <code>-a</code> (ask) muestra qué va a cambiar antes de confirmar.</div>
+<div class="file-label">Limpiar kernels viejos</div>
+<pre><code>root # emerge --depclean
+# o, específicamente:
+root # emerge --prune sys-kernel/gentoo-kernel sys-kernel/gentoo-kernel-bin</code></pre>
+<div class="para-que-sirve"><strong>Para qué sirve:</strong> libera espacio en disco eliminando versiones antiguas que Portage conserva hasta que se le pide limpiar.</div>
+</div>
+<h2><span class="num">32.2</span> Configuración manual (alternativa)</h2>
+<p>Usa <code>sys-kernel/gentoo-sources</code> en vez de un kernel de distribución. Acá vos configurás cada opción a mano con herramientas como <code>make menuconfig</code>. Hay tres formas de decidir <em>qué</em> incluir:</p>
+<details>
+<summary>Opción 1 — Modprobed-db (automatiza la detección con el tiempo)</summary>
+<div class="content">
+<p><code>sys-kernel/modprobed-db</code> es un demonio que corre en segundo plano (vía cron o un timer de systemd) y va <strong>registrando qué módulos del kernel usa tu sistema a lo largo del tiempo</strong> — no solo en el momento de instalar, sino con cada dispositivo nuevo que conectás.</p>
+<p>Ejemplo: si semanas después de instalar Gentoo conectás un control de Xbox, modprobed-db anota ese módulo, y la próxima vez que reconstruyas el kernel, ese soporte ya está incluido automáticamente — sin que vos tengas que acordarte de agregarlo.</p>
+<pre><code>root # emerge --ask sys-kernel/modprobed-db</code></pre>
+<div class="para-que-sirve"><strong>Para qué sirve:</strong> pensado para quien compila el kernel manualmente pero no quiere estar adivinando qué módulos incluir cada vez. Es la opción más "hands-off" dentro del camino manual — se usa normalmente junto con <code>gentoo-kernel-bin</code> como base.</div>
+</div>
+</details>
+<details>
+<summary>Opción 2 — Proceso asistido (detección puntual, una sola vez)</summary>
+<div class="content">
+<p>A diferencia de modprobed-db (que observa con el tiempo), este método hace una <strong>detección instantánea</strong> del hardware presente en el momento de la instalación, usando dos herramientas:</p>
+<ul>
+<li><code>lspci</code> — lista los dispositivos conectados por PCI (tarjeta de red, gráfica, etc.)</li>
+<li><code>lsmod</code> — muestra qué módulos ya está usando el medio de instalación (el "live CD"), lo cual da pistas de qué necesitás activar</li>
+</ul>
+<pre><code>root # emerge --ask sys-apps/pciutils
+root # cd /usr/src/linux
+root # make localmodconfig</code></pre>
+<div class="para-que-sirve"><strong>Para qué sirve:</strong> <code>make localmodconfig</code> autodetecta los módulos que el sistema está usando <em>ahora mismo</em> y genera una configuración base con eso. Es un punto de partida razonable si no querés empezar de cero, pero no seguirá aprendiendo después como modprobed-db.</div>
+<p>Después de esto, se puede revisar manualmente con una interfaz de texto:</p>
+<pre><code>root # make nconfig</code></pre>
+<div class="para-que-sirve"><strong>Para qué sirve:</strong> abre un menú interactivo para ajustar opciones específicas del kernel a mano, por si la autodetección se saltó algo.</div>
+</div>
+</details>
+<details>
+<summary>Opción 3 — Configuración manual completa</summary>
+<div class="content">
+<p>Sin ayuda de detección automática: se configura cada opción del kernel a mano, una por una. Requiere conocer bien el hardware propio (controladores de disco, tarjeta de red, sistema de archivos, etc.). Es la opción de máximo control, pero también la de mayor curva de aprendizaje y riesgo de olvidar algo esencial (como el driver del disco donde arranca el sistema).</p>
+</div>
+</details>
+<h2><span class="num">32.2.4</span> Compilar e instalar (camino manual)</h2>
+<div class="card">
+<span class="tag alto">Toma tiempo · no interrumpir</span>
+<div class="file-label">Comandos</div>
+<pre><code>root # make -j$(nproc) &amp;&amp; make modules_install
+root # make install</code></pre>
+<table>
+<tr><th>Comando</th><th>Para qué sirve</th></tr>
+<tr><td><code>make -j$(nproc)</code></td><td>Compila el kernel usando todos los núcleos de CPU disponibles en paralelo (<code>nproc</code> los cuenta automáticamente), acelerando la compilación</td></tr>
+<tr><td><code>make modules_install</code></td><td>Instala los módulos ya compilados en <code>/lib/modules/</code></td></tr>
+<tr><td><code>make install</code></td><td>Copia la imagen del kernel a <code>/boot/</code>. Si <code>installkernel</code> está presente, delega en él para nombrar el archivo con su versión y, opcionalmente, generar initramfs y actualizar el bootloader</td></tr>
+</table>
+</div>
+<h2><span class="num">32.x</span> Resumen rápido</h2>
+<table>
+<tr><th>Necesito</th><th>Uso</th></tr>
+<tr><td>Instalar rápido, sin complicaciones</td><td><code>emerge --ask sys-kernel/gentoo-kernel-bin</code></td></tr>
+<tr><td>Instalar con mis propias USE flags</td><td><code>emerge --ask sys-kernel/gentoo-kernel</code></td></tr>
+<tr><td>Que el sistema se auto-mantenga tras cada update</td><td><code>USE="dist-kernel"</code> en <code>make.conf</code></td></tr>
+<tr><td>Control total del kernel</td><td><code>sys-kernel/gentoo-sources</code> + <code>make menuconfig</code></td></tr>
+<tr><td>Que el kernel manual aprenda solo con el tiempo</td><td><code>sys-kernel/modprobed-db</code></td></tr>
+<tr><td>Detección rápida y puntual de mi hardware actual</td><td><code>make localmodconfig</code></td></tr>
+</table>
+</main>
+<footer>Compendio Gentoo — Capítulo 32 · Selección del Kernel</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-31-installkernel.html">← Cap. 31: Capítulo 31 — sys-kernel/installkernel</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-33-fstab.html">Cap. 33: Capítulo 33 · Información del sistema de archivos →</a>
+</div>
+</body>
+</html>

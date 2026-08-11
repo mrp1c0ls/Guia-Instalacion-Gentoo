@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Capítulo 22 — Configurando las opciones de compilación</title>
+<style>
+  :root {
+    --bg: #14161a;
+    --bg-card: #1c1f26;
+    --bg-code: #10121600;
+    --border: #2b2f38;
+    --text: #d8dbe0;
+    --text-dim: #8b909c;
+    --accent: #7aa2f7;
+    --accent2: #9ece6a;
+    --warn: #e0af68;
+    --danger: #f7768e;
+    --code-bg: #0e1015;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  h1 {
+    font-size: 1.7rem;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 12px;
+    margin-bottom: 4px;
+  }
+  .subtitle { color: var(--text-dim); margin-bottom: 32px; font-size: 0.95rem; }
+  h2 {
+    font-size: 1.25rem;
+    color: var(--accent);
+    margin-top: 44px;
+    border-left: 4px solid var(--accent);
+    padding-left: 10px;
+  }
+  h3 { font-size: 1.05rem; color: var(--accent2); margin-top: 28px; }
+  p { margin: 10px 0; }
+  code {
+    background: var(--code-bg);
+    color: var(--accent2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: "SF Mono", Consolas, monospace;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+  pre code { background: none; padding: 0; color: #c9d1d9; }
+  .file-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-bottom: 6px;
+  }
+  .callout {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent2);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 0.93rem;
+  }
+  .callout strong { color: var(--accent2); }
+  .warning {
+    border-left-color: var(--danger);
+    background: #241a1e;
+  }
+  .warning strong { color: var(--danger); }
+  .tip { border-left-color: var(--warn); background: #221f18; }
+  .tip strong { color: var(--warn); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+  }
+  th { background: var(--bg-card); color: var(--accent); }
+  tr:nth-child(even) { background: #191c22; }
+  .risk {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .risk-low { background: #1e3a2a; color: var(--accent2); }
+  .risk-med { background: #3a301a; color: var(--warn); }
+  .risk-high { background: #3a1e24; color: var(--danger); }
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 12px 0;
+    padding: 10px 14px;
+  }
+  summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  summary:hover { color: #9db8f7; }
+  .loc {
+    font-family: monospace;
+    background: var(--code-bg);
+    color: var(--accent);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">V. Sistema base (stage3)</span>
+</div>
+<span class="jagg-badge">Cap. 22 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<span class="file-tag">Gentoo Handbook · Instalación</span>
+<h1>Capítulo 22 — Configurando las opciones de compilación</h1>
+<p class="subtitle">Qué son las variables de compilación, para qué sirven y cómo configurarlas correctamente en <code>make.conf</code>.</p>
+<div class="callout">
+<strong>¿Dónde se configura todo esto?</strong><br/>
+Todo lo de este capítulo va en un solo archivo: <span class="loc">/mnt/gentoo/etc/portage/make.conf</span> (dentro del chroot, simplemente <span class="loc">/etc/portage/make.conf</span>). Este archivo lo lee <strong>Portage</strong> cada vez que compila cualquier paquete, así que los cambios aquí afectan a todo el sistema, no solo a la instalación inicial.
+</div>
+<pre><code>root # nano /mnt/gentoo/etc/portage/make.conf</code></pre>
+<p><em>Para qué sirve:</em> abre el archivo de configuración principal de Portage con el editor <code>nano</code> para poder editar las variables.</p>
+<hr/>
+<h2>1. CFLAGS y CXXFLAGS — compilador de C y C++</h2>
+<p>Le dicen a <strong>GCC</strong> (el compilador) cómo optimizar el código de cada programa en C (<code>CFLAGS</code>) y C++ (<code>CXXFLAGS</code>) al momento de compilarlo.</p>
+<pre><code>COMMON_FLAGS="-march=native -O2 -pipe"
+CFLAGS="${COMMON_FLAGS}"
+CXXFLAGS="${COMMON_FLAGS}"</code></pre>
+<p><em>Para qué sirve:</em> define una sola vez el conjunto de flags (<code>COMMON_FLAGS</code>) y lo reutiliza en ambos compiladores, para no repetir código.</p>
+<h3>Flags disponibles y qué hace cada una</h3>
+<table>
+<tr><th>Flag</th><th>Qué hace</th><th>Recomendación</th></tr>
+<tr><td><code>-march=native</code></td><td>Optimiza el código para el CPU exacto de la máquina donde compilas.</td><td>✅ Uso común</td></tr>
+<tr><td><code>-march=x86-64-v2 / v3 / v4</code></td><td>Optimiza para un nivel de instrucciones x86-64 genérico (útil si el binario correrá en otra máquina distinta).</td><td>Alternativa a <code>native</code></td></tr>
+<tr><td><code>-mtune=native</code></td><td>Ajusta solo el "tuning" (orden de instrucciones), sin exigir instrucciones exclusivas del CPU. Más portable que <code>-march</code>.</td><td>Opcional</td></tr>
+<tr><td><code>-pipe</code></td><td>Usa memoria RAM en vez de archivos temporales entre etapas del compilador. Compila algo más rápido.</td><td><span class="risk risk-med">RAM baja: evitar</span></td></tr>
+<tr><td><code>-fomit-frame-pointer</code></td><td>Libera un registro extra del CPU al no guardar el "frame pointer".</td><td><span class="risk risk-high">Dificulta depuración</span></td></tr>
+</table>
+<h3>Niveles de optimización <code>-O</code> (letra O, no cero)</h3>
+<table>
+<tr><th>Flag</th><th>Qué significa</th></tr>
+<tr><td><code>-O0</code></td><td>Sin optimizar. Compila rápido, el programa corre lento. Útil solo para depurar.</td></tr>
+<tr><td><code>-O1</code></td><td>Optimizaciones básicas, seguras.</td></tr>
+<tr><td><code>-O2</code></td><td><strong>Recomendado por el handbook.</strong> Buen balance velocidad/estabilidad.</td></tr>
+<tr><td><code>-O3</code></td><td>Máxima optimización de velocidad. <span class="risk risk-high">Puede causar bugs en algunos paquetes</span> si se usa en todo el sistema.</td></tr>
+<tr><td><code>-Os</code></td><td>Optimiza para tamaño del binario, no velocidad. Útil en discos/RAM muy limitados.</td></tr>
+<tr><td><code>-Og</code></td><td>Optimización mínima pensada para depurar con buena información de debug.</td></tr>
+</table>
+<div class="callout warning">
+<strong>Advertencia del handbook:</strong> no metas flags experimentales aquí. Demasiada optimización puede hacer que los programas se comporten mal (crasheen o, peor, funcionen mal silenciosamente). Los valores por defecto que trae el stage3 ya son suficientemente buenos si no quieres tocar nada.
+</div>
+<hr/>
+<h2>2. RUSTFLAGS — compilador de Rust</h2>
+<p>Es <strong>independiente</strong> de <code>CFLAGS</code>/<code>CXXFLAGS</code>: cada variable solo afecta al compilador de su propio lenguaje. Rust ya optimiza a nivel 3 por defecto, así que lo único que vale la pena añadir es la optimización para tu CPU específico:</p>
+<pre><code>RUSTFLAGS="${RUSTFLAGS} -C target-cpu=native"</code></pre>
+<p><em>Para qué sirve:</em> el <code>${RUSTFLAGS}</code> al inicio conserva cualquier valor previo (por ejemplo, del profile de Gentoo) y le agrega <code>-C target-cpu=native</code> al final, en vez de sobrescribirlo.</p>
+<pre><code>root # rustc -C target-cpu=help</code></pre>
+<p><em>Para qué sirve:</em> muestra la lista de CPUs que Rust reconoce, y cuál sería seleccionado con <code>native</code> en tu máquina.</p>
+<div class="callout">
+Si dejas <strong>solo</strong> <code>RUSTFLAGS</code> sin tocar <code>CFLAGS</code>/<code>CXXFLAGS</code>, el sistema compila sin problema: los paquetes en Rust quedan optimizados a tu CPU, y los de C/C++ usan los valores por defecto del stage3.
+</div>
+<hr/>
+<h2>3. MAKEOPTS — compilación en paralelo</h2>
+<p>Controla cuántos procesos de compilación corren <strong>al mismo tiempo</strong>.</p>
+<pre><code>MAKEOPTS="-j4 -l5"</code></pre>
+<table>
+<tr><th>Flag</th><th>Qué controla</th></tr>
+<tr><td><code>-j4</code></td><td>Techo fijo: máximo 4 compilaciones en paralelo.</td></tr>
+<tr><td><code>-l5</code></td><td>Freno dinámico: si el <em>load average</em> (carga del sistema) llega a 5, no lanza más procesos, aunque <code>-j</code> deje margen.</td></tr>
+</table>
+<p><strong>Regla práctica:</strong> usa el menor valor entre el número de hilos (<code>nproc</code>) de tu CPU, o tu RAM total dividida entre 2 GiB.</p>
+<div class="callout warning">
+<strong>Sobre la memoria:</strong> no existe un flag de <code>MAKEOPTS</code> que limite RAM directamente (no hay un <code>-mMemoria</code>). La memoria se controla <em>indirectamente</em> bajando <code>-j</code>: menos procesos en paralelo = menos memoria usada a la vez. Regla del handbook: al menos 2 GiB de RAM por cada job (<code>-j6</code> requiere mínimo 12 GiB).
+</div>
+<details>
+<summary>¿Y si necesito un límite duro de memoria? <span class="risk risk-med">Avanzado</span></summary>
+<p>Portage/<code>make</code> no lo ofrecen de forma nativa. Se lograría con herramientas externas del sistema como <em>cgroups</em> o <code>systemd-run --scope -p MemoryMax=...</code>, fuera del alcance de este capítulo.</p>
+</details>
+<hr/>
+<h2>Resumen: qué escribir al final</h2>
+<pre><code>COMMON_FLAGS="-march=native -O2 -pipe"
+CFLAGS="${COMMON_FLAGS}"
+CXXFLAGS="${COMMON_FLAGS}"
+RUSTFLAGS="${RUSTFLAGS} -C target-cpu=native"
+MAKEOPTS="-j4 -l5"</code></pre>
+<p>Guarda con <code>Ctrl+O</code> y sal con <code>Ctrl+X</code> (en <code>nano</code>). Con esto, el capítulo 22 queda listo para pasar al capítulo 24 (Chrooting) — el 23 son solo referencias.</p>
+
+<div id="jagg-bottombar">
+<a href="cap-21-instalando-stage.html">← Cap. 21: Capítulo 21 — Instalando el archivo stage</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-23-referencias.html">Cap. 23: Capítulo 23 — Referencias Informativo →</a>
+</div>
+</body>
+</html>

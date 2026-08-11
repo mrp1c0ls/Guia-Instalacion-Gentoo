@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Capítulo 5 — Grabar el medio de arranque</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --border:#30363d;
+    --text:#c9d1d9; --muted:#8b949e; --accent:#58a6ff;
+    --green:#3fb950; --yellow:#d29922; --red:#f85149;
+    --code-bg:#010409;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,Segoe UI,Roboto,sans-serif;
+    max-width:820px; margin:0 auto; padding:32px 20px 80px;
+    line-height:1.6;
+  }
+  h1{font-size:1.7rem; border-bottom:2px solid var(--accent); padding-bottom:10px;}
+  h2{font-size:1.25rem; color:var(--accent); margin-top:2.2rem;}
+  p{color:var(--text);}
+  .subtitle{color:var(--muted); margin-top:-8px;}
+  .callout{
+    background:var(--panel); border-left:4px solid var(--accent);
+    padding:10px 14px; border-radius:6px; margin:14px 0; font-size:.92rem;
+  }
+  .callout b{color:var(--accent);}
+  .warning{border-left-color:var(--red);}
+  .warning b{color:var(--red);}
+  .tip{border-left-color:var(--green);}
+  .tip b{color:var(--green);}
+  code, pre{
+    font-family:"SFMono-Regular",Consolas,Menlo,monospace;
+  }
+  pre{
+    background:var(--code-bg); border:1px solid var(--border);
+    border-radius:8px; padding:14px 16px; overflow-x:auto; font-size:.88rem;
+  }
+  code.inline{
+    background:var(--code-bg); border:1px solid var(--border);
+    padding:1px 6px; border-radius:4px; font-size:.88rem;
+  }
+  details{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:8px; margin:14px 0; padding:2px 16px;
+  }
+  summary{
+    cursor:pointer; font-weight:600; padding:10px 0; color:var(--accent);
+  }
+  .risk{
+    display:inline-block; font-size:.72rem; font-weight:700;
+    padding:2px 9px; border-radius:12px; margin-left:8px; vertical-align:middle;
+  }
+  .risk-alto{background:rgba(248,81,73,.15); color:var(--red); border:1px solid var(--red);}
+  .risk-medio{background:rgba(210,153,34,.15); color:var(--yellow); border:1px solid var(--yellow);}
+  .risk-bajo{background:rgba(63,185,80,.15); color:var(--green); border:1px solid var(--green);}
+  .para-que-sirve{
+    font-size:.85rem; color:var(--muted); margin-top:8px;
+    border-top:1px dashed var(--border); padding-top:8px;
+  }
+  .para-que-sirve b{color:var(--text);}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem;}
+  th,td{border:1px solid var(--border); padding:8px 10px; text-align:left;}
+  th{background:var(--panel); color:var(--accent);}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px 20px;}
+  .toc a{color:var(--text); text-decoration:none;}
+  .toc a:hover{color:var(--accent);}
+  footer{color:var(--muted); font-size:.8rem; margin-top:50px; border-top:1px solid var(--border); padding-top:14px;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">II. Medio de instalación</span>
+</div>
+<span class="jagg-badge">Cap. 05 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 5 — Grabar el medio de arranque</h1>
+<p class="subtitle">Manual de instalación de Gentoo AMD64 · Resumen simplificado</p>
+<div class="toc">
+<b>En este capítulo:</b>
+<ul>
+<li><a href="#idea">Idea general</a></li>
+<li><a href="#usb">5.1 Crear un USB booteable</a></li>
+<li><a href="#disco">5.2 Grabar en disco (CD/DVD)</a></li>
+<li><a href="#extra">Extra: verificar y comparar métodos</a></li>
+</ul>
+</div>
+<h2 id="idea">Idea general</h2>
+<p>
+Ya tienes el archivo <code class="inline">.iso</code> de Gentoo descargado, pero un ISO por sí solo no arranca una computadora.
+Este capítulo explica cómo "volcar" ese ISO a un USB o disco físico para que la máquina pueda iniciar desde ahí.
+</p>
+<h2 id="usb">5.1 Crear un USB booteable</h2>
+<div class="callout warning">
+<b>Advertencia:</b> No uses herramientas como <b>Ventoy</b> para escribir el USB — puede provocar fallos de arranque con el medio de Gentoo.
+</div>
+<details open="">
+<summary>Paso 1 — Identificar el dispositivo USB <span class="risk risk-bajo">riesgo bajo</span></summary>
+<p>Antes de escribir nada, hay que saber qué nombre tiene tu USB en el sistema (ej. <code class="inline">/dev/sdd</code>).</p>
+<pre>root # dmesg</pre>
+<pre>root # lsblk</pre>
+<div class="para-que-sirve">
+<b>Para qué sirve:</b> <code class="inline">dmesg</code> muestra el hardware detectado recientemente (útil justo después de conectar el USB).
+<code class="inline">lsblk</code> lista todos los discos y particiones del sistema para confirmar cuál es el correcto por su tamaño.
+</div>
+</details>
+<details open="">
+<summary>Paso 2 — Escribir el ISO con <code class="inline">dd</code> <span class="risk risk-alto">riesgo alto</span></summary>
+<pre>root # dd if=install-amd64-minimal-&lt;fecha&gt;.iso of=/dev/sdd bs=4096 status=progress &amp;&amp; sync</pre>
+<table>
+<tr><th>Parte</th><th>Significado</th></tr>
+<tr><td><code class="inline">if=</code></td><td>archivo de entrada (el ISO descargado)</td></tr>
+<tr><td><code class="inline">of=</code></td><td>dispositivo de salida (tu USB) — todo su contenido se borra</td></tr>
+<tr><td><code class="inline">bs=4096</code></td><td>tamaño de bloque, acelera la escritura</td></tr>
+<tr><td><code class="inline">status=progress</code></td><td>muestra el avance en tiempo real</td></tr>
+<tr><td><code class="inline">sync</code></td><td>fuerza a que todo quede realmente escrito antes de retirar el USB</td></tr>
+</table>
+<div class="callout warning">
+<b>Cuidado:</b> usa el dispositivo base (<code class="inline">sdd</code>), no una partición (<code class="inline">sdd1</code>). Si te equivocas de <code class="inline">of=</code>, borras el disco incorrecto — no hay "deshacer".
+</div>
+<div class="para-que-sirve">
+<b>Para qué sirve:</b> <code class="inline">dd</code> copia el ISO byte por byte al USB, replicando la estructura de arranque (particiones GPT incluidas) tal cual la trae la imagen oficial.
+</div>
+</details>
+<details>
+<summary>Alternativa en Windows <span class="risk risk-bajo">riesgo bajo</span></summary>
+<p>Se usa el programa gráfico <b>win32diskimager</b>, que cumple la misma función que <code class="inline">dd</code> pero con interfaz visual.</p>
+<div class="callout warning">
+<b>Advertencia del manual:</b> descárgalo únicamente desde su página oficial en SourceForge, para evitar versiones alteradas.
+</div>
+</details>
+<h2 id="disco">5.2 Grabar en disco (CD/DVD)</h2>
+<details>
+<summary>En Linux — <code class="inline">cdrecord</code> <span class="risk risk-medio">riesgo medio</span></summary>
+<pre>user $ cdrecord dev=/dev/sr0 install-amd64-minimal-20141204.iso</pre>
+<div class="para-que-sirve">
+<b>Para qué sirve:</b> graba el ISO como imagen booteable en un disco físico. <code class="inline">/dev/sr0</code> es la primera unidad óptica del sistema.
+</div>
+<p>Si prefieres interfaz gráfica, <b>K3B</b> hace lo mismo desde su menú "Grabar imagen de CD".</p>
+</details>
+<details>
+<summary>En Windows 7 o superior <span class="risk risk-bajo">riesgo bajo</span></summary>
+<p>No necesitas programas extra: clic derecho sobre el archivo ISO → <b>"Grabar imagen de disco"</b>.</p>
+</details>
+<h2 id="extra">Extra: comparación rápida de métodos</h2>
+<table>
+<tr><th>Medio</th><th>Sistema</th><th>Herramienta</th><th>Nivel</th></tr>
+<tr><td>USB</td><td>Linux</td><td><code class="inline">dd</code></td><td><span class="risk risk-alto">alto</span></td></tr>
+<tr><td>USB</td><td>Windows</td><td>win32diskimager</td><td><span class="risk risk-bajo">bajo</span></td></tr>
+<tr><td>CD/DVD</td><td>Linux</td><td><code class="inline">cdrecord</code> / K3B</td><td><span class="risk risk-medio">medio</span></td></tr>
+<tr><td>CD/DVD</td><td>Windows 7+</td><td>Explorador de archivos</td><td><span class="risk risk-bajo">bajo</span></td></tr>
+</table>
+<div class="callout tip">
+<b>Tip (aporte adicional):</b> antes de grabar, verifica la integridad del ISO comparando su checksum
+  (<code class="inline">sha256sum install-amd64-minimal-&lt;fecha&gt;.iso</code>) contra el valor publicado en la página de descargas de Gentoo.
+  Un ISO corrupto puede causar errores extraños durante la instalación que son difíciles de diagnosticar después.
+</div>
+<div class="callout tip">
+<b>Tip (aporte adicional):</b> el USB es preferible al CD/DVD hoy en día — es más rápido, reutilizable, y casi todo hardware moderno arranca desde USB sin problema.
+</div>
+<footer>
+  Compendio personal · Capítulo 5 basado en el Gentoo AMD64 Handbook (Gentoo Wiki)
+</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-04-descargando.html">← Cap. 04: Capítulo 4 — Descargando</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-06-arranque.html">Cap. 06: Capítulo 6 — Arranque del medio de instalación →</a>
+</div>
+</body>
+</html>

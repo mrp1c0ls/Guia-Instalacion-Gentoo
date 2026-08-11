@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 27 — Zona horaria (Timezone) | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --bg-card:#161b22;
+    --border:#30363d;
+    --text:#c9d1d9;
+    --text-dim:#8b949e;
+    --accent:#58a6ff;
+    --accent2:#79c0ff;
+    --green:#3fb950;
+    --yellow:#d29922;
+    --red:#f85149;
+    --code-bg:#010409;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+  }
+  .wrap{
+    max-width:820px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  header{
+    border-bottom:1px solid var(--border);
+    padding-bottom:20px;
+    margin-bottom:28px;
+  }
+  .kicker{
+    color:var(--accent);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    font-weight:600;
+  }
+  h1{
+    font-size:28px;
+    margin:8px 0 6px;
+    color:#fff;
+  }
+  .subtitle{
+    color:var(--text-dim);
+    font-size:15px;
+  }
+  h2{
+    font-size:19px;
+    color:var(--accent2);
+    margin-top:36px;
+    border-left:3px solid var(--accent);
+    padding-left:10px;
+  }
+  p{
+    font-size:15.5px;
+  }
+  .note-musl{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-left:3px solid var(--yellow);
+    padding:10px 14px;
+    border-radius:6px;
+    font-size:14px;
+    color:var(--text-dim);
+    margin:16px 0;
+  }
+  .callout{
+    background:rgba(88,166,255,0.08);
+    border:1px solid rgba(88,166,255,0.3);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:10px 0 16px;
+    font-size:14px;
+  }
+  .callout b{color:var(--accent2);}
+  .risk{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    padding:2px 8px;
+    border-radius:20px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .risk-bajo{background:rgba(63,185,80,0.15);color:var(--green);border:1px solid rgba(63,185,80,0.4);}
+  .risk-medio{background:rgba(210,153,34,0.15);color:var(--yellow);border:1px solid rgba(210,153,34,0.4);}
+  .cmd-block{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:14px 0 22px;
+    overflow:hidden;
+  }
+  .cmd-title{
+    display:flex;
+    align-items:center;
+    padding:10px 14px;
+    font-size:14px;
+    font-weight:600;
+    color:#fff;
+    border-bottom:1px solid var(--border);
+    background:rgba(255,255,255,0.02);
+  }
+  pre{
+    margin:0;
+    padding:14px;
+    background:var(--code-bg);
+    overflow-x:auto;
+    font-size:13.5px;
+  }
+  code{
+    font-family:"SF Mono",Consolas,Monaco,monospace;
+    color:#e6edf3;
+  }
+  .prompt{color:var(--green);}
+  .comment{color:var(--text-dim);}
+  details{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin:10px 0 20px;
+    padding:0;
+  }
+  summary{
+    cursor:pointer;
+    padding:12px 16px;
+    font-weight:600;
+    color:var(--accent2);
+    font-size:14.5px;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{
+    content:"▸";
+    display:inline-block;
+    transition:transform 0.15s;
+  }
+  details[open] summary::before{
+    transform:rotate(90deg);
+  }
+  .details-body{
+    padding:0 16px 16px;
+    font-size:14.5px;
+    color:var(--text);
+  }
+  .warn-box{
+    background:rgba(248,81,73,0.08);
+    border:1px solid rgba(248,81,73,0.35);
+    border-radius:8px;
+    padding:12px 16px;
+    margin:16px 0;
+    font-size:14.5px;
+  }
+  .warn-box b{color:var(--red);}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+    margin:12px 0;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:8px 10px;
+    text-align:left;
+  }
+  th{background:var(--bg-card);color:var(--accent2);}
+  .nix-box{
+    background:rgba(210,153,34,0.05);
+    border:1px dashed rgba(210,153,34,0.4);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:13.5px;
+    color:var(--text-dim);
+    margin:14px 0;
+  }
+  footer{
+    margin-top:50px;
+    padding-top:16px;
+    border-top:1px solid var(--border);
+    font-size:12.5px;
+    color:var(--text-dim);
+    text-align:center;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">VII. Configuración regional y hardware</span>
+</div>
+<span class="jagg-badge">Cap. 27 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header>
+<div class="kicker">Compendio de instalación Gentoo · Capítulo 27</div>
+<h1>Zona horaria (Timezone)</h1>
+<div class="subtitle">Cómo decirle al sistema en qué parte del mundo está — un paso corto pero necesario</div>
+</header>
+<div class="note-musl">
+    ⚠️ Este paso <b>no aplica</b> si tu sistema usa <code>musl libc</code> en vez de <code>glibc</code>. Si no sabes qué es eso, probablemente usas glibc y este capítulo sí te aplica.
+  </div>
+<h2>¿Qué estamos haciendo aquí?</h2>
+<p>
+    Linux necesita saber en qué zona horaria vive tu equipo para mostrar la hora local correcta (aunque internamente el reloj del sistema siga funcionando en UTC). Gentoo trae precargada una base de datos con <b>todas</b> las zonas horarias del mundo, guardada en <code>/usr/share/zoneinfo/</code>. Tu trabajo es simplemente decirle al sistema cuál de esas usar.
+  </p>
+<div class="callout">
+<b>¿Para qué sirve esto?</b> El sistema siempre consulta un solo archivo — <code>/etc/localtime</code> — para saber la hora local. En vez de copiar un archivo pesado ahí, se crea un <b>enlace simbólico</b> (como un acceso directo) que apunta a la zona horaria que elijas. Cambiar de zona horaria en el futuro es tan simple como rehacer ese enlace.
+  </div>
+<h2>Paso 1 — Ver las zonas disponibles <span class="risk risk-bajo">Riesgo bajo</span></h2>
+<div class="cmd-block">
+<div class="cmd-title">Listar continentes/regiones</div>
+<pre><code><span class="prompt">root #</span> ls -l /usr/share/zoneinfo</code></pre>
+</div>
+<div class="cmd-block">
+<div class="cmd-title">Listar ciudades dentro de una región (ejemplo: América)</div>
+<pre><code><span class="prompt">root #</span> ls -l /usr/share/zoneinfo/America/</code></pre>
+</div>
+<div class="callout">
+<b>Para qué sirve:</b> solo estás mirando, no cambias nada todavía. Sirve para confirmar el nombre <i>exacto</i> del archivo que necesitas (mayúsculas, guiones bajos, etc.) antes de crear el enlace.
+  </div>
+<h2>Paso 2 — Crear el enlace simbólico <span class="risk risk-medio">Riesgo medio</span></h2>
+<div class="cmd-block">
+<div class="cmd-title">Ejemplo con Bruselas (tú usarías tu propia zona)</div>
+<pre><code><span class="prompt">root #</span> ln -sf ../usr/share/zoneinfo/Europe/Brussels /etc/localtime</code></pre>
+</div>
+<div class="callout">
+<b>Para qué sirve:</b> este comando es el que realmente configura la zona horaria. <code>-s</code> crea un enlace simbólico (no copia el archivo), y <code>-f</code> fuerza la sobreescritura si ya existía un enlace ahí. A partir de este momento, cada vez que el sistema pida la hora, seguirá este enlace hasta la zona elegida.
+  </div>
+<details>
+<summary>¿Por qué la ruta empieza con <code>../</code>?</summary>
+<div class="details-body">
+<p>
+        El enlace se va a crear dentro de <code>/etc/</code>. Cuando usas una ruta relativa como <code>../usr/share/zoneinfo/...</code>, esa ruta se interpreta <b>desde la ubicación del enlace</b> (o sea, desde <code>/etc/</code>), no desde tu directorio actual de trabajo. Por eso el <code>../</code> "sube" un nivel desde <code>/etc/</code> hasta la raíz <code>/</code>, y de ahí baja a <code>/usr/share/zoneinfo/...</code>.
+      </p>
+<p>
+        ¿Por qué no usar una ruta absoluta como <code>/usr/share/zoneinfo/...</code> directamente? También funciona, pero una ruta relativa es más portátil: sigue funcionando incluso si el sistema se monta bajo una raíz alterna (por ejemplo, si estás reparando el sistema desde un live USB y montas todo en <code>/mnt/gentoo</code>).
+      </p>
+</div>
+</details>
+<div class="warn-box">
+<b>Cuidado con las zonas <code>Etc/GMT*</code>:</b> sus nombres están invertidos por una rareza histórica del estándar POSIX. <code>Etc/GMT-8</code> en realidad significa GMT<b>+8</b>, no GMT-8. Mejor evítalas por completo y usa siempre una zona geográfica real (ciudad/región), como <code>America/Monterrey</code> o <code>America/Mexico_City</code>.
+  </div>
+<h2>Zonas horarias relevantes para México (Tamaulipas)</h2>
+<table>
+<tr><th>Zona horaria</th><th>Aplica a</th></tr>
+<tr><td><code>America/Matamoros</code></td><td>Tamaulipas (sigue horario de EE. UU./frontera, DST incluido)</td></tr>
+<tr><td><code>America/Monterrey</code></td><td>Zona centro de México (Nuevo León y la mayoría del país)</td></tr>
+<tr><td><code>America/Mexico_City</code></td><td>Zona centro general (alias más reconocido)</td></tr>
+</table>
+<p style="font-size:13.5px;color:var(--text-dim);">
+    Tamaulipas tiene una particularidad: algunos municipios fronterizos usan el horario de la frontera (que sí observa horario de verano/DST), por eso existe la entrada específica <code>America/Matamoros</code>. Verifica cuál corresponde a tu municipio antes de crear el enlace.
+  </p>
+<h2>Paso 3 — Verificar (opcional pero recomendado)</h2>
+<div class="cmd-block">
+<div class="cmd-title">Confirmar que el enlace apunta a donde debe</div>
+<pre><code><span class="prompt">root #</span> ls -l /etc/localtime</code></pre>
+</div>
+<div class="callout">
+<b>Para qué sirve:</b> te muestra hacia dónde apunta el enlace ahora mismo, así confirmas que quedó bien antes de seguir adelante.
+  </div>
+<details>
+<summary>¿Y si uso systemd en vez de OpenRC?</summary>
+<div class="details-body">
+<p>
+        Con systemd existe la herramienta <code>timedatectl</code>, que hace lo mismo pero de forma más guiada:
+      </p>
+<pre><code><span class="prompt">root #</span> timedatectl list-timezones
+<span class="prompt">root #</span> timedatectl set-timezone America/Monterrey</code></pre>
+<p>
+        Internamente crea el mismo tipo de enlace simbólico relativo en <code>/etc/localtime</code>, solo que valida el nombre por ti y evita que te equivoques al escribir la ruta a mano.
+      </p>
+<p style="color:var(--text-dim);font-size:13px;">
+        Nota: en tu instalación estás usando <b>OpenRC</b>, así que el método manual con <code>ln -sf</code> es el que te corresponde.
+      </p>
+</div>
+</details>
+<div class="nix-box">
+    💡 En este capítulo no hay mucho paralelismo útil con NixOS más allá de que, ahí, la zona horaria se declara como una línea de texto en <code>configuration.nix</code> (<code>time.timeZone = "..."</code>) y el sistema genera el enlace por ti al aplicar la configuración. Aquí en Gentoo, tú creas ese enlace manualmente — mismo resultado, un paso más explícito.
+  </div>
+<h2>Resumen rápido</h2>
+<p>
+    1) Busca tu zona en <code>/usr/share/zoneinfo/</code> → 2) crea el enlace con <code>ln -sf ../usr/share/zoneinfo/TU_ZONA /etc/localtime</code> → 3) evita las zonas <code>Etc/GMT*</code> → 4) verifica con <code>ls -l /etc/localtime</code>. Listo, siguiente capítulo: configuración de locales.
+  </p>
+<footer>
+    Compendio de instalación Gentoo Linux · Generado para consulta personal · Capítulo 27 de la Handbook oficial
+  </footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-26-openrc-vs-systemd.html">← Cap. 26: Capítulo 26 Opcional: Usar systemd como sistema y gestor de servicios</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-28-locales.html">Cap. 28: Configurar los locales →</a>
+</div>
+</body>
+</html>

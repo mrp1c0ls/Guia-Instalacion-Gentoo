@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Capítulo 25 — Configurando Portage</title>
+<style>
+  :root{
+    --bg:#0f1115; --bg-card:#171a21; --bg-code:#0b0d12;
+    --border:#262b36; --text:#dfe3ea; --text-dim:#9aa3b2;
+    --accent:#7dd3fc; --accent2:#a78bfa; --green:#4ade80;
+    --yellow:#facc15; --red:#f87171; --orange:#fb923c;
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg); color:var(--text); margin:0; padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:36px 20px 80px;}
+  h1{font-size:1.7rem; color:var(--accent); margin-bottom:4px;}
+  .subtitle{color:var(--text-dim); margin-top:0; margin-bottom:32px; font-size:.95rem;}
+  h2{
+    color:var(--accent2); border-bottom:1px solid var(--border);
+    padding-bottom:8px; margin-top:44px; font-size:1.25rem;
+  }
+  h3{color:var(--accent); font-size:1.05rem; margin-top:26px;}
+  p{color:var(--text);}
+  code{
+    background:var(--bg-code); color:#e2e8f0; padding:2px 6px;
+    border-radius:4px; font-size:.88em; font-family:"SF Mono",Consolas,monospace;
+  }
+  pre{
+    background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; font-size:.87rem;
+  }
+  pre code{background:none; padding:0;}
+  .card{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+    padding:16px 18px; margin:16px 0;
+  }
+  .callout{
+    border-left:3px solid var(--accent); background:rgba(125,211,252,.07);
+    padding:10px 14px; border-radius:0 6px 6px 0; margin:14px 0; font-size:.92rem;
+  }
+  .callout strong{color:var(--accent);}
+  .tag{
+    display:inline-block; font-size:.72rem; font-weight:600; letter-spacing:.02em;
+    padding:2px 9px; border-radius:20px; margin-left:8px; vertical-align:middle;
+    text-transform:uppercase;
+  }
+  .tag.low{background:rgba(74,222,128,.15); color:var(--green); border:1px solid rgba(74,222,128,.3);}
+  .tag.med{background:rgba(250,204,21,.15); color:var(--yellow); border:1px solid rgba(250,204,21,.3);}
+  .tag.high{background:rgba(248,113,113,.15); color:var(--red); border:1px solid rgba(248,113,113,.3);}
+  .tag.info{background:rgba(167,139,250,.15); color:var(--accent2); border:1px solid rgba(167,139,250,.3);}
+  details{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:8px;
+    margin:14px 0; padding:0;
+  }
+  summary{
+    cursor:pointer; padding:12px 16px; font-weight:600; color:var(--accent);
+    list-style:none; display:flex; align-items:center; gap:8px;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸"; transition:transform .15s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  details .content{padding:0 16px 16px;}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem;}
+  th,td{border:1px solid var(--border); padding:8px 12px; text-align:left;}
+  th{background:#1c2029; color:var(--accent);}
+  tr:nth-child(even){background:rgba(255,255,255,.02);}
+  ul,ol{padding-left:22px;}
+  li{margin-bottom:6px;}
+  .cmd-block{margin:10px 0;}
+  .para-que{
+    font-size:.85rem; color:var(--text-dim); margin-top:4px; padding-left:2px;
+  }
+  .para-que b{color:var(--orange);}
+  .toc{background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:16px 20px;}
+  .toc a{color:var(--accent); text-decoration:none; font-size:.92rem;}
+  .toc a:hover{text-decoration:underline;}
+  .toc li{margin-bottom:4px;}
+  hr{border:none; border-top:1px solid var(--border); margin:36px 0;}
+  .flow{display:flex; flex-direction:column; gap:10px;}
+  .flow .step{
+    display:flex; gap:12px; align-items:flex-start; background:var(--bg-card);
+    border:1px solid var(--border); border-radius:8px; padding:10px 14px;
+  }
+  .flow .num{
+    background:var(--accent2); color:#111; font-weight:700; border-radius:50%;
+    width:24px; height:24px; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-size:.8rem;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">VI. Chroot y Portage</span>
+</div>
+<span class="jagg-badge">Cap. 25 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<h1>Capítulo 25 — Configurando Portage</h1>
+<p class="subtitle">Handbook de Gentoo AMD64 · Preparando el gestor de paquetes antes de instalar software real</p>
+<div class="toc">
+<b>Contenido</b>
+<ul>
+<li><a href="#objetivo">¿Qué se logra en este capítulo?</a></li>
+<li><a href="#repo">1. Descargar el repositorio ebuild</a></li>
+<li><a href="#news">2. Noticias de Gentoo</a></li>
+<li><a href="#perfil">3. Elegir el perfil del sistema</a></li>
+<li><a href="#init">Los perfiles y los sistemas init (OpenRC, systemd y más)</a></li>
+<li><a href="#binhost">4. Paquetes binarios (opcional)</a></li>
+<li><a href="#use">5. La variable USE — a fondo</a></li>
+<li><a href="#cpuvideo">CPU_FLAGS_X86 y VIDEO_CARDS</a></li>
+<li><a href="#licencia">6. ACCEPT_LICENSE</a></li>
+<li><a href="#world">7. El conjunto @world</a></li>
+<li><a href="#resumen">Resumen del flujo mínimo</a></li>
+</ul>
+</div>
+<h2 id="objetivo">¿Qué se logra en este capítulo?</h2>
+<p>
+    Hasta el capítulo 24 el sistema es un esqueleto: tiene archivos base pero no sabe nada de software
+    disponible. Aquí se le enseña a <b>Portage</b> (el gestor de paquetes de Gentoo) qué paquetes existen,
+    qué perfil de configuración usar, y qué opciones de compilación aplicar por defecto. Es la puesta a
+    punto antes de instalar kernel, bootloader y el resto del sistema.
+  </p>
+<div class="callout">
+<strong>Contexto importante:</strong> Gentoo es una distribución <b>basada en código fuente</b>. Cada
+    <code>emerge</code> normalmente descarga el código fuente de un paquete y lo <b>compila en tu propia
+    máquina</b>, no instala un binario prehecho (salvo que actives paquetes binarios, ver más abajo). Por
+    eso toda esta configuración de Portage importa tanto: define cómo se comporta cada compilación, para
+    siempre, no solo en la instalación inicial.
+  </div>
+<hr/>
+<h2 id="repo">1. Descargar el repositorio ebuild <span class="tag low">bajo riesgo</span></h2>
+<p>
+    Un <b>ebuild</b> es la "receta" que le dice a Portage cómo compilar e instalar un paquete. El
+    repositorio ebuild es la colección completa de esas recetas — sin él, <code>emerge</code> no sabe que
+    un paquete existe.
+  </p>
+<div class="cmd-block">
+<pre><code>root # emerge-webrsync</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> descarga un snapshot diario del repositorio vía HTTP/FTP
+    (funciona incluso detrás de firewalls restrictivos) y lo coloca en
+    <code>/var/db/repos/gentoo/</code>.</p>
+</div>
+<details>
+<summary>Opcional — Actualizar el repositorio a la última hora (no solo al día)</summary>
+<div class="content">
+<pre><code>root # emerge --sync</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> usa el protocolo rsync para traer cambios más recientes
+      (hasta ~1 hora de antigüedad) en vez del snapshot diario de <code>emerge-webrsync</code>. Es
+      totalmente opcional en la instalación inicial.</p>
+<pre><code>root # emerge --sync --quiet</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> igual que arriba, pero silenciando la salida —
+      recomendado en terminales lentas (framebuffer, consola serial).</p>
+</div>
+</details>
+<h2 id="news">2. Noticias de Gentoo</h2>
+<p>
+    Al sincronizar, Portage puede avisar de <b>news items</b>: comunicados oficiales sobre cambios
+    importantes (por ejemplo, migraciones de perfil que requieren pasos manuales).
+  </p>
+<pre><code>root # eselect news list
+root # eselect news read</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> <code>eselect</code> es la herramienta genérica de Gentoo
+  para gestionar distintos aspectos del sistema mediante "módulos" (aquí, el módulo <code>news</code>).
+  <code>list</code> muestra los comunicados pendientes, <code>read</code> los muestra completos.</p>
+<hr/>
+<h2 id="perfil">3. Elegir el perfil del sistema <span class="tag med">impacto medio</span></h2>
+<p>
+    Un <b>perfil</b> es una plantilla mantenida por los desarrolladores de Gentoo que define valores por
+    defecto de <code>USE</code>, <code>CFLAGS</code> y otras variables, además de fijar un rango de
+    versiones de paquetes compatibles entre sí.
+  </p>
+<pre><code>root # eselect profile list</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> muestra los perfiles disponibles para tu arquitectura, con un
+  número al lado de cada uno.</p>
+<pre><code>root # eselect profile set 2</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> selecciona el perfil número 2 de la lista anterior como base
+  de configuración del sistema.</p>
+<div class="callout">
+<strong>Advertencia del propio handbook:</strong> al elegir el perfil inicial, usa la misma versión que
+    trae tu stage file (por ejemplo, 23.0). Cambiar de versión de perfil más adelante no es trivial —
+    siempre viene anunciado por un news item con instrucciones de migración.
+  </div>
+<h3 id="init">Los perfiles y los sistemas init (OpenRC, systemd y más)</h3>
+<p>
+    Algo que <b>no siempre es obvio</b> al mirar la lista de perfiles: el nombre del perfil determina qué
+    <b>sistema init</b> (el proceso que arranca todo lo demás al encender la máquina) usará tu instalación.
+    Gentoo es de las pocas distros que te deja elegir esto desde el principio.
+  </p>
+<table>
+<tr><th>Sistema init</th><th>Cómo se ve en el perfil</th><th>Notas</th></tr>
+<tr>
+<td><b>OpenRC</b></td>
+<td><code>default/linux/amd64/23.0</code> (sin "systemd" en el nombre)</td>
+<td>El init tradicional de Gentoo. Basado en scripts shell y dependencias declaradas simples.
+      Servicios se gestionan con <code>rc-update</code> / <code>rc-service</code>. Es la configuración
+      usada en este proyecto.</td>
+</tr>
+<tr>
+<td><b>systemd</b></td>
+<td><code>default/linux/amd64/23.0/systemd</code></td>
+<td>Init más extendido en otras distros (Fedora, Arch, Debian). Gestiona servicios, logs
+      (<code>journald</code>) y más como un conjunto integrado. Servicios con
+      <code>systemctl enable/start</code>.</td>
+</tr>
+<tr>
+<td>Otros (no cubiertos por perfiles oficiales)</td>
+<td>—</td>
+<td>Gentoo también permite <b>runit</b> o <b>s6</b> vía overlays/paquetes de la comunidad, aunque no
+      tienen un perfil oficial dedicado como OpenRC/systemd — requieren configuración manual adicional.</td>
+</tr>
+</table>
+<div class="callout">
+<strong>Nota:</strong> el capítulo 26 del handbook (opcional) cubre systemd en detalle. Si tu perfil no
+    incluye "systemd" en el nombre, tu sistema queda en OpenRC — que es el caso de esta instalación.
+  </div>
+<details>
+<summary>Sub-perfiles no-multilib (solo 64-bit puro)</summary>
+<div class="content">
+<pre><code>root # eselect profile list
+...
+ [5] default/linux/amd64/23.0/no-multilib
+root # eselect profile set 5</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> elimina la capacidad de correr binarios de 32-bit en un
+      sistema 64-bit. Útil si nunca vas a necesitar compatibilidad con software antiguo de 32-bit.</p>
+</div>
+</details>
+<hr/>
+<h2 id="binhost">4. Paquetes binarios (opcional) <span class="tag info">ahorra tiempo</span></h2>
+<p>
+    Por defecto Portage compila todo desde código fuente. Si prefieres velocidad sobre optimización a
+    medida, puedes usar binarios ya compilados por Gentoo (el "binhost oficial").
+  </p>
+<pre><code>FEATURES="${FEATURES} getbinpkg"
+FEATURES="${FEATURES} binpkg-request-signature"</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> le dice a Portage que, al pedir un paquete, primero pregunte
+  al binhost si existe un binario compatible, y solo compile localmente si no lo encuentra.
+  <code>binpkg-request-signature</code> exige que ese binario venga firmado criptográficamente.</p>
+<pre><code>root # getuto</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> configura el llavero (keyring) necesario para verificar esas
+  firmas antes de instalar cualquier binario.</p>
+<hr/>
+<h2 id="use">5. La variable USE — a fondo <span class="tag high">alto impacto</span></h2>
+<p>
+    Las <b>USE flags</b> son el mecanismo con el que decides qué funcionalidades opcionales se compilan
+    dentro de cada paquete. A diferencia de distros binarias (que suelen incluir "todo por si acaso"),
+    Gentoo te deja decidir tú.
+  </p>
+<div class="card">
+<b>Sintaxis básica</b>
+<pre><code>USE="ssl -X gnome gtk -kde -qt5"</code></pre>
+<ul>
+<li><code>ssl</code> → compila con soporte para cifrado SSL/TLS</li>
+<li><code>-X</code> → el signo <b>menos</b> significa "sin esto" (sin servidor gráfico X11)</li>
+<li><code>gnome gtk -kde -qt5</code> → favorece el ecosistema GNOME/GTK, descarta KDE/Qt</li>
+</ul>
+</div>
+<h3>¿Por qué importan? Ejemplos concretos</h3>
+<table>
+<tr><th>Situación</th><th>Sin ajustar la flag</th><th>Con la flag ajustada</th></tr>
+<tr>
+<td>Servidor sin monitor</td>
+<td>Se compilan decenas de paquetes con soporte X11/GUI innecesario</td>
+<td><code>USE="-X"</code> ahorra tiempo de compilación y espacio en disco</td>
+</tr>
+<tr>
+<td>Sistema de audio</td>
+<td>Un reproductor podría traer PulseAudio aunque tu sistema use ALSA puro</td>
+<td><code>alsa -pulseaudio</code> evita instalar un demonio de audio que nunca arrancará</td>
+</tr>
+<tr>
+<td>Seguridad / superficie de ataque</td>
+<td>Más código compilado = más código que podría tener vulnerabilidades sin usarse nunca</td>
+<td>Desactivar soporte no usado (ej. <code>-ftp -telnet</code> en un cliente) reduce esa superficie</td>
+</tr>
+<tr>
+<td>Un solo paquete necesita algo distinto al resto</td>
+<td>Cambiar el <code>USE</code> global afectaría a todo el sistema</td>
+<td><code>package.use/</code> permite la excepción solo para ese paquete</td>
+</tr>
+</table>
+<div class="callout">
+<strong>Importante:</strong> nunca instalas "sin" USE flags — siempre hay un conjunto activo (el del
+    perfil, más lo que agregues en <code>make.conf</code>). La pregunta nunca es "¿uso USE flags o no?",
+    sino "¿acepto las que trae el perfil por defecto, o las personalizo?".
+  </div>
+<details>
+<summary>¿Dónde se configuran? Global vs. por paquete</summary>
+<div class="content">
+<p><b>Global</b> — afecta a todos los paquetes que reconozcan esa flag:</p>
+<pre><code># /etc/portage/make.conf
+USE="X gtk -kde alsa -pulseaudio"</code></pre>
+<p><b>Por paquete</b> — sobreescribe la regla global, solo para ese paquete:</p>
+<pre><code># /etc/portage/package.use/mpv
+media-video/mpv pulseaudio -alsa</code></pre>
+<p class="para-que"><b>Para qué sirve <code>package.use/</code>:</b> evita que <code>make.conf</code>
+      crezca sin control. Es un directorio, no un archivo único — Portage lee todo lo que haya dentro,
+      sin importar cómo lo organices (por paquete, por tema, etc.). Sigue la lógica de "regla general en
+      <code>make.conf</code>, excepciones puntuales en <code>package.use/</code>".</p>
+</div>
+</details>
+<div class="callout">
+<strong>Advertencia del handbook:</strong> nunca uses <code>USE="-*"</code> (desactivar todo). Los
+    desarrolladores de cada ebuild eligen valores por defecto para evitar conflictos y errores —
+    desactivarlo todo puede romper el sistema de formas inesperadas.
+  </div>
+<h3 id="cpuvideo">USE flags de hardware: CPU_FLAGS_X86 y VIDEO_CARDS</h3>
+<p>Son dos variables especiales, ligadas a tu hardware físico, independientes entre sí.</p>
+<table>
+<tr><th></th><th>CPU_FLAGS_X86</th><th>VIDEO_CARDS</th></tr>
+<tr><td><b>Hardware que describe</b></td><td>Tu procesador (CPU)</td><td>Tu tarjeta gráfica (GPU)</td></tr>
+<tr><td><b>¿Es obligatorio configurarlo?</b></td><td>No, pero no tiene desventaja hacerlo</td><td>Prácticamente sí, si hay GPU dedicada o interfaz gráfica</td></tr>
+<tr><td><b>Qué controla</b></td><td>Rutas de código especiales escritas a mano por cada paquete (cifrado, codecs de video) que aprovechan instrucciones concretas del CPU (AVX2, AES-NI, SSE4.2...)</td><td>Qué driver de GPU compilar en Xorg/Mesa/el kernel</td></tr>
+<tr><td><b>Dónde se nota</b></td><td>Software de cómputo pesado: cifrado (OpenSSL), codificación de video (ffmpeg, x264), gráficos (Mesa)</td><td>Cualquier cosa que dibuje en pantalla o use aceleración de GPU</td></tr>
+</table>
+<div class="callout">
+<strong>No confundir con <code>-march=native</code>:</strong> <code>CFLAGS="-march=native"</code> le
+    dice al <b>compilador</b> que optimice automáticamente el código para tu CPU. <code>CPU_FLAGS_X86</code>
+    activa rutas de código <b>manuales</b> escritas por los desarrolladores del paquete — son mecanismos
+    distintos y complementarios, no sustitutos entre sí.
+  </div>
+<pre><code>root # emerge --ask --oneshot app-portage/cpuid2cpuflags
+root # cpuid2cpuflags
+root # echo "*/* $(cpuid2cpuflags)" &gt; /etc/portage/package.use/00cpu-flags</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> <code>cpuid2cpuflags</code> detecta automáticamente qué
+  instrucciones soporta tu CPU real (no hay que adivinarlo a mano) y genera el archivo
+  <code>package.use</code> correspondiente, aplicado a todo paquete (<code>*/*</code>) que use esa flag.</p>
+<pre><code># /etc/portage/package.use/00video_cards
+*/* VIDEO_CARDS: -* amdgpu radeonsi</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> primero desactiva (<code>-*</code>) los drivers genéricos que
+  trae el perfil por defecto, luego activa solo el tuyo — evita compilar soporte para tarjetas gráficas
+  que no tienes.</p>
+<table>
+<tr><th>Fabricante</th><th>Valor VIDEO_CARDS</th></tr>
+<tr><td>AMD (reciente)</td><td><code>amdgpu radeonsi</code></td></tr>
+<tr><td>NVIDIA (propietario)</td><td><code>nvidia</code></td></tr>
+<tr><td>NVIDIA (open source)</td><td><code>nouveau</code></td></tr>
+<tr><td>Intel</td><td><code>intel</code></td></tr>
+</table>
+<hr/>
+<h2 id="licencia">6. ACCEPT_LICENSE</h2>
+<p>
+    Controla qué licencias de software tu sistema tiene permitido instalar. Por defecto, solo se permite
+    software agrupado en <code>@FREE</code> (libre, según la definición de la FSF/OSI).
+  </p>
+<pre><code>user $ portageq envvar ACCEPT_LICENSE
+@FREE</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> consulta el valor actual configurado en el sistema.</p>
+<pre><code># /etc/portage/make.conf
+ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> amplía lo permitido — aquí se agregan también licencias que
+  permiten redistribuir binarios, aunque no sean 100% libres.</p>
+<p>
+    También se puede ajustar por paquete en <code>/etc/portage/package.license/</code>, igual que con
+    <code>package.use/</code>.
+  </p>
+<hr/>
+<h2 id="world">7. El conjunto @world</h2>
+<p>
+    Es la lista de <b>paquetes que instalaste explícitamente</b> — no las dependencias que se jalaron
+    automáticamente. Vive en <code>/var/lib/portage/world</code>.
+  </p>
+<pre><code>root # emerge --ask --verbose --update --deep --changed-use @world</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> actualiza todo lo que pediste explícitamente (y sus
+  dependencias), recompilando lo necesario si cambiaron USE flags o el perfil.</p>
+<pre><code>root # emerge --ask --pretend --depclean
+root # emerge --ask --depclean</code></pre>
+<p class="para-que"><b>Para qué sirve:</b> detecta y elimina paquetes que ya nadie necesita (ni tú los
+  pediste, ni son dependencia de algo que sí pediste). <code>--pretend</code> primero simula el resultado
+  sin borrar nada — conviene revisarlo antes del depclean real.</p>
+<div class="callout">
+<strong>Comparación con NixOS:</strong> <code>@world</code> se parece a
+    <code>environment.systemPackages</code>, pero no es declarativo ni reproducible — es más un registro
+    que Portage va actualizando según los comandos <code>emerge</code> que ejecutes, no un archivo que edites
+    a mano para reconstruir el sistema desde cero.
+  </div>
+<hr/>
+<h2 id="resumen">Resumen del flujo mínimo</h2>
+<div class="flow">
+<div class="step"><div class="num">1</div><div><code>emerge-webrsync</code> — obtener el catálogo de paquetes disponibles</div></div>
+<div class="step"><div class="num">2</div><div><code>eselect profile list</code> / <code>set N</code> — elegir perfil (define también OpenRC vs. systemd)</div></div>
+<div class="step"><div class="num">3</div><div>(Opcional) ajustar <code>USE</code>, <code>CPU_FLAGS_X86</code>, <code>VIDEO_CARDS</code> y <code>ACCEPT_LICENSE</code></div></div>
+<div class="step"><div class="num">4</div><div>(Opcional) <code>emerge --ask --verbose --update --deep --changed-use @world</code></div></div>
+</div>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-24-chroot.html">← Cap. 24: Cap. 24 — Chrooting</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-26-openrc-vs-systemd.html">Cap. 26: Capítulo 26 Opcional: Usar systemd como sistema y gestor de servicios →</a>
+</div>
+</body>
+</html>

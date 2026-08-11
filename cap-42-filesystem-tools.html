@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 42 — Herramientas de Sistemas de Archivos | Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --bg-alt:#161b22;
+    --border:#30363d;
+    --text:#c9d1d9;
+    --text-dim:#8b949e;
+    --accent:#58a6ff;
+    --accent-soft:#1f6feb33;
+    --code-bg:#1a1f27;
+    --green:#3fb950;
+    --yellow:#d29922;
+    --red:#f85149;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:0;
+    background:var(--bg); color:var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height:1.65;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:40px 22px 80px;}
+  header.top{
+    border-bottom:1px solid var(--border);
+    padding-bottom:22px; margin-bottom:32px;
+  }
+  .kicker{
+    color:var(--accent); font-size:0.8rem; letter-spacing:.12em;
+    text-transform:uppercase; font-weight:600; margin-bottom:8px;
+  }
+  h1{font-size:1.9rem; margin:0 0 8px; color:#fff;}
+  .subtitle{color:var(--text-dim); font-size:1rem;}
+  h2{
+    font-size:1.3rem; color:#fff; margin-top:44px;
+    padding-bottom:8px; border-bottom:1px solid var(--border);
+  }
+  h3{font-size:1.05rem; color:var(--accent); margin-top:28px;}
+  p{margin:12px 0;}
+  code{
+    background:var(--code-bg); padding:2px 6px; border-radius:4px;
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size:0.88em; color:#e6edf3;
+  }
+  pre{
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; margin:14px 0;
+  }
+  pre code{background:none; padding:0; font-size:0.85rem;}
+  .callout{
+    border-radius:8px; padding:14px 16px; margin:16px 0;
+    border-left:4px solid var(--accent); background:var(--accent-soft);
+  }
+  .callout b{color:var(--accent);}
+  .risk{
+    display:inline-block; font-size:0.72rem; font-weight:700; letter-spacing:.05em;
+    text-transform:uppercase; padding:3px 9px; border-radius:20px; margin-bottom:10px;
+  }
+  .risk.low{background:#2ea04326; color:var(--green); border:1px solid #2ea04355;}
+  .risk.med{background:#d2992226; color:var(--yellow); border:1px solid #d2992255;}
+  .risk.high{background:#f8514926; color:var(--red); border:1px solid #f8514955;}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;}
+  th, td{padding:9px 12px; border:1px solid var(--border); text-align:left;}
+  th{background:var(--bg-alt); color:#fff;}
+  tr:nth-child(even){background:#ffffff05;}
+  details{
+    background:var(--bg-alt); border:1px solid var(--border); border-radius:8px;
+    margin:14px 0; padding:0;
+  }
+  details summary{
+    cursor:pointer; padding:12px 16px; font-weight:600; color:var(--accent);
+    list-style:none; display:flex; align-items:center; gap:8px;
+  }
+  details summary::-webkit-details-marker{display:none;}
+  details summary::before{content:"▸"; transition:transform .15s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  details .content{padding:0 16px 16px;}
+  .path-tag{
+    font-family: monospace; font-size:0.85rem; background:#21262d;
+    padding:5px 10px; border-radius:6px; color:var(--yellow); display:inline-block;
+  }
+  ul{padding-left:22px;}
+  li{margin:6px 0;}
+  .nix{
+    border-left:4px solid #7c8fff; background:#7c8fff1a; border-radius:8px;
+    padding:12px 16px; margin:16px 0; font-size:0.92rem;
+  }
+  .nix b{color:#a6b3ff;}
+  footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--border); color:var(--text-dim); font-size:0.85rem;}
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">X. Configuración inicial del sistema y servicios</span>
+</div>
+<span class="jagg-badge">Cap. 42 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<div class="wrap">
+<header class="top">
+<div class="kicker">Compendio Gentoo · Instalación paso a paso</div>
+<h1>Capítulo 42 — Herramientas de Sistemas de Archivos</h1>
+<p class="subtitle">Filesystem tools: qué son, para qué sirven y cómo instalarlas correctamente antes de continuar con el bootloader.</p>
+</header>
+<div class="callout">
+<b>Idea central del capítulo:</b> ya creaste tus particiones y les diste formato (con <code>mkfs.xfs</code>, <code>mkfs.ext4</code>, etc.). Pero <b>formatear</b> no es lo mismo que <b>mantener</b>. Este capítulo trata sobre instalar las herramientas de administración de cada filesystem — las que usarás <i>después</i>, ya con el sistema arrancado, para revisar, reparar o redimensionar tus particiones.
+</div>
+<h2>¿Para qué sirve esto?</h2>
+<p>
+Cada tipo de filesystem (XFS, ext4, btrfs, etc.) es en realidad un formato de datos distinto en el disco, y cada uno tiene su propio conjunto de programas para administrarlo: revisar errores, reparar corrupción, agrandar o achicar la partición, ver estadísticas de uso, etc. El kernel sabe <i>leer y escribir</i> esos formatos, pero las tareas de mantenimiento las hacen programas de espacio de usuario (userspace), no el kernel.
+</p>
+<p>
+Si no instalas el paquete correspondiente, tu sistema instalado se quedará <b>sin herramientas de mantenimiento</b> para su propio disco — por ejemplo, no podrás correr un <code>fsck</code> si algo se corrompe después de un apagón.
+</p>
+<div class="nix">
+<b>Analogía con NixOS:</b> es como declarar <code>boot.supportedFilesystems</code> en tu <code>configuration.nix</code>. No basta con que el kernel soporte el filesystem — también necesitas los paquetes de utilidades correspondientes instalados para poder administrarlo día a día.
+</div>
+<h2>Punto clave: ext4 ya viene incluido</h2>
+<p>
+Las herramientas de <b>ext4</b> (<code>sys-fs/e2fsprogs</code>) ya están instaladas por defecto en cualquier sistema Gentoo, porque forman parte del <span class="path-tag">@system set</span> — el conjunto mínimo de paquetes que Portage considera imprescindibles. Si tu partición raíz es ext4, no tienes que hacer nada en este capítulo.
+</p>
+<p>
+Para cualquier otro filesystem (XFS, btrfs, VFAT, F2FS, NTFS, ZFS), <b>sí tienes que emergerlo tú mismo</b>, dentro del chroot, antes de reiniciar.
+</p>
+<h2>Tabla de referencia: qué instalar según tu filesystem</h2>
+<table>
+<tr><th>Filesystem</th><th>Paquete</th><th>Herramienta principal de reparación/chequeo</th></tr>
+<tr><td>XFS</td><td><code>sys-fs/xfsprogs</code></td><td><code>xfs_repair</code></td></tr>
+<tr><td>ext4</td><td><code>sys-fs/e2fsprogs</code> <i>(ya instalado)</i></td><td><code>e2fsck</code></td></tr>
+<tr><td>VFAT (FAT32)</td><td><code>sys-fs/dosfstools</code></td><td><code>fsck.vfat</code></td></tr>
+<tr><td>btrfs</td><td><code>sys-fs/btrfs-progs</code></td><td><code>btrfs check</code></td></tr>
+<tr><td>F2FS</td><td><code>sys-fs/f2fs-tools</code></td><td><code>fsck.f2fs</code></td></tr>
+<tr><td>NTFS</td><td><code>sys-fs/ntfs3g</code></td><td><code>ntfsfix</code></td></tr>
+<tr><td>ZFS</td><td><code>sys-fs/zfs</code></td><td><code>zpool scrub</code></td></tr>
+</table>
+<h2>El comando</h2>
+<span class="risk low">RIESGO BAJO — es solo instalar paquetes, totalmente reversible</span>
+<p>El patrón general es siempre el mismo:</p>
+<pre><code>emerge --ask sys-fs/&lt;paquete-correspondiente&gt;</code></pre>
+<p>Por ejemplo, si tu raíz es XFS:</p>
+<pre><code>root # emerge --ask sys-fs/xfsprogs</code></pre>
+<h3>¿En dónde se ejecuta esto?</h3>
+<p>
+Todavía estás dentro del <b>chroot</b> (el sistema nuevo, no el live environment). No hay ningún archivo de configuración que editar en este capítulo — es puramente instalar el paquete correcto vía Portage.
+</p>
+<h2>Profundizando: qué hace cada herramienta y sus opciones más usadas</h2>
+<details>
+<summary>xfsprogs (XFS) — comandos y opciones útiles</summary>
+<div class="content">
+<p><b>Para qué sirve:</b> XFS es el filesystem recomendado por el handbook para uso general moderno. <code>xfsprogs</code> trae todo lo necesario para crearlo, revisarlo y mantenerlo.</p>
+<ul>
+<li><code>mkfs.xfs</code> — crea el filesystem (ya lo usaste en el capítulo de discos).</li>
+<li><code>xfs_repair /dev/sdaX</code> — repara corrupción. <b>Importante:</b> la partición debe estar desmontada.</li>
+<li><code>xfs_growfs /</code> — agranda el filesystem <i>en caliente</i> (con el sistema montado) después de expandir la partición subyacente. XFS no se puede achicar.</li>
+<li><code>xfs_info /</code> — muestra información técnica del filesystem (tamaño de bloque, geometría, etc.).</li>
+</ul>
+</div>
+</details>
+<details>
+<summary>e2fsprogs (ext4) — comandos y opciones útiles</summary>
+<div class="content">
+<p><b>Para qué sirve:</b> conjunto de herramientas para ext2/ext3/ext4. Ya viene instalado por defecto.</p>
+<ul>
+<li><code>e2fsck -f /dev/sdaX</code> — revisa y repara. La opción <code>-f</code> fuerza el chequeo aunque el filesystem se vea "limpio".</li>
+<li><code>resize2fs /dev/sdaX</code> — agranda o achica el filesystem (a diferencia de XFS, ext4 sí se puede achicar, pero solo desmontado).</li>
+<li><code>tune2fs -l /dev/sdaX</code> — muestra parámetros configurados (UUID, label, intervalos de chequeo automático, etc.).</li>
+</ul>
+</div>
+</details>
+<details>
+<summary>dosfstools (VFAT/FAT32) — comandos y opciones útiles</summary>
+<div class="content">
+<p><b>Para qué sirve:</b> necesario para administrar tu partición EFI (<span class="path-tag">/efi</span>), que obligatoriamente es FAT32 por especificación UEFI.</p>
+<ul>
+<li><code>fsck.vfat -a /dev/sdaX</code> — revisa y repara automáticamente (<code>-a</code> = auto-fix sin preguntar).</li>
+<li><code>fatlabel /dev/sdaX NOMBRE</code> — cambia la etiqueta de la partición.</li>
+</ul>
+<div class="callout"><b>Relevante para tu instalación:</b> ya que usas GPT + UEFI, tu partición <span class="path-tag">/efi</span> depende de este paquete. Aunque técnicamente no es obligatorio tenerlo instalado en el sistema final (el kernel puede montarlo sin problema), sí lo necesitas si algún día quieres reparar o redimensionar esa partición.</div>
+</div>
+</details>
+<details>
+<summary>btrfs-progs, f2fs-tools, ntfs3g, zfs — solo si aplica</summary>
+<div class="content">
+<p>Estos no aplican a tu configuración actual (XFS/ext4 + FAT32), pero se dejan documentados para referencia:</p>
+<ul>
+<li><b>btrfs-progs</b>: <code>btrfs check</code>, <code>btrfs balance</code> (redistribuye datos entre discos), <code>btrfs subvolume</code> (crea subvolúmenes tipo snapshot).</li>
+<li><b>f2fs-tools</b>: pensado para memorias flash (USB, microSD). <code>fsck.f2fs</code>, <code>resize.f2fs</code>.</li>
+<li><b>ntfs3g</b>: <code>ntfsfix</code> repara errores básicos; no reemplaza <code>chkdsk</code> de Windows para reparaciones profundas.</li>
+<li><b>zfs</b>: administración por <i>pools</i>, no por partición individual — <code>zpool status</code>, <code>zpool scrub</code> (verifica integridad de datos con checksums).</li>
+</ul>
+</div>
+</details>
+<h2>¿Aplica systemd aquí?</h2>
+<p>
+No. Este capítulo es agnóstico al sistema de init — <code>emerge</code> y las herramientas de filesystem funcionan exactamente igual bajo OpenRC o systemd, porque son utilidades de Portage/kernel, no servicios. La diferencia OpenRC/systemd solo aparece cuando se trata de <i>automatizar</i> chequeos (por ejemplo, systemd tiene unidades <code>fstrim.timer</code> para SSDs vía <code>systemctl enable fstrim.timer</code>; en OpenRC eso se haría con un cronjob).
+</p>
+<h2>Extra: recomendación adicional del handbook</h2>
+<p>
+Si tu disco es un SSD/NVMe, el handbook recomienda instalar <code>sys-block/io-scheduler-udev-rules</code> para que el sistema use el planificador de E/S correcto automáticamente:
+</p>
+<pre><code>root # emerge --ask sys-block/io-scheduler-udev-rules</code></pre>
+<h2>Checklist rápido antes de avanzar al capítulo 43</h2>
+<ul>
+<li>✅ ¿Tu raíz es ext4? → no hay nada que hacer.</li>
+<li>✅ ¿Tu raíz es XFS u otro? → corre <code>emerge --ask sys-fs/&lt;paquete&gt;</code>.</li>
+<li>✅ ¿Vas a mantener tu <code>/efi</code> a futuro? → considera <code>dosfstools</code> si no lo tienes.</li>
+<li>➡️ Siguiente paso: capítulo 43-44, selección e instalación del bootloader (GRUB) — el paso más delicado de toda la instalación.</li>
+</ul>
+<footer>
+Compendio Gentoo · Capítulo 42 de la guía oficial (Handbook AMD64) · Generado para instalación con OpenRC + multilib + GPT/UEFI + GRUB/dracut
+</footer>
+</div>
+
+<div id="jagg-bottombar">
+<a href="cap-41-sincronizacion-tiempo.html">← Cap. 41: Capítulo 41 — Sincronización de tiempo</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-43-seleccion-bootloader.html">Cap. 43: Cap. 43–47 · Seleccionar e instalar el Bootloader →</a>
+</div>
+</body>
+</html>

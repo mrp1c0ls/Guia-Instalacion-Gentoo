@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 34 · Información de red — Compendio Gentoo</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --bg-alt:#161922;
+    --card:#1b1f2a;
+    --border:#2a2f3d;
+    --text:#e4e6eb;
+    --text-dim:#9aa1b2;
+    --accent:#7dd3fc;
+    --accent2:#a78bfa;
+    --green:#4ade80;
+    --yellow:#facc15;
+    --red:#f87171;
+    --code-bg:#11141c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+  }
+  header{
+    padding:2.5rem 1.5rem 1.5rem;
+    background:linear-gradient(160deg,var(--bg-alt),var(--bg));
+    border-bottom:1px solid var(--border);
+    text-align:center;
+  }
+  header .cap{
+    display:inline-block;
+    font-size:.85rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:rgba(125,211,252,.1);
+    border:1px solid rgba(125,211,252,.3);
+    padding:.25rem .75rem;
+    border-radius:999px;
+    margin-bottom:.75rem;
+  }
+  header h1{
+    margin:.25rem 0 .5rem;
+    font-size:1.9rem;
+  }
+  header p{color:var(--text-dim);max-width:640px;margin:0 auto}
+
+  main{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
+
+  section{margin-bottom:2.25rem}
+  h2{
+    font-size:1.3rem;
+    border-left:4px solid var(--accent2);
+    padding-left:.7rem;
+    margin-bottom:.9rem;
+  }
+  h3{font-size:1.05rem;color:var(--accent);margin:1.3rem 0 .5rem}
+
+  p{margin:.6rem 0}
+  ul,ol{padding-left:1.3rem}
+  li{margin:.3rem 0}
+
+  code{
+    background:var(--code-bg);
+    padding:.15rem .4rem;
+    border-radius:5px;
+    font-size:.88em;
+    color:#eab676;
+    font-family:"SF Mono",Consolas,Monaco,monospace;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:1rem 1.1rem;
+    overflow-x:auto;
+    margin:.6rem 0 1rem;
+  }
+  pre code{
+    background:none;padding:0;color:#d1d5db;font-size:.87rem;
+  }
+  .file-label{
+    font-size:.72rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:.3rem;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:1.1rem 1.3rem;
+    margin:.9rem 0;
+  }
+
+  .purpose{
+    display:flex;
+    gap:.6rem;
+    background:rgba(167,139,250,.08);
+    border:1px solid rgba(167,139,250,.25);
+    border-radius:10px;
+    padding:.7rem .9rem;
+    margin:.5rem 0 .9rem;
+    font-size:.93rem;
+  }
+  .purpose .icon{font-size:1.1rem}
+  .purpose b{color:var(--accent2)}
+
+  .risk{
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    padding:.2rem .6rem;
+    border-radius:999px;
+    margin-bottom:.5rem;
+  }
+  .risk-bajo{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.35)}
+  .risk-medio{background:rgba(250,204,21,.12);color:var(--yellow);border:1px solid rgba(250,204,21,.35)}
+  .risk-alto{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.35)}
+
+  .where{
+    font-size:.85rem;
+    color:var(--text-dim);
+    margin-top:.3rem;
+  }
+  .where b{color:var(--text)}
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:.8rem 0;
+    font-size:.9rem;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:.55rem .7rem;
+    text-align:left;
+  }
+  th{background:var(--bg-alt);color:var(--accent)}
+  tr:nth-child(even){background:rgba(255,255,255,.02)}
+
+  details{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    margin:.9rem 0;
+    padding:.2rem .3rem;
+  }
+  summary{
+    cursor:pointer;
+    padding:.8rem 1rem;
+    font-weight:600;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{
+    content:"＋";
+    color:var(--accent);
+    font-size:1.1rem;
+    transition:transform .2s;
+  }
+  details[open] summary::after{content:"－"}
+  details > .content{padding:0 1.1rem 1.1rem}
+
+  .badge-method{
+    display:inline-block;
+    font-size:.7rem;
+    background:rgba(125,211,252,.12);
+    color:var(--accent);
+    border:1px solid rgba(125,211,252,.3);
+    padding:.15rem .5rem;
+    border-radius:6px;
+    margin-left:.4rem;
+  }
+
+  .note{
+    border-left:3px solid var(--yellow);
+    background:rgba(250,204,21,.06);
+    padding:.6rem .9rem;
+    border-radius:6px;
+    font-size:.9rem;
+    margin:.6rem 0;
+  }
+  .warn{
+    border-left:3px solid var(--red);
+    background:rgba(248,113,113,.06);
+    padding:.6rem .9rem;
+    border-radius:6px;
+    font-size:.9rem;
+    margin:.6rem 0;
+  }
+
+  .summary-table td:first-child{white-space:nowrap;font-weight:600}
+
+  footer{
+    text-align:center;
+    padding:1.5rem;
+    color:var(--text-dim);
+    font-size:.8rem;
+    border-top:1px solid var(--border);
+  }
+
+  @media(max-width:600px){
+    header h1{font-size:1.5rem}
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">IX. fstab y red permanente</span>
+</div>
+<span class="jagg-badge">Cap. 34 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<header>
+<span class="cap">Capítulo 34</span>
+<h1>Información de red</h1>
+<p>Cómo dejar configurada la red del sistema ya instalado: nombre del equipo, resolución de nombres local y el método de conexión (DHCP, NetworkManager o netifrc). Enfoque: <b style="color:var(--accent)">OpenRC</b>.</p>
+</header>
+<main>
+<section>
+<h2>¿Para qué sirve este capítulo?</h2>
+<div class="purpose">
+<span class="icon">💡</span>
+<div>Hasta ahora usaste la red del <b>medio de instalación (live USB)</b>. Este capítulo configura la red que usará tu Gentoo <b>ya instalado</b>, la primera vez que arranque sin el USB. Si te lo saltas, el sistema instalado no tendrá internet al reiniciar.</div>
+</div>
+</section>
+<section>
+<h2>1. Nombre del equipo (hostname)</h2>
+<div class="risk risk-bajo">Riesgo bajo · reversible</div>
+<p>El <b>hostname</b> es el nombre que identifica tu máquina en la red local. No es una decisión permanente: se puede cambiar después sin problema.</p>
+<div class="where"><b>Dónde se configura:</b> <code>/etc/hostname</code></div>
+<div class="file-label">Comando (dentro del chroot)</div>
+<pre><code>echo tux &gt; /etc/hostname</code></pre>
+<div class="purpose"><span class="icon">🎯</span><div>Reemplaza <code>tux</code> por el nombre que quieras darle a tu equipo. Solo letras, números y guiones, sin espacios.</div></div>
+</section>
+<section>
+<h2>2. Archivo /etc/hosts</h2>
+<div class="risk risk-bajo">Riesgo bajo · reversible</div>
+<p><code>/etc/hosts</code> es una "libreta de contactos" local: traduce nombres a direcciones IP <b>sin necesidad de un servidor DNS</b>. Es lo primero que el sistema consulta antes de preguntarle a internet.</p>
+<div class="warn">⚠️ En sistemas <b>OpenRC</b> es obligatorio que el hostname elegido en el paso anterior también aparezca aquí. Si no coincide, pueden aparecer errores o demoras al arrancar servicios.</div>
+<div class="where"><b>Dónde se configura:</b> <code>/etc/hosts</code></div>
+<div class="file-label">Archivo /etc/hosts</div>
+<pre><code># Debe coincidir con /etc/hostname
+127.0.0.1   tux.homenetwork tux localhost
+::1         tux.homenetwork tux localhost
+
+# Opcional: otros equipos conocidos de tu red
+192.168.0.5 jenny.homenetwork jenny
+192.168.0.6 benny.homenetwork benny</code></pre>
+<p style="font-size:.88rem;color:var(--text-dim)">La línea con <code>127.0.0.1</code> es IPv4 "loopback" (la máquina hablándose a sí misma); la de <code>::1</code> es lo mismo en IPv6. Ambas deben existir.</p>
+</section>
+<section>
+<h2>3. Elegir el método de conexión</h2>
+<p>El handbook ofrece varias formas de conectar el sistema instalado. No hay que usar más de una a la vez.</p>
+<div class="warn">⚠️ <b>No mezcles gestores de red.</b> Si activas dos al mismo tiempo (por ejemplo netifrc y NetworkManager), van a pelear por controlar la misma interfaz y la red puede fallar de forma intermitente.</div>
+<table class="summary-table">
+<tr><th>Método</th><th>Ideal para</th><th>Init compatible</th></tr>
+<tr><td>dhcpcd</td><td>Ethernet con router doméstico, IP automática</td><td>Cualquiera</td></tr>
+<tr><td>NetworkManager</td><td>WiFi, laptops, escritorio</td><td>Cualquiera</td></tr>
+<tr><td><b>netifrc</b></td><td>Configuración clásica y control fino</td><td>Solo OpenRC ✅</td></tr>
+<tr><td>systemd-networkd</td><td>Equivalente de netifrc</td><td>Solo systemd</td></tr>
+</table>
+<details>
+<summary>Opción A — DHCP automático con dhcpcd <span class="badge-method">rápido</span></summary>
+<div class="content">
+<div class="risk risk-bajo">Riesgo bajo</div>
+<div class="purpose"><span class="icon">🎯</span><div>La forma más simple: tu router le asigna la IP a tu equipo automáticamente. Úsalo si no necesitas configuración especial.</div></div>
+<div class="where"><b>Dónde se configura:</b> nada que editar — el servicio hace todo solo.</div>
+<pre><code>emerge --ask net-misc/dhcpcd
+rc-update add dhcpcd default</code></pre>
+<p style="font-size:.88rem;color:var(--text-dim)"><code>rc-update add dhcpcd default</code> agrega el servicio al runlevel <code>default</code>, el conjunto de servicios que arrancan en cada boot normal.</p>
+</div>
+</details>
+<details>
+<summary>Opción B — NetworkManager <span class="badge-method">WiFi / escritorio</span></summary>
+<div class="content">
+<div class="risk risk-bajo">Riesgo bajo</div>
+<div class="purpose"><span class="icon">🎯</span><div>Gestiona Ethernet, WiFi y PPPoE por CLI, TUI o GUI. Preferido si vas a usar un entorno de escritorio.</div></div>
+<div class="where"><b>Dónde se configura:</b> <code>/etc/portage/make.conf</code> y <code>/etc/portage/package.use/</code></div>
+<div class="file-label">/etc/portage/make.conf</div>
+<pre><code>USE="${USE} networkmanager"</code></pre>
+<div class="file-label">/etc/portage/package.use/networkmanager</div>
+<pre><code>net-wireless/wpa_supplicant dbus</code></pre>
+<pre><code>emerge --ask net-misc/networkmanager
+rc-update add NetworkManager default</code></pre>
+</div>
+</details>
+<details open="">
+<summary>Opción C — netifrc <span class="badge-method">recomendado para tu setup OpenRC</span></summary>
+<div class="content">
+<div class="risk risk-medio">Riesgo medio · si te equivocas de interfaz, pierdes red al reiniciar</div>
+<div class="purpose"><span class="icon">🎯</span><div>La forma "nativa" de OpenRC. Toda la configuración vive en <b>un solo archivo</b>: <code>/etc/conf.d/net</code>. Te da control total sobre IP estática, rutas, DNS, etc.</div></div>
+<div class="where"><b>Dónde se configura:</b> <code>/etc/conf.d/net</code></div>
+<h3>Instalar el paquete</h3>
+<pre><code>emerge --ask --noreplace net-misc/netifrc</code></pre>
+<p style="font-size:.88rem;color:var(--text-dim)"><code>--noreplace</code> evita reinstalar si ya está presente, por si viene de fábrica en el stage3.</p>
+<h3>Configurar la interfaz</h3>
+<pre><code>nano /etc/conf.d/net</code></pre>
+<div class="file-label">Opción 1 — DHCP</div>
+<pre><code>config_eth0="dhcp"</code></pre>
+<div class="file-label">Opción 2 — IP estática</div>
+<pre><code>config_eth0="192.168.0.2 netmask 255.255.255.0 brd 192.168.0.255"
+routes_eth0="default via 192.168.0.1"</code></pre>
+<div class="note">📝 El nombre de tu interfaz real casi nunca es <code>eth0</code> hoy en día (suele ser algo como <code>enp3s0</code>). Verifícalo antes con <code>ip a</code> desde el entorno live, y reemplaza <code>eth0</code> por ese nombre en todo el proceso.</div>
+<h3>Activar la red al arrancar</h3>
+<pre><code>cd /etc/init.d
+ln -s net.lo net.eth0
+rc-update add net.eth0 default</code></pre>
+<p style="font-size:.88rem;color:var(--text-dim)"><b>¿Por qué un symlink?</b> <code>net.lo</code> es un script genérico de OpenRC que sabe leer <code>/etc/conf.d/net</code> y aplicar la configuración según el nombre con el que se le invoque. Al enlazarlo como <code>net.eth0</code>, ese mismo script configurará específicamente esa interfaz. Si tienes varias interfaces, repites el enlace para cada una (<code>net.wlan0</code>, etc.).</p>
+<h3>Si te equivocaste de nombre de interfaz tras reiniciar</h3>
+<ol style="font-size:.9rem">
+<li>Corrige el nombre en <code>/etc/conf.d/net</code></li>
+<li>Crea el nuevo enlace simbólico correcto</li>
+<li>Borra el enlace viejo: <code>rm /etc/init.d/net.eth0</code></li>
+<li>Agrega el nuevo al runlevel: <code>rc-update add net.enpXsY default</code></li>
+<li>Quita el viejo: <code>rc-update del net.eth0 default</code></li>
+</ol>
+</div>
+</details>
+<details>
+<summary>Opción D — systemd-networkd <span class="badge-method">solo si usas systemd</span></summary>
+<div class="content">
+<div class="risk risk-bajo">No aplica a tu instalación (usas OpenRC) · referencia</div>
+<div class="purpose"><span class="icon">🎯</span><div>Es el equivalente de netifrc pero para systemd. Se configura con archivos <code>.network</code> en estilo INI.</div></div>
+<div class="where"><b>Dónde se configura:</b> <code>/etc/systemd/network/*.network</code></div>
+<div class="file-label">/etc/systemd/network/50-dhcp.network</div>
+<pre><code>[Match]
+Name=en*
+
+[Network]
+DHCP=yes</code></pre>
+<pre><code>systemctl enable systemd-networkd.service</code></pre>
+</div>
+</details>
+</section>
+<section>
+<h2>4. Conceptos de red que conviene entender</h2>
+<details>
+<summary>CIDR — ¿qué significa el "/24"?</summary>
+<div class="content">
+<p>CIDR indica cuántos bits de la dirección IP pertenecen a la <b>red</b> y cuántos al <b>host</b>. Es la notación tipo <code>192.168.0.2/24</code>.</p>
+<ul>
+<li><b>/24</b> → 254 direcciones utilizables (el tamaño más común en redes domésticas)</li>
+<li><b>/32</b> → 1 sola dirección (un host individual)</li>
+</ul>
+<p>Fórmula: <code>2^(32 − CIDR) − 2</code> direcciones utilizables (se restan la dirección de red y la de broadcast).</p>
+</div>
+</details>
+<details>
+<summary>Gateway / ruta por defecto</summary>
+<div class="content">
+<p>El <b>gateway</b> (puerta de enlace) es el dispositivo — normalmente tu router — que reenvía tu tráfico hacia fuera de la red local, hacia internet. Es lo que le dice a tu equipo "todo lo que no sea de esta red, mándamelo a mí".</p>
+<pre><code># Ver rutas actuales
+ip route
+
+# Agregar ruta por defecto manualmente
+ip route add default via 192.168.0.1</code></pre>
+</div>
+</details>
+<details>
+<summary>DNS — traducir nombres a IPs</summary>
+<div class="content">
+<p>El DNS traduce nombres de dominio (<code>gentoo.org</code>) a direcciones IP. Se configura en <code>/etc/resolv.conf</code>.</p>
+<div class="file-label">/etc/resolv.conf</div>
+<pre><code>nameserver 1.1.1.1
+nameserver 1.0.0.1</code></pre>
+<div class="warn">⚠️ Si <code>dhcpcd</code> está corriendo, sobrescribirá este archivo automáticamente y tus cambios manuales no persistirán. Verifica con <code>ps x | grep dhcpcd</code>.</div>
+</div>
+</details>
+</section>
+<section>
+<div style="background:#0d1117;border:1px solid #2a3140;border-radius:10px;padding:1rem 1rem .5rem;margin:1.2rem auto;max-width:760px;">
+<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrow3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#4a5568"/>
+    </marker>
+  </defs>
+  <g font-family="monospace" font-size="11">
+    <rect x="20" y="10" width="680" height="42" rx="6" fill="#132116" stroke="#2d4a2d"/>
+    <text x="40" y="28" fill="#9ece6a">1. Interfaz activa</text>
+    <text x="40" y="44" fill="#8b93a3" font-size="10">ip link · ip addr</text>
+    <text x="500" y="36" fill="#6b7280" font-size="10">¿existe y está UP?</text>
+
+    <line x1="360" y1="52" x2="360" y2="66" stroke="#4a5568" stroke-width="1.6" marker-end="url(#arrow3)"/>
+
+    <rect x="20" y="68" width="680" height="42" rx="6" fill="#0f1e33" stroke="#2a4568"/>
+    <text x="40" y="86" fill="#7dd3fc">2. IP + CIDR asignada</text>
+    <text x="40" y="102" fill="#8b93a3" font-size="10">ip a · dhcpcd / netifrc</text>
+    <text x="500" y="94" fill="#6b7280" font-size="10">red local</text>
+
+    <line x1="360" y1="110" x2="360" y2="124" stroke="#4a5568" stroke-width="1.6" marker-end="url(#arrow3)"/>
+
+    <rect x="20" y="126" width="680" height="42" rx="6" fill="#221f18" stroke="#4a3820"/>
+    <text x="40" y="144" fill="#facc15">3. Ruta por defecto (gateway)</text>
+    <text x="40" y="160" fill="#8b93a3" font-size="10">ip route · ping -c3 1.1.1.1</text>
+    <text x="500" y="152" fill="#6b7280" font-size="10">salida a internet</text>
+
+    <line x1="360" y1="168" x2="360" y2="182" stroke="#4a5568" stroke-width="1.6" marker-end="url(#arrow3)"/>
+
+    <rect x="20" y="184" width="680" height="42" rx="6" fill="#1c1720" stroke="#4a3860"/>
+    <text x="40" y="202" fill="#c792ea">4. DNS resolviendo</text>
+    <text x="40" y="218" fill="#8b93a3" font-size="10">/etc/resolv.conf · curl gentoo.org</text>
+    <text x="500" y="210" fill="#6b7280" font-size="10">nombres → IP</text>
+  </g>
+</svg>
+<p style="text-align:center;color:#8b93a3;font-size:.78rem;margin:.4rem 0 0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">Diagnóstico por capas: si un nivel falla, el problema está ahí (no en los de arriba).</p></div><h2>5. Verificar que todo funciona</h2>
+<div class="card">
+<pre><code># Ver interfaces y direcciones asignadas
+ip a
+
+# Ver tabla de rutas
+ip r
+
+# Probar conectividad y resolución DNS
+ping -c 3 gentoo.org</code></pre>
+<p style="font-size:.88rem;color:var(--text-dim)">Si el <code>ping</code> responde, tienes conectividad e internet funcionando correctamente.</p>
+</div>
+</section>
+<section>
+<h2>Resumen de tu ruta (OpenRC)</h2>
+<ol>
+<li><code>echo tux &gt; /etc/hostname</code></li>
+<li>Reflejar el mismo nombre en <code>/etc/hosts</code></li>
+<li><code>emerge --ask --noreplace net-misc/netifrc</code></li>
+<li>Configurar <code>/etc/conf.d/net</code> (DHCP o IP estática)</li>
+<li>Crear el symlink y activar en el runlevel: <code>rc-update add net.eth0 default</code></li>
+<li>Verificar con <code>ip a</code> y <code>ping</code></li>
+</ol>
+</section>
+</main>
+<footer>Compendio Gentoo · Capítulo 34 — Información de red</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-33-fstab.html">← Cap. 33: Capítulo 33 · Información del sistema de archivos</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-35-system-information.html">Cap. 35: Capítulo 35 · System Information →</a>
+</div>
+</body>
+</html>

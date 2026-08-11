@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capítulo 12 — Configuración manual de red con IP estática</title>
+<style>
+  :root{
+    --bg:#0e1116;
+    --bg-panel:#161b22;
+    --border:#2a313c;
+    --text:#c9d1d9;
+    --text-dim:#8b949e;
+    --accent:#58a6ff;
+    --green:#3fb950;
+    --yellow:#d29922;
+    --red:#f85149;
+    --code-bg:#0a0d12;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    max-width:820px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+    line-height:1.6;
+  }
+  h1{
+    font-size:1.7rem;
+    border-bottom:2px solid var(--accent);
+    padding-bottom:12px;
+    margin-bottom:4px;
+  }
+  .subtitle{color:var(--text-dim);font-size:.95rem;margin-bottom:32px;}
+  h2{
+    font-size:1.25rem;
+    color:var(--accent);
+    margin-top:40px;
+    border-left:4px solid var(--accent);
+    padding-left:10px;
+  }
+  h3{font-size:1.05rem;color:var(--text);margin-top:24px;}
+  p{margin:10px 0;}
+  code{
+    background:var(--code-bg);
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:"SF Mono",Consolas,Monaco,monospace;
+    font-size:.9em;
+    color:#79c0ff;
+  }
+  pre{
+    background:var(--code-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+    margin:10px 0 4px;
+  }
+  pre code{
+    background:none;
+    padding:0;
+    color:#e6edf3;
+    display:block;
+  }
+  .prompt{color:#7ee787;}
+  .cmd-block{margin:16px 0 22px;}
+  .util{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-left:3px solid var(--green);
+    border-radius:6px;
+    padding:8px 12px;
+    margin-top:6px;
+    font-size:.9rem;
+  }
+  .util .label{color:var(--green);font-weight:600;white-space:nowrap;}
+  .risk{
+    display:inline-block;
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:.03em;
+    padding:2px 9px;
+    border-radius:999px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .risk-bajo{background:rgba(63,185,80,.15);color:var(--green);border:1px solid var(--green);}
+  .risk-medio{background:rgba(210,153,34,.15);color:var(--yellow);border:1px solid var(--yellow);}
+  .risk-alto{background:rgba(248,81,73,.15);color:var(--red);border:1px solid var(--red);}
+  .warn{
+    background:rgba(210,153,34,.08);
+    border:1px solid var(--yellow);
+    border-radius:6px;
+    padding:10px 14px;
+    margin:14px 0;
+    font-size:.92rem;
+  }
+  .warn strong{color:var(--yellow);}
+  .tip{
+    background:rgba(88,166,255,.08);
+    border:1px solid var(--accent);
+    border-radius:6px;
+    padding:10px 14px;
+    margin:14px 0;
+    font-size:.92rem;
+  }
+  .tip strong{color:var(--accent);}
+  details{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 16px;
+    margin:16px 0;
+  }
+  summary{
+    cursor:pointer;
+    font-weight:600;
+    color:var(--accent);
+  }
+  summary:hover{color:#79c0ff;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0;
+    font-size:.9rem;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:8px 10px;
+    text-align:left;
+  }
+  th{background:var(--bg-panel);color:var(--accent);}
+  .flow{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px;
+    margin:16px 0;
+    text-align:center;
+    font-size:.9rem;
+  }
+  .flow .step{
+    display:inline-block;
+    background:var(--code-bg);
+    border:1px solid var(--accent);
+    border-radius:6px;
+    padding:6px 12px;
+    margin:4px;
+    color:var(--accent);
+  }
+  .flow .arrow{color:var(--text-dim);}
+  footer{
+    margin-top:50px;
+    padding-top:16px;
+    border-top:1px solid var(--border);
+    color:var(--text-dim);
+    font-size:.85rem;
+    text-align:center;
+  }
+</style>
+
+<style id="jagg-nav-css">
+  #jagg-topbar{
+    background:#0a0c10;border-bottom:1px solid #262b36;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:.55rem 1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:.75rem;flex-wrap:wrap;font-size:.82rem;position:relative;z-index:999;
+  }
+  #jagg-topbar a{color:#7dd3fc;text-decoration:none;margin-right:.9rem;}
+  #jagg-topbar a:hover{text-decoration:underline;}
+  #jagg-topbar .jagg-crumb{color:#8b93a3;}
+  #jagg-topbar .jagg-nav-links{display:flex;gap:1rem;align-items:center;}
+  #jagg-topbar .jagg-badge{
+    background:#152238;border:1px solid #24405f;color:#7dd3fc;border-radius:999px;
+    padding:.1rem .6rem;font-size:.72rem;white-space:nowrap;
+  }
+  .jaggnote{
+    max-width:900px;margin:1rem auto 0;background:#12203a;border:1px solid #2a4568;
+    border-left:4px solid #7dd3fc;border-radius:6px;padding:.7rem 1rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:.88rem;
+    color:#cfe0f5;line-height:1.5;
+  }
+  .jaggnote a{color:#7dd3fc;}
+  #jagg-bottombar{
+    background:#0a0c10;border-top:1px solid #262b36;margin-top:2rem;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    padding:1rem;display:flex;align-items:center;justify-content:space-between;
+    gap:1rem;flex-wrap:wrap;font-size:.85rem;
+  }
+  #jagg-bottombar a{color:#7dd3fc;text-decoration:none;padding:.4rem .9rem;border:1px solid #24405f;border-radius:6px;}
+  #jagg-bottombar a:hover{background:#152238;}
+</style>
+</head>
+<body>
+<div id="jagg-topbar">
+<div class="jagg-nav-links">
+<a href="index.html">← Índice</a>
+<span class="jagg-crumb">III. Red durante la instalación (medio live)</span>
+</div>
+<span class="jagg-badge">Cap. 12 · Compendio Gentoo · JorgeAGG</span>
+</div>
+
+<h1>Capítulo 12: Configuración manual de red con IP estática</h1>
+<p class="subtitle">Handbook de Gentoo AMD64 — Sección de instalación / redes</p>
+<p>Este capítulo aplica en la práctica lo visto en la teoría de redes (interfaces, CIDR, rutas y DNS). Aquí se configura <strong>a mano</strong> una IP fija, la ruta de salida a internet y el servidor DNS, todo desde el <strong>medio de instalación en vivo</strong> — es decir, es temporal, sirve solo para tener internet mientras instalas. La configuración permanente del sistema final se hace más adelante (con <code>netifrc</code> o <code>systemd-networkd</code>).</p>
+<div class="flow">
+<span class="step">1. IP local</span> <span class="arrow">→</span>
+<span class="step">2. Ruta por defecto</span> <span class="arrow">→</span>
+<span class="step">3. DNS</span> <span class="arrow">→</span>
+<span class="step">Internet funcionando</span>
+</div>
+<h2>12.1 Configurar la dirección IP de la interfaz</h2>
+<p>Le asignas una dirección IP a tu tarjeta de red (aquí <code>enp1s0</code>) usando el comando <code>ip</code>, parte del paquete <code>sys-apps/iproute2</code>.</p>
+<div class="cmd-block">
+<pre><code><span class="prompt">root #</span> ip address add 192.168.0.2/24 dev enp1s0</code></pre>
+<div class="util"><span class="label">Para qué sirve:</span> le da identidad a tu equipo dentro de la red local. Sin esto, nadie puede "verte" en la red.</div>
+</div>
+<span class="risk risk-bajo">RIESGO BAJO</span> — es completamente reversible, solo se pierde al reiniciar (vive en memoria, no se guarda en disco).
+
+<div class="warn"><strong>Cuidado:</strong> la IP se pone a mano, así que puede chocar con la de otro dispositivo ya conectado a la red (conflicto de IP). Revisa que el número que elijas esté libre.</div>
+<div class="tip"><strong>Atajo:</strong> <code>ip a</code> es lo mismo que <code>ip address</code>.</div>
+<h2>12.2 Configurar la ruta por defecto (gateway)</h2>
+<p>Con solo el paso anterior, tu equipo ya puede hablar con otros dispositivos de <strong>la misma red local</strong>, pero no con internet. Falta decirle cuál es la "puerta de salida" (normalmente tu router).</p>
+<div class="cmd-block">
+<pre><code><span class="prompt">root #</span> ip route add default via 192.168.0.1</code></pre>
+<div class="util"><span class="label">Para qué sirve:</span> le dice al sistema "todo el tráfico que no sea para mi red local, mándalo por aquí" — es la puerta hacia internet.</div>
+</div>
+<p>Para revisar qué rutas están activas:</p>
+<pre><code><span class="prompt">root #</span> ip route</code></pre>
+<div class="tip"><strong>Atajo:</strong> <code>ip r</code> es lo mismo que <code>ip route</code>.</div>
+<h2>12.3 Configuración de DNS</h2>
+<p>El DNS traduce nombres como <code>gentoo.org</code> a direcciones IP. En Linux se define en <code>/etc/resolv.conf</code>.</p>
+<div class="cmd-block">
+<pre><code><span class="prompt">root #</span> nano /etc/resolv.conf</code></pre>
+<div class="util"><span class="label">Para qué sirve:</span> abre el archivo donde defines qué servidores DNS usar, para poder navegar por nombre y no solo por IP.</div>
+</div>
+<p>Dentro se agregan líneas <code>nameserver</code> (se consultan en el orden en que aparecen):</p>
+<table>
+<tr><th>Proveedor</th><th>Contenido del archivo</th></tr>
+<tr><td>Cloudflare</td><td><code>nameserver 1.1.1.1</code><br/><code>nameserver 1.0.0.1</code></td></tr>
+<tr><td>Quad9</td><td><code>nameserver 9.9.9.9</code><br/><code>nameserver 149.112.112.112</code></td></tr>
+</table>
+<div class="warn"><strong>Cuidado:</strong> si <code>dhcpcd</code> está corriendo, va a sobrescribir tus cambios a <code>resolv.conf</code> automáticamente. Verifica primero con <code>ps x | grep dhcpcd</code>.</div>
+<p>Para confirmar que todo funciona:</p>
+<pre><code><span class="prompt">root #</span> ping -c 3 gentoo.org</code></pre>
+<div class="util"><span class="label">Para qué sirve:</span> si responde, tienes IP, ruta y DNS funcionando al mismo tiempo — luz verde para seguir con la partición de discos.</div>
+<h2>Extra: diagnóstico rápido si algo falla</h2>
+<p>El handbook lo menciona disperso en capítulos anteriores, pero conviene tenerlo junto como checklist de diagnóstico:</p>
+<table>
+<tr><th>Comando</th><th>Qué revisa</th></tr>
+<tr><td><code>ping -c 3 1.1.1.1</code></td><td>Conectividad básica a internet (por IP, sin depender de DNS)</td></tr>
+<tr><td><code>curl --location gentoo.org --output /dev/null</code></td><td>Acceso HTTPS + que el DNS resuelva nombres</td></tr>
+<tr><td><code>ip link</code></td><td>Si la interfaz de red existe y está activa (<code>UP</code>)</td></tr>
+</table>
+<div class="tip"><strong>Lógica de diagnóstico:</strong> si el ping a <code>1.1.1.1</code> funciona pero <code>curl a gentoo.org</code> falla, el problema es DNS, no la conexión. Aísla el problema por partes en vez de adivinar.</div>
+<details>
+<summary>¿Por qué esta config no sobrevive un reinicio?</summary>
+<p>Los comandos <code>ip address</code> e <code>ip route</code> modifican la configuración de red en memoria (kernel), no escriben nada en disco. Es ideal para el entorno live de instalación, pero para que la IP estática persista en el sistema ya instalado, se necesita configurarla en <code>/etc/conf.d/net</code> (con <code>netifrc</code> en OpenRC) o en un archivo <code>.network</code> (con <code>systemd-networkd</code>), pasos que se ven en capítulos posteriores del proceso de instalación.</p>
+</details>
+<details>
+<summary>Repaso relámpago de CIDR (¿por qué /24?)</summary>
+<p><code>/24</code> equivale a la máscara <code>255.255.255.0</code> y define cuántos equipos caben en la red: 254 direcciones usables. Es el tamaño más común para redes domésticas y de laboratorio. La fórmula general es <code>2^(32-CIDR) - 2</code>.</p>
+</details>
+<footer>
+  Compendio de instalación de Gentoo — Capítulo 12 · Generado como material de apoyo de estudio
+</footer>
+
+<div id="jagg-bottombar">
+<a href="cap-11-internet-ip-basics.html">← Cap. 11: Capítulo 11 — Conceptos básicos de Internet e IP</a>
+<a href="index.html">Índice del compendio</a>
+<a href="cap-02-particionado-intro.html">Cap. 02: Capítulo 2: Particionado del disco →</a>
+</div>
+</body>
+</html>
